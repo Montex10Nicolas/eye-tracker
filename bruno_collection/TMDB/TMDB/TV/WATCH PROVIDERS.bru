@@ -1,0 +1,23 @@
+meta {
+  name: WATCH PROVIDERS
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseURL}}/tv/{{seriesID}}/season/{{seasonNumber}}/watch/providers?language=it-IT
+  body: none
+  auth: none
+}
+
+query {
+  language: it-IT
+}
+
+vars:pre-request {
+  seasonNumber: 1
+}
+
+docs {
+  This does not have full information about every state so I don't think I will implement this router
+}

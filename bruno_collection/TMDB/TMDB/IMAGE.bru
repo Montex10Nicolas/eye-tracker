@@ -1,0 +1,17 @@
+meta {
+  name: IMAGE
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://image.tmdb.org/t/p/w{{width}}_and_h{{height}}_face/{{image_url}}
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  width: 1920
+  height: 1080
+  image_url: 3Ujyp6wzwcfPp76K7XqP5CYYxPE.jpg
+}

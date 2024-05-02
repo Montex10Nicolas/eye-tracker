@@ -1,0 +1,20 @@
+meta {
+  name: DETAILS
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseURL}}/tv/{{seriesID}}?language=us-US
+  body: none
+  auth: none
+}
+
+query {
+  language: us-US
+  ~append_to_response: reviews,keywords
+}
+
+vars:pre-request {
+  seriesID: 3215
+}
