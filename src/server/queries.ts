@@ -58,6 +58,7 @@ export async function MultiSearch(query: string) {
 
 export async function GetMovieDetail(id: number) {
   const url = new URL(`3/movie/${id}`, TMDB_URL);
+  url.searchParams.set("append_to_response", "credits,images,videos");
 
   const response = await fetch(url, {
     headers: {
