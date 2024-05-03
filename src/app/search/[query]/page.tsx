@@ -73,18 +73,18 @@ function DisplayPerson(props: { result: PersonSearchType }) {
 function DipsplaySerie(props: { result: TVResultType }) {
   const found = props.result;
   return (
-    <div className="max-w-[200px] cursor-pointer bg-sky-600 hover:border-yellow-600">
+    <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600">
       <Image
         src={TMDB_IMAGE_URL(50, 150, found.backdrop_path)}
         width={500}
         height={300}
         alt={`Poster ${found.name}`}
-        className="image min-h-[300px] min-w-[200px] rounded-b-3xl object-cover"
+        className="image min-h-[300px] min-w-[200px] overflow-hidden rounded-b-3xl object-cover transition-all duration-200 ease-in-out hover:relative hover:top-[-16px] hover:scale-110"
       />
       <div className="p-2">
         <div>{found.name}</div>
         <div className="flex justify-between">
-          <span>{displayHumanDate(found.first_air_date)}</span>
+          <span>First episode: {displayHumanDate(found.first_air_date)}</span>
           <span>{found.origin_country}</span>
         </div>
       </div>
@@ -95,18 +95,18 @@ function DipsplaySerie(props: { result: TVResultType }) {
 function DisplayMovies(props: { result: MovieResultType }) {
   const found = props.result;
   return (
-    <div className="min-h-[300px] max-w-[200px] cursor-pointer bg-sky-600 hover:border-yellow-600">
+    <div className="min-h-[300px] max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600">
       <Image
         src={TMDB_IMAGE_URL(50, 150, found.backdrop_path)}
         width={500}
         height={300}
         alt={`Poster ${found.title}`}
-        className="image min-h-[300px] min-w-[200px] rounded-b-3xl object-cover"
+        className="image min-h-[300px] min-w-[200px] overflow-hidden rounded-b-3xl object-cover transition-all duration-200 ease-in-out hover:relative hover:top-[-16px] hover:scale-110"
       />
       <div className="p-2">
         <div>{found.title}</div>
         <div className="flex justify-between">
-          <span>{displayHumanDate(found.release_date)}</span>
+          <span>Released in: {displayHumanDate(found.release_date)}</span>
         </div>
       </div>
     </div>
