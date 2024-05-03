@@ -1,6 +1,7 @@
 import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
+import { redirect } from "next/navigation";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,9 +19,31 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  async function searchMovieSeries(formData: FormData) {
+    "use server";
+    const search = formData.get("search") as string;
+
+    redirect(`/search/${search}`);
+  }
+
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable}`}>{children}</body>
+      <body
+        className={`font-sans ${inter.variable} flex min-h-screen flex-col bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white`}
+      >
+        <div className="flex w-full flex-col items-center justify-center gap-4 pb-6">
+          <h1 className="text-5xl">The Eye Tracker</h1>
+          <form action={searchMovieSeries}>
+            <input
+              type="text"
+              className="w-96 rounded-2xl p-2 text-black"
+              placeholder="Search your a Movie or Series"
+              name="search"
+            />
+          </form>
+        </div>
+        {children}
+      </body>
     </html>
   );
 }
