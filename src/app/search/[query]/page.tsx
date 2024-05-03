@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { MultiSearch, TMDB_IMAGE_URL } from "~/server/queries";
 import {
   type MovieResultType,
@@ -94,21 +95,23 @@ function DipsplaySerie(props: { result: TVResultType }) {
 function DisplayMovies(props: { result: MovieResultType }) {
   const found = props.result;
   return (
-    <div className="min-h-[300px] max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600">
-      <Image
-        src={TMDB_IMAGE_URL(50, 150, found.backdrop_path)}
-        width={500}
-        height={300}
-        alt={`Poster ${found.title}`}
-        className="image min-h-[300px] min-w-[200px] overflow-hidden rounded-b-3xl object-cover transition-all duration-200 ease-in-out hover:relative hover:top-[-16px] hover:scale-110"
-      />
-      <div className="p-2">
-        <div>{found.title}</div>
-        <div className="flex justify-between">
-          <span>Released in: {displayHumanDate(found.release_date)}</span>
+    <Link href={`/detail/movie/${found.id}`}>
+      <div className="min-h-[300px] max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600">
+        <Image
+          src={TMDB_IMAGE_URL(50, 150, found.backdrop_path)}
+          width={500}
+          height={300}
+          alt={`Poster ${found.title}`}
+          className="image min-h-[300px] min-w-[200px] overflow-hidden rounded-b-3xl object-cover transition-all duration-200 ease-in-out hover:relative hover:top-[-16px] hover:scale-110"
+        />
+        <div className="p-2">
+          <div>{found.title}</div>
+          <div className="flex justify-between">
+            <span>Released in: {displayHumanDate(found.release_date)}</span>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 

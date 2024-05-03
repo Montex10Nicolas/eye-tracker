@@ -54,3 +54,17 @@ export async function MultiSearch(query: string) {
   const data: unknown = await response.json();
   return data as Search<MovieResultType & PersonSearchType & TVResultType>;
 }
+
+export async function MovieDetail(id: number) {
+  const url = new URL(`3/movie/${id}`);
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: Authorization,
+    },
+  });
+
+  if (response.status !== 200) {
+    throw new Error("Smething went wrong");
+  }
+}
