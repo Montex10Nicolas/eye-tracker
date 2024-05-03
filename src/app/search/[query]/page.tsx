@@ -50,7 +50,6 @@ function DisplayPerson(props: { result: PersonSearchType }) {
   const person = props.result;
 
   return (
-    // <div className="max-w-[200px] cursor-pointer bg-sky-600 transition-transform duration-200 ease-in-out  hover:scale-105">
     <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600">
       <Image
         src={TMDB_IMAGE_URL(50, 150, person.profile_path)}
