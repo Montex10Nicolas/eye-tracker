@@ -31,7 +31,7 @@ export default function RootLayout({
       <body
         className={`font-sans ${inter.variable} flex min-h-screen flex-col bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white`}
       >
-        <div className="flex w-full flex-col items-center justify-center gap-4 pb-6">
+        <div className="flex w-full flex-col items-center justify-center gap-4 py-6">
           <h1 className="text-5xl">The Eye Tracker</h1>
           <form action={searchMovieSeries}>
             <input
