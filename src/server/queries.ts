@@ -1,4 +1,5 @@
 import {
+  type MovieDetail,
   type MovieResultType,
   type PersonSearchType,
   type Search,
@@ -55,8 +56,8 @@ export async function MultiSearch(query: string) {
   return data as Search<MovieResultType & PersonSearchType & TVResultType>;
 }
 
-export async function MovieDetail(id: number) {
-  const url = new URL(`3/movie/${id}`);
+export async function GetMovieDetail(id: number) {
+  const url = new URL(`3/movie/${id}`, TMDB_URL);
 
   const response = await fetch(url, {
     headers: {
@@ -67,4 +68,7 @@ export async function MovieDetail(id: number) {
   if (response.status !== 200) {
     throw new Error("Smething went wrong");
   }
+
+  const data: unknown = await response.json();
+  return data as MovieDetail;
 }
