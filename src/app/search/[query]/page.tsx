@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { displayHumanDate } from "~/_utils/utils";
-import { MultiSearch, TMDB_IMAGE_URL } from "~/server/queries";
+import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
+import { MultiSearch } from "~/server/queries";
 import {
   type MovieResultType,
   type PersonSearchType,
@@ -38,10 +38,10 @@ function DisplayPerson(props: { result: PersonSearchType }) {
   const person = props.result;
 
   return (
-    <Link href={`/person/${person.id}`}>
+    <Link href={`/detail/person/${person.id}`}>
       <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600">
         <Image
-          src={TMDB_IMAGE_URL(50, 150, person.profile_path)}
+          src={TMDB_IMAGE_URL(person.profile_path)}
           width={200}
           height={300}
           alt={`Poster ${person.name}`}
@@ -64,7 +64,7 @@ function DipsplaySerie(props: { result: TVResultType }) {
   return (
     <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600">
       <Image
-        src={TMDB_IMAGE_URL(50, 150, found.backdrop_path)}
+        src={TMDB_IMAGE_URL(found.backdrop_path)}
         width={500}
         height={300}
         alt={`Poster ${found.name}`}
@@ -87,7 +87,7 @@ function DisplayMovies(props: { result: MovieResultType }) {
     <Link href={`/detail/movie/${found.id}`}>
       <div className="min-h-[300px] max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600">
         <Image
-          src={TMDB_IMAGE_URL(50, 150, found.backdrop_path)}
+          src={TMDB_IMAGE_URL(found.backdrop_path)}
           width={500}
           height={300}
           alt={`Poster ${found.title}`}

@@ -11,3 +11,7 @@ export function displayHumanDate(date: string) {
 
   return `${parts[1]}/${parts[2]}/${parts[0]}`;
 }
+
+export const TMDB_IMAGE_URL = function (image_url: string) {
+  return `https://image.tmdb.org/t/p/original/${image_url}`;
+};

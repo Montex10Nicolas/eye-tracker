@@ -1,19 +1,12 @@
 import {
   type MovieDetail,
   type MovieResultType,
+  type PersonDetailType,
   type PersonSearchType,
   type Search,
   type TVResultType,
 } from "~/types/tmdb";
 
-export const TMDB_IMAGE_URL = function (
-  width: number,
-  height: number,
-  image_url: string,
-) {
-  return `https://image.tmdb.org/t/p/original/${image_url}`;
-  // return `https://image.tmdb.org/t/p/w${width}_and_h${height}_face/${image_url}`;
-};
 const TMDB_URL = "https://api.themoviedb.org";
 const TMDB_TOKEN = process.env.TMDB_TOKEN;
 
@@ -76,6 +69,7 @@ export async function GetMovieDetail(id: number) {
 
 export async function GetPersonDetail(id: number) {
   const url = new URL(`3/person/${id}`, TMDB_URL);
+  console.log(url);
   url.searchParams.set("append_to_response", "movie_credits,tv_credits,images");
 
   const response = await fetch(url, {
@@ -85,8 +79,10 @@ export async function GetPersonDetail(id: number) {
   });
 
   if (response.status !== 200) {
-    throw new Error("Something wrong");
+    throw new Error(
+      `Something wrong, ${response.status}, ${response.statusText}`,
+    );
   }
   const data: unknown = await response.json();
-  return data as PersonDetail;
+  return data as PersonDetailType;
 }

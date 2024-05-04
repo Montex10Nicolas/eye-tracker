@@ -1,10 +1,10 @@
 import Image from "next/image";
-import { displayHumanDate } from "~/_utils/utils";
+import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { GetMovieDetail, TMDB_IMAGE_URL } from "~/server/queries";
+import { GetMovieDetail } from "~/server/queries";
 import { type Cast, type Crew, type MovieDetail } from "~/types/tmdb";
 import PersonSummary from "../../_components/DisplayPerson";
 
@@ -31,7 +31,7 @@ export default async function MovieDetail(props: {
   return (
     <main className="px-8 py-2">
       <Image
-        src={TMDB_IMAGE_URL(100, 100, movie.poster_path)}
+        src={TMDB_IMAGE_URL(movie.poster_path)}
         width={200}
         height={100}
         alt={`Poster ${movie.title}`}
@@ -83,7 +83,7 @@ function bho() {
               {image.iso_639_1}
             </p>
             <Image
-              src={`${TMDB_IMAGE_URL(50, 50, image.file_path)}`}
+              src={`${TMDB_IMAGE_URL(image.file_path)}`}
               width={image.width}
               height={image.height}
               alt={image.file_path}
@@ -100,7 +100,7 @@ function bho() {
             </p>
             <Image
               key={image.file_path + idx}
-              src={`${TMDB_IMAGE_URL(50, 50, image.file_path)}`}
+              src={`${TMDB_IMAGE_URL(image.file_path)}`}
               width={image.width}
               height={image.height}
               alt={image.file_path}
@@ -116,7 +116,7 @@ function bho() {
               {image.iso_639_1}
             </p>
             <Image
-              src={`${TMDB_IMAGE_URL(50, 50, image.file_path)}`}
+              src={`${TMDB_IMAGE_URL(image.file_path)}`}
               width={image.width}
               height={image.height}
               alt={image.file_path}
