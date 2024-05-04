@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { DateDiff, TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
+import {
+  DateDiff,
+  TMDB_IMAGE_URL,
+  ageCalculator,
+  displayHumanDate,
+} from "~/_utils/utils";
 import { GetPersonDetail } from "~/server/queries";
 import {
   type MovieCredits,
@@ -68,13 +73,11 @@ export default async function PersonDetail(props: {
           <div>{person.name}</div>
           <div>
             {displayHumanDate(person.birthday)}
-            {person.deathday === null ? (
-              <span className="ml-2">
-                {DateDiff.inYears(new Date(person.birthday), new Date())}yo
-              </span>
-            ) : (
-              displayHumanDate(person.deathday)
-            )}
+            <span className="ml-2">
+              {person.deathday === null
+                ? ageCalculator(new Date(person.birthday), new Date())
+                : displayHumanDate(person.deathday)}
+            </span>
           </div>
           <div>{person.biography}</div>
         </div>

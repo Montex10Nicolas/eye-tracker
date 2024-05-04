@@ -1,3 +1,5 @@
+import { year } from "drizzle-orm/mysql-core";
+
 // Convert US date in EU date
 export function displayHumanDate(date: string) {
   const parts = date.split("-");
@@ -12,31 +14,10 @@ export const TMDB_IMAGE_URL = function (image_url: string) {
   return `https://image.tmdb.org/t/p/original/${image_url}`;
 };
 
-export const DateDiff = {
-  inDays: function (d1: Date, d2: Date) {
-    const t2 = d2.getTime();
-    const t1 = d1.getTime();
+export function ageCalculator(d1: Date, d2: Date) {
+  let years = d2.getFullYear() - d1.getFullYear();
+  const months = d2.getMonth() - d1.getMonth();
+  if (months < 0) years--;
 
-    return Math.floor((t2 - t1) / (24 * 3600 * 1000));
-  },
-
-  inWeeks: function (d1: Date, d2: Date) {
-    const t2 = d2.getTime();
-    const t1 = d1.getTime();
-
-    return (t2 - t1) / (24 * 3600 * 1000 * 7);
-  },
-
-  inMonths: function (d1: Date, d2: Date) {
-    const d1Y = d1.getFullYear();
-    const d2Y = d2.getFullYear();
-    const d1M = d1.getMonth();
-    const d2M = d2.getMonth();
-
-    return d2M + 12 * d2Y - (d1M + 12 * d1Y);
-  },
-
-  inYears: function (d1: Date, d2: Date) {
-    return d2.getFullYear() - d1.getFullYear();
-  },
-};
+  return years;
+}
