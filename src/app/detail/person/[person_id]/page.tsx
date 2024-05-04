@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  DateDiff,
   TMDB_IMAGE_URL,
   ageCalculator,
   displayHumanDate,
@@ -31,20 +30,18 @@ function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
     }
   }
 
-  const sorted = removed_duplicate.sort((a, b) => {
-    let date_a: Date = new Date(),
-      date_b: Date = new Date();
+  // Check the data using the movie or tv proprierty
+  function getData(person: PersonsCast) {
+    return person.first_air_date
+      ? new Date(person.first_air_date)
+      : person.release_date
+        ? new Date(person.release_date)
+        : new Date();
+  }
 
-    date_a = a.first_air_date
-      ? new Date(a.first_air_date)
-      : a.release_date
-        ? new Date(a.release_date)
-        : new Date();
-    date_b = b.first_air_date
-      ? new Date(b.first_air_date)
-      : b.release_date
-        ? new Date(b.release_date)
-        : new Date();
+  const sorted = removed_duplicate.sort((a, b) => {
+    const date_a: Date = getData(a),
+      date_b: Date = getData(b);
 
     return date_b.getTime() - date_a.getTime();
   });
@@ -56,14 +53,13 @@ export default async function PersonDetail(props: {
   params: { person_id: number };
 }) {
   const person = await GetPersonDetail(props.params.person_id);
-
   const credits = mergeCredits(person.movie_credits, person.tv_credits);
 
   return (
     <div className="m-4">
       <div className="flex flex-row gap-4">
         <Image
-          className="max-h-[300] shrink-0"
+          className="max-h-[300px] shrink-0"
           src={`${TMDB_IMAGE_URL(person.profile_path)}`}
           alt={`Profile ${person.name}`}
           width={200}
