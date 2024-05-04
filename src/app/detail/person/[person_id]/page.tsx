@@ -39,7 +39,9 @@ function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
       continue;
     }
 
-    final.push(merged[i]);
+    const new_item = merged[i] ? merged[i] : null;
+    if (new_item === null || new_item === undefined) continue;
+    final.push(new_item);
   }
 
   return final;
