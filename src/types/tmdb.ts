@@ -217,8 +217,8 @@ export interface PersonDetailType {
 }
 
 export interface MovieCredits {
-  cast: Cast[];
-  crew: Crew[];
+  cast: PersonsCast[];
+  crew: PersonsCast[];
 }
 
 // Acting of a person
@@ -232,7 +232,8 @@ export interface PersonsCast {
   overview: string;
   popularity: number;
   poster_path?: string;
-  release_date: string;
+  release_date?: string;
+  first_air_date?: string;
   title: string;
   video: boolean;
   vote_average: number;
@@ -240,32 +241,34 @@ export interface PersonsCast {
   character: string;
   credit_id: string;
   order: number;
+  department?: string;
+  job?: string;
 }
 
-// Work in a crew of a person
-export interface PersonsCrew {
-  adult: boolean;
-  backdrop_path?: string;
-  genre_ids: number[];
-  id: number;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path?: string;
-  release_date: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
-  credit_id: string;
-  department: string;
-  job: string;
-}
+// // Work in a crew of a person
+// export interface PersonsCrew {
+//   adult: boolean;
+//   backdrop_path?: string;
+//   genre_ids: number[];
+//   id: number;
+//   original_language: string;
+//   original_title: string;
+//   overview: string;
+//   popularity: number;
+//   poster_path?: string;
+//   release_date: string;
+//   title: string;
+//   video: boolean;
+//   vote_average: number;
+//   vote_count: number;
+//   credit_id: string;
+//   department: string;
+//   job: string;
+// }
 
 export interface TvCredits {
-  cast: Cast[];
-  crew: Crew[];
+  cast: PersonsCast[];
+  crew: PersonsCast[];
 }
 
 export interface Images {

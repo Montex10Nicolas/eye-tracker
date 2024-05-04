@@ -6,7 +6,7 @@ import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetMovieDetail } from "~/server/queries";
 import { type Cast, type Crew, type MovieDetail } from "~/types/tmdb";
-import PersonSummary from "../../_components/DisplayPerson";
+import PersonSummary from "../../_components/Summary";
 
 function RenderCastCrew(props: { persons: Crew[] | Cast[] }) {
   return (

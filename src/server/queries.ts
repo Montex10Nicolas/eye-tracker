@@ -69,7 +69,6 @@ export async function GetMovieDetail(id: number) {
 
 export async function GetPersonDetail(id: number) {
   const url = new URL(`3/person/${id}`, TMDB_URL);
-  console.log(url);
   url.searchParams.set("append_to_response", "movie_credits,tv_credits,images");
 
   const response = await fetch(url, {
