@@ -5,7 +5,6 @@ import { GetPersonDetail } from "~/server/queries";
 import {
   type MovieCredits,
   type PersonsCast,
-  type PersonsCrew,
   type TvCredits,
 } from "~/types/tmdb";
 
