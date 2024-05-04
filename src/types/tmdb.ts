@@ -195,3 +195,89 @@ export interface Result {
   published_at: string;
   id: string;
 }
+
+export interface PersonDetailType {
+  adult: boolean;
+  also_known_as: string[];
+  biography: string;
+  birthday: string;
+  deathday: string | null;
+  gender: number;
+  homepage: string | null;
+  id: number;
+  imdb_id: string;
+  known_for_department: string;
+  name: string;
+  place_of_birth: string;
+  popularity: number;
+  profile_path: string;
+  movie_credits: MovieCredits;
+  tv_credits: TvCredits;
+  images: Images;
+}
+
+export interface MovieCredits {
+  cast: Cast[];
+  crew: Crew[];
+}
+
+// Acting of a person
+export interface PersonsCast {
+  adult: boolean;
+  backdrop_path?: string;
+  genre_ids: number[];
+  id: number;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path?: string;
+  release_date: string;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+  character: string;
+  credit_id: string;
+  order: number;
+}
+
+// Work in a crew of a person
+export interface PersonsCrew {
+  adult: boolean;
+  backdrop_path?: string;
+  genre_ids: number[];
+  id: number;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path?: string;
+  release_date: string;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+  credit_id: string;
+  department: string;
+  job: string;
+}
+
+export interface TvCredits {
+  cast: Cast[];
+  crew: Crew[];
+}
+
+export interface Images {
+  profiles: Profile[];
+}
+
+export interface Profile {
+  aspect_ratio: number;
+  height: number;
+  iso_639_1: string;
+  file_path: string;
+  vote_average: number;
+  vote_count: number;
+  width: number;
+}

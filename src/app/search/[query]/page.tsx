@@ -38,22 +38,24 @@ function DisplayPerson(props: { result: PersonSearchType }) {
   const person = props.result;
 
   return (
-    <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600">
-      <Image
-        src={TMDB_IMAGE_URL(50, 150, person.profile_path)}
-        width={200}
-        height={300}
-        alt={`Poster ${person.name}`}
-        className="image object-fit min-h-[300px] min-w-[200px] overflow-hidden rounded-b-3xl transition-all duration-200 ease-in-out hover:relative hover:top-[-16px] hover:scale-110"
-      />
-      <div className="z-10 overflow-hidden p-2">
-        <div>{person.name}</div>
-        <div className="flex justify-between">
-          <span>{convertGender(person.gender)}</span>
-          <span>{person.known_for_department}</span>
+    <Link href={`/person/${person.id}`}>
+      <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600">
+        <Image
+          src={TMDB_IMAGE_URL(50, 150, person.profile_path)}
+          width={200}
+          height={300}
+          alt={`Poster ${person.name}`}
+          className="image object-fit min-h-[300px] min-w-[200px] overflow-hidden rounded-b-3xl transition-all duration-200 ease-in-out hover:relative hover:top-[-16px] hover:scale-110"
+        />
+        <div className="z-10 overflow-hidden p-2">
+          <div>{person.name}</div>
+          <div className="flex justify-between">
+            <span>{convertGender(person.gender)}</span>
+            <span>{person.known_for_department}</span>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
