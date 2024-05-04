@@ -6,13 +6,22 @@ import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetMovieDetail } from "~/server/queries";
 import { type Cast, type Crew, type MovieDetail } from "~/types/tmdb";
-import PersonSummary from "../../_components/Summary";
+import {
+  PersonSummaryCast,
+  PersonSummaryCrew,
+} from "../../_components/Summary";
 
 function RenderCastCrew(props: { persons: Crew[] | Cast[] }) {
+  let test: Crew[];
+
   return (
     <div className="flex flex-row flex-wrap gap-4">
       {props.persons.map((person) => {
-        return <PersonSummary key={person.id} person={person} />;
+        if (typeof person === typeof test) {
+          return <PersonSummaryCrew person={person as Crew} key={person.id} />;
+        } else {
+          return <PersonSummaryCast person={person as Cast} key={person.id} />;
+        }
       })}
     </div>
   );
@@ -68,62 +77,5 @@ export default async function MovieDetail(props: {
       </ScrollArea>
       <Separator className="my-3" />
     </main>
-  );
-}
-
-function bho() {
-  const movie: MovieDetail = {};
-  return (
-    <div>
-      {movie.images.logos.map((image, idx) => {
-        return (
-          <div key={image.file_path + idx}>
-            <p>
-              Logos {image.width} {image.height} {image.aspect_ratio}{" "}
-              {image.iso_639_1}
-            </p>
-            <Image
-              src={`${TMDB_IMAGE_URL(image.file_path)}`}
-              width={image.width}
-              height={image.height}
-              alt={image.file_path}
-            />
-          </div>
-        );
-      })}
-      {movie.images.backdrops.map((image, idx) => {
-        return (
-          <>
-            <p>
-              Backdrops {image.width} {image.height} {image.aspect_ratio}{" "}
-              {image.iso_639_1}
-            </p>
-            <Image
-              key={image.file_path + idx}
-              src={`${TMDB_IMAGE_URL(image.file_path)}`}
-              width={image.width}
-              height={image.height}
-              alt={image.file_path}
-            />
-          </>
-        );
-      })}
-      {movie.images.posters.map((image, idx) => {
-        return (
-          <div key={image.file_path + idx}>
-            <p>
-              Poster {image.width} {image.height} {image.aspect_ratio}{" "}
-              {image.iso_639_1}
-            </p>
-            <Image
-              src={`${TMDB_IMAGE_URL(image.file_path)}`}
-              width={image.width}
-              height={image.height}
-              alt={image.file_path}
-            />
-          </div>
-        );
-      })}
-    </div>
   );
 }

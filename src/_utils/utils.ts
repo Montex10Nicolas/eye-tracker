@@ -1,13 +1,5 @@
 // Convert US date in EU date
-export function displayHumanDate(date: string | undefined) {
-  if (date === undefined) {
-    return date;
-  }
-
-  if (date === null) {
-    return date;
-  }
-
+export function displayHumanDate(date: string) {
   const parts = date.split("-");
   if (parts.length < 3) {
     return date;

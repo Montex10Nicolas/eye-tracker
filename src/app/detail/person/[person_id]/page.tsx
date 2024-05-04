@@ -36,7 +36,6 @@ function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
 
   const final: PersonsCast[] = [merged[0]];
   for (let i = 1; i < merged.length; i++) {
-    if (merged[i] === undefined || merged[i - 1] === undefined) continue;
     if (merged[i]?.id === merged[i - 1]?.id) {
       continue;
     }
@@ -79,45 +78,48 @@ export default async function PersonDetail(props: {
           <div>{person.biography}</div>
         </div>
       </div>
-      <div className="my-6 rounded-md bg-white p-4 text-black">
-        <div className="flex flex-row flex-wrap gap-4">
-          {credits.map((cred) => {
-            const movie = cred.release_date !== undefined;
-            return (
-              <Link
-                key={cred.id}
-                href={
-                  movie ? `/detail/movie/${cred.id}` : `/detail/tv/${cred.id}`
-                }
-              >
-                <div className="border-red flex max-w-[150px] flex-col flex-wrap border p-2">
-                  <Image
-                    src={TMDB_IMAGE_URL(cred.poster_path)}
-                    width={150}
-                    height={200}
-                    alt={`${cred.original_title}`}
-                  />
+      <div className="my-6 flex flex-row flex-wrap items-stretch gap-4 rounded-md bg-white p-4 text-base text-black">
+        {credits.map((cred) => {
+          const movie = cred.release_date !== undefined;
+          const url_image = cred.poster_path
+            ? TMDB_IMAGE_URL(cred.poster_path)
+            : "/image_not_found.png";
 
-                  <div className="max-w flex flex-col flex-wrap">
+          return (
+            <Link
+              key={cred.id}
+              href={
+                movie ? `/detail/movie/${cred.id}` : `/detail/tv/${cred.id}`
+              }
+            >
+              <div className="border-red flex h-full max-w-48 flex-col border p-2">
+                <Image
+                  src={url_image}
+                  width={192}
+                  height={250}
+                  alt={`${cred.original_title}`}
+                  className="min-h-[250px]"
+                />
+                <div className="font-bold">
+                  {cred.title ?? cred.title} {cred.name ?? cred.name} {"\n"}
+                </div>
+                <div className="max-w bottom-0 flex flex-col">
+                  <span>{cred.character}</span>
+                  <div className="flex justify-between">
                     <span>
-                      {cred.title ?? cred.title} {cred.name ?? cred.name} {"\n"}
-                      {cred.character}
+                      {cred.release_date !== undefined
+                        ? displayHumanDate(cred.release_date)
+                        : cred.first_air_date !== undefined
+                          ? displayHumanDate(cred.first_air_date)
+                          : null}
                     </span>
-                    <div className="flex justify-between">
-                      <span>
-                        {cred.release_date ??
-                          displayHumanDate(cred.release_date)}
-                        {cred.first_air_date ??
-                          displayHumanDate(cred.first_air_date)}
-                      </span>
-                      <span>{cred.vote_average.toFixed(1)}</span>
-                    </div>
+                    <span>{cred.vote_average.toFixed(1)}</span>
                   </div>
                 </div>
-              </Link>
-            );
-          })}
-        </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
