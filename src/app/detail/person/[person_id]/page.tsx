@@ -14,13 +14,14 @@ function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
   if (all[0] === undefined) return all;
   const removed_duplicate = [all[0]];
   for (let i = 1; i < all.length; i++) {
-    const new_item = all[i],
-      prev_item = all[i - 1];
-    if (new_item === undefined || prev_item === undefined) {
-      continue;
-    }
+    const new_item = all[i];
 
-    if (prev_item.id !== new_item.id) {
+    if (new_item === undefined) continue;
+
+    const found = removed_duplicate.find((a) => {
+      if (a.id === new_item.id) return a;
+    });
+    if (found === undefined) {
       removed_duplicate.push(new_item);
     }
   }
@@ -40,17 +41,6 @@ function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
         ? new Date(b.release_date)
         : new Date();
 
-    const name_a = a.title ? a.title : a.name ? a.name : "name_a";
-    const name_b = b.title ? b.title : b.name ? b.name : "name_b";
-
-    console.log("\nConfronting");
-    console.log(name_a, date_a);
-    console.log(name_b, date_b);
-    console.log(
-      date_b.getTime() - date_a.getTime() < 1 ? "b is after" : "a is after",
-    );
-    console.log("\nConfronting");
-
     return date_b.getTime() - date_a.getTime();
   });
 
@@ -62,7 +52,7 @@ function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
   //       ? a.first_air_date
   //       : "wtf";
 
-  //   console.log(name, date);
+  // console.log(name, date, a.id);
   // }
 
   return sorted;
