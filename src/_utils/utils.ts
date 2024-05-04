@@ -32,7 +32,7 @@ export const DateDiff = {
     const t2 = d2.getTime();
     const t1 = d1.getTime();
 
-    return parseInt((t2 - t1) / (24 * 3600 * 1000 * 7));
+    return (t2 - t1) / (24 * 3600 * 1000 * 7);
   },
 
   inMonths: function (d1: Date, d2: Date) {
