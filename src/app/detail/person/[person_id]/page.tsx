@@ -44,17 +44,6 @@ function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
     return date_b.getTime() - date_a.getTime();
   });
 
-  // for (const a of sorted) {
-  //   const name = a.title ? a.title : a.name ? a.name : "wtf";
-  //   const date = a.release_date
-  //     ? a.release_date
-  //     : a.first_air_date
-  //       ? a.first_air_date
-  //       : "wtf";
-
-  // console.log(name, date, a.id);
-  // }
-
   return sorted;
 }
 
