@@ -1,5 +1,22 @@
+import Image from "next/image";
+import { displayHumanDate } from "~/_utils/utils";
 import { Badge } from "~/components/ui/badge";
-import { GetMovieDetail } from "~/server/queries";
+import { ScrollArea } from "~/components/ui/scroll-area";
+import { Separator } from "~/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { GetMovieDetail, TMDB_IMAGE_URL } from "~/server/queries";
+import { type Cast, type Crew, type MovieDetail } from "~/types/tmdb";
+import PersonSummary from "../../_components/DisplayPerson";
+
+function RenderCastCrew(props: { persons: Crew[] | Cast[] }) {
+  return (
+    <div className="flex flex-row flex-wrap gap-4">
+      {props.persons.map((person) => {
+        return <PersonSummary key={person.id} person={person} />;
+      })}
+    </div>
+  );
+}
 
 export default async function MovieDetail(props: {
   params: { movie_id: number };
@@ -12,39 +29,101 @@ export default async function MovieDetail(props: {
   const movie = await GetMovieDetail(id);
 
   return (
-    <main>
-      <div>{movie.original_title}</div>
-      <div>{movie.overview}</div>
-      <div>Budget ${movie.budget}</div>
-      {movie.production_companies.map((company) => {
-        return (
-          <div key={company.id} className="flex gap-2">
-            <span>{company.name}</span>
-            <span>{company.origin_country}</span>
-          </div>
-        );
-      })}
-      <div>{movie.release_date}</div>
-      <div>{movie.revenue}</div>
-      <div>{movie.runtime}</div>
-      <div>
-        {movie.spoken_languages.map((language) => {
-          return <span key={language.iso_639_1}>{language.name}</span>;
-        })}
-      </div>
+    <main className="px-8 py-2">
+      <Image
+        src={TMDB_IMAGE_URL(100, 100, movie.poster_path)}
+        width={200}
+        height={100}
+        alt={`Poster ${movie.title}`}
+      />
+      <h2>{movie.title}</h2>
       <div>{movie.status}</div>
-      <div>{movie.vote_average}</div>
+      <div>{displayHumanDate(movie.release_date)}</div>
+      <div>{movie.overview}</div>
       <div>
-        Genres:
         {movie.genres.map((genre) => {
           return <Badge key={genre.id}>{genre.name}</Badge>;
         })}
       </div>
-      <div className="flex flex-col gap-8 bg-white p-8 text-black">
-        <code>{JSON.stringify(movie.images, null, 2)}</code>
-        <code>{JSON.stringify(movie.credits, null, 2)}</code>
-        <code>{JSON.stringify(movie.videos, null, 2)}</code>
+      <div>
+        {movie.vote_average.toFixed(1)} | {movie.vote_count}
       </div>
+      <ScrollArea className="h-[500] w-full overflow-hidden">
+        <Tabs defaultValue="cast" className="relative">
+          <TabsList className="flex w-full flex-row">
+            <TabsTrigger value="cast" className="w-full">
+              Cast
+            </TabsTrigger>
+            <TabsTrigger value="crew" className="w-full">
+              Crew
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="cast" className="mt-6">
+            <RenderCastCrew persons={movie.credits.cast} />
+          </TabsContent>
+          <TabsContent value="crew" className="mt-6">
+            <RenderCastCrew persons={movie.credits.crew} />
+          </TabsContent>
+        </Tabs>
+      </ScrollArea>
+      <Separator className="my-3" />
     </main>
+  );
+}
+
+function bho() {
+  const movie: MovieDetail = {};
+  return (
+    <div>
+      {movie.images.logos.map((image, idx) => {
+        return (
+          <div key={image.file_path + idx}>
+            <p>
+              Logos {image.width} {image.height} {image.aspect_ratio}{" "}
+              {image.iso_639_1}
+            </p>
+            <Image
+              src={`${TMDB_IMAGE_URL(50, 50, image.file_path)}`}
+              width={image.width}
+              height={image.height}
+              alt={image.file_path}
+            />
+          </div>
+        );
+      })}
+      {movie.images.backdrops.map((image, idx) => {
+        return (
+          <>
+            <p>
+              Backdrops {image.width} {image.height} {image.aspect_ratio}{" "}
+              {image.iso_639_1}
+            </p>
+            <Image
+              key={image.file_path + idx}
+              src={`${TMDB_IMAGE_URL(50, 50, image.file_path)}`}
+              width={image.width}
+              height={image.height}
+              alt={image.file_path}
+            />
+          </>
+        );
+      })}
+      {movie.images.posters.map((image, idx) => {
+        return (
+          <div key={image.file_path + idx}>
+            <p>
+              Poster {image.width} {image.height} {image.aspect_ratio}{" "}
+              {image.iso_639_1}
+            </p>
+            <Image
+              src={`${TMDB_IMAGE_URL(50, 50, image.file_path)}`}
+              width={image.width}
+              height={image.height}
+              alt={image.file_path}
+            />
+          </div>
+        );
+      })}
+    </div>
   );
 }

@@ -190,7 +190,7 @@ export interface Result {
   key: string;
   site: string;
   size: number;
-  type: "trailer" | "clip";
+  type: "Trailer" | "Teaser" | "Clip";
   official: boolean;
   published_at: string;
   id: string;

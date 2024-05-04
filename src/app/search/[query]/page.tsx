@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { displayHumanDate } from "~/_utils/utils";
 import { MultiSearch, TMDB_IMAGE_URL } from "~/server/queries";
 import {
   type MovieResultType,
@@ -20,20 +21,6 @@ function sortByPopularity(
   });
 
   return sorted;
-}
-
-// Convert US date in EU date
-function displayHumanDate(date: string) {
-  if (date === undefined) {
-    return date;
-  }
-
-  const parts = date.split("-");
-  if (parts.length < 3) {
-    return date;
-  }
-
-  return `${parts[1]}/${parts[2]}/${parts[0]}`;
 }
 
 function convertGender(gender: number) {

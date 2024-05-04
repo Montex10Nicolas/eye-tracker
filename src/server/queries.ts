@@ -73,3 +73,20 @@ export async function GetMovieDetail(id: number) {
   const data: unknown = await response.json();
   return data as MovieDetail;
 }
+
+export async function GetPersonDetail(id: number) {
+  const url = new URL(`3/person/${id}`, TMDB_URL);
+  url.searchParams.set("append_to_response", "movie_credits,tv_credits,images");
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: Authorization,
+    },
+  });
+
+  if (response.status !== 200) {
+    throw new Error("Something wrong");
+  }
+  const data: unknown = await response.json();
+  return data as PersonDetail;
+}
