@@ -11,40 +11,61 @@ import {
 function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
   const all = [...movie.cast, ...movie.crew, ...tv.cast, ...tv.crew];
 
-  const merged = all.sort((a, b) => {
+  if (all[0] === undefined) return all;
+  const removed_duplicate = [all[0]];
+  for (let i = 1; i < all.length; i++) {
+    const new_item = all[i],
+      prev_item = all[i - 1];
+    if (new_item === undefined || prev_item === undefined) {
+      continue;
+    }
+
+    if (prev_item.id !== new_item.id) {
+      removed_duplicate.push(new_item);
+    }
+  }
+
+  const sorted = removed_duplicate.sort((a, b) => {
     let date_a: Date = new Date(),
       date_b: Date = new Date();
 
-    if (a.release_date === undefined && a.first_air_date !== undefined) {
-      date_a = new Date(a.first_air_date);
-    } else if (a.release_date !== undefined && a.first_air_date === undefined) {
-      date_a = new Date(a.release_date);
-    }
-    if (b.release_date === undefined && b.first_air_date !== undefined) {
-      date_b = new Date(b.first_air_date);
-    } else if (b.release_date !== undefined && b.first_air_date === undefined) {
-      date_b = new Date(b.release_date);
-    }
+    date_a = a.first_air_date
+      ? new Date(a.first_air_date)
+      : a.release_date
+        ? new Date(a.release_date)
+        : new Date();
+    date_b = b.first_air_date
+      ? new Date(b.first_air_date)
+      : b.release_date
+        ? new Date(b.release_date)
+        : new Date();
+
+    const name_a = a.title ? a.title : a.name ? a.name : "name_a";
+    const name_b = b.title ? b.title : b.name ? b.name : "name_b";
+
+    console.log("\nConfronting");
+    console.log(name_a, date_a);
+    console.log(name_b, date_b);
+    console.log(
+      date_b.getTime() - date_a.getTime() < 1 ? "b is after" : "a is after",
+    );
+    console.log("\nConfronting");
 
     return date_b.getTime() - date_a.getTime();
   });
 
-  if (merged[0] === undefined) {
-    return merged;
-  }
+  // for (const a of sorted) {
+  //   const name = a.title ? a.title : a.name ? a.name : "wtf";
+  //   const date = a.release_date
+  //     ? a.release_date
+  //     : a.first_air_date
+  //       ? a.first_air_date
+  //       : "wtf";
 
-  const final: PersonsCast[] = [merged[0]];
-  for (let i = 1; i < merged.length; i++) {
-    if (merged[i]?.id === merged[i - 1]?.id) {
-      continue;
-    }
+  //   console.log(name, date);
+  // }
 
-    const new_item = merged[i] ? merged[i] : null;
-    if (new_item === null || new_item === undefined) continue;
-    final.push(new_item);
-  }
-
-  return final;
+  return sorted;
 }
 
 export default async function PersonDetail(props: {
