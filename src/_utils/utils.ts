@@ -1,5 +1,3 @@
-import { year } from "drizzle-orm/mysql-core";
-
 // Convert US date in EU date
 export function displayHumanDate(date: string) {
   const parts = date.split("-");
