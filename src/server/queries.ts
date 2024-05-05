@@ -4,6 +4,7 @@ import {
   type PersonDetailType,
   type PersonSearchType,
   type Search,
+  type TVDetail,
   type TVResultType,
 } from "~/types/tmdb";
 
@@ -84,4 +85,17 @@ export async function GetPersonDetail(id: number) {
   }
   const data: unknown = await response.json();
   return data as PersonDetailType;
+}
+
+export async function GetTVDetail(id: number) {
+  const url = new URL(`/3/tv/${id}`, TMDB_URL);
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: Authorization,
+    },
+  });
+
+  const data: unknown = await response.json();
+  return data as TVDetail;
 }
