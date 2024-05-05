@@ -39,7 +39,7 @@ function DisplayPerson(props: { result: PersonSearchType }) {
 
   return (
     <Link href={`/detail/person/${person.id}`}>
-      <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600">
+      <div className="max-w-[200px] cursor-pointer cursor-pointer overflow-hidden bg-sky-600">
         <Image
           src={TMDB_IMAGE_URL(person.profile_path)}
           width={200}
@@ -87,7 +87,7 @@ function DisplayMovies(props: { result: MovieResultType }) {
   const found = props.result;
   return (
     <Link href={`/detail/movie/${found.id}`}>
-      <div className="min-h-[300px] max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600">
+      <div className="min-h-[300px] max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600 ">
         <Image
           src={TMDB_IMAGE_URL(found.backdrop_path)}
           width={500}

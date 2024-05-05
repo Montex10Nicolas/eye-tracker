@@ -92,7 +92,7 @@ export default async function PersonDetail(props: {
                 movie ? `/detail/movie/${cred.id}` : `/detail/tv/${cred.id}`
               }
             >
-              <div className="border-red flex h-full max-w-48 flex-col border p-2">
+              <div className="border-red flex h-full max-w-48 cursor-pointer flex-col border p-2">
                 <Image
                   src={url_image}
                   width={192}

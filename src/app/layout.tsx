@@ -10,7 +10,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Eye Tracker",
+  title: "Siuwi Tracker",
   description: "The place to track all your favorite series and movies",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
@@ -34,7 +34,7 @@ export default function RootLayout({
       >
         <div className="flex w-full flex-col items-center justify-center gap-4 py-6">
           <Link href={"/"}>
-            <h1 className="text-5xl">The Eye Tracker</h1>
+            <h1 className="text-5xl">The Siuwi Tracker</h1>
           </Link>
           <form action={searchMovieSeries}>
             <input
