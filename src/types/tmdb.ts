@@ -320,6 +320,7 @@ export interface TVDetail {
   type: string;
   vote_average: number;
   vote_count: number;
+  credits: Credits;
 }
 
 export interface CreatedBy {

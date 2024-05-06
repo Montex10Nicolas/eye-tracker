@@ -9,23 +9,8 @@ import { type Cast, type Crew, type MovieDetail } from "~/types/tmdb";
 import {
   PersonSummaryCast,
   PersonSummaryCrew,
+  RenderCastCrew,
 } from "../../_components/Summary";
-
-function RenderCastCrew(props: { persons: Crew[] | Cast[] }) {
-  let test: Crew[];
-
-  return (
-    <div className="flex flex-row flex-wrap gap-4">
-      {props.persons.map((person) => {
-        if (typeof person === typeof test) {
-          return <PersonSummaryCrew person={person as Crew} key={person.id} />;
-        } else {
-          return <PersonSummaryCast person={person as Cast} key={person.id} />;
-        }
-      })}
-    </div>
-  );
-}
 
 export default async function MovieDetail(props: {
   params: { movie_id: number };

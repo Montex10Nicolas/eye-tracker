@@ -89,6 +89,7 @@ export async function GetPersonDetail(id: number) {
 
 export async function GetTVDetail(id: number) {
   const url = new URL(`/3/tv/${id}`, TMDB_URL);
+  url.searchParams.set("append_to_response", "credits");
 
   const response = await fetch(url, {
     headers: {
