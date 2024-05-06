@@ -128,6 +128,9 @@ export default async function SearchPage(props: { params: { query: string } }) {
         const background_image_url = res.backdrop_path
           ? res.backdrop_path
           : NOT_FOUND_POSTER;
+        const background_poster = res.profile_path
+          ? res.profile_path
+          : NOT_FOUND_POSTER;
 
         switch (res.media_type) {
           case "movie":
@@ -139,10 +142,7 @@ export default async function SearchPage(props: { params: { query: string } }) {
             );
           case "person":
             return (
-              <DisplayPerson
-                result={res}
-                background_url={background_image_url}
-              />
+              <DisplayPerson result={res} background_url={background_poster} />
             );
           case "tv":
             return (
