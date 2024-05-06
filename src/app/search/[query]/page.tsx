@@ -34,14 +34,17 @@ function convertGender(gender: number) {
   }
 }
 
-function DisplayPerson(props: { result: PersonSearchType }) {
-  const person = props.result;
+function DisplayPerson(props: {
+  result: PersonSearchType;
+  background_url: string;
+}) {
+  const { result: person, background_url } = props;
 
   return (
     <Link href={`/detail/person/${person.id}`}>
-      <div className="max-w-[200px] cursor-pointer cursor-pointer overflow-hidden bg-sky-600">
+      <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600">
         <Image
-          src={TMDB_IMAGE_URL(person.profile_path)}
+          src={TMDB_IMAGE_URL(background_url)}
           width={200}
           height={300}
           alt={`Poster ${person.name}`}
@@ -59,13 +62,13 @@ function DisplayPerson(props: { result: PersonSearchType }) {
   );
 }
 
-function DipsplayTV(props: { result: TVResultType }) {
-  const found = props.result;
+function DipsplayTV(props: { result: TVResultType; background_url: string }) {
+  const { result: found, background_url } = props;
   return (
     <Link href={`/detail/tv/${found.id}`}>
       <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600">
         <Image
-          src={TMDB_IMAGE_URL(found.backdrop_path)}
+          src={TMDB_IMAGE_URL(background_url)}
           width={500}
           height={300}
           alt={`Poster ${found.name}`}
@@ -83,13 +86,16 @@ function DipsplayTV(props: { result: TVResultType }) {
   );
 }
 
-function DisplayMovies(props: { result: MovieResultType }) {
-  const found = props.result;
+function DisplayMovies(props: {
+  result: MovieResultType;
+  background_url: string;
+}) {
+  const { result: found, background_url } = props;
   return (
     <Link href={`/detail/movie/${found.id}`}>
       <div className="min-h-[300px] max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600 ">
         <Image
-          src={TMDB_IMAGE_URL(found.backdrop_path)}
+          src={TMDB_IMAGE_URL(background_url)}
           width={500}
           height={300}
           alt={`Poster ${found.title}`}
@@ -115,13 +121,29 @@ export default async function SearchPage(props: { params: { query: string } }) {
   return (
     <div className="m-4 flex flex-row flex-wrap justify-center gap-6 rounded-3xl bg-white p-8">
       {results.results.map((res) => {
+        const background_image_url = res.backdrop_path
+          ? res.backdrop_path
+          : NOT_FOUND_POSTER;
+
         switch (res.media_type) {
           case "movie":
-            return <DisplayMovies result={res} />;
+            return (
+              <DisplayMovies
+                result={res}
+                background_url={background_image_url}
+              />
+            );
           case "person":
-            return <DisplayPerson result={res} />;
+            return (
+              <DisplayPerson
+                result={res}
+                background_url={background_image_url}
+              />
+            );
           case "tv":
-            return <DipsplayTV result={res} />;
+            return (
+              <DipsplayTV result={res} background_url={background_image_url} />
+            );
           default:
             return <div>something is missing and I do not know what</div>;
         }

@@ -9,6 +9,12 @@ export function displayHumanDate(date: string) {
 }
 
 export const TMDB_IMAGE_URL = function (image_url: string) {
+  if (image_url === NOT_FOUND_POSTER) {
+    return NOT_FOUND_POSTER;
+  } else if (image_url === MISSING_PERSON) {
+    return MISSING_PERSON;
+  }
+
   return `https://image.tmdb.org/t/p/original/${image_url}`;
 };
 
@@ -20,4 +26,5 @@ export function ageCalculator(d1: Date, d2: Date) {
   return years;
 }
 
-export const NOT_FOUND_POSTER = "poster_not_found.png";
+export const NOT_FOUND_POSTER = "/poster_not_found.png";
+export const MISSING_PERSON = "/missing_person.webp";
