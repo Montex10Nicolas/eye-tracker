@@ -21,14 +21,14 @@ function DisplaySeason(props: { season: Season; name: string }) {
 
   return (
     <Link key={season.id} href={`/detail/tv/season/${season.id}`}>
-      <div>
+      <div className="flex h-full flex-col">
         <Image
           src={TMDB_IMAGE_URL(season_poster_image_url)}
           width={150}
           height={250}
           alt={`Poster ${name}-${season.id}`}
         />
-        <div className="flex justify-between">
+        <div className="mt-auto flex justify-between">
           <div>{season.episode_count} episodes</div>
           <div>{season.vote_average}/10</div>
         </div>
@@ -80,7 +80,7 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
       </section>
       <section className="mt-4 rounded-md bg-white p-4 text-black">
         <h2 className="text-xl font-semibold">Seasons</h2>
-        <div className="mt-6 flex flex-row flex-wrap gap-2">
+        <div className="mt-6 flex flex-row flex-wrap gap-4">
           {tv.seasons.map((season) => (
             <DisplaySeason key={season.id} season={season} name={tv.name} />
           ))}

@@ -11,7 +11,7 @@ export function PersonSummaryCast(props: { person: Cast }) {
   return (
     <Link
       href={`/detail/person/${person.id}`}
-      className="flex-flex-col h-full w-24 items-center justify-center"
+      className="flex-flex-col h-full w-32 items-center justify-center"
     >
       <Image
         src={TMDB_IMAGE_URL(person_url)}
@@ -38,7 +38,7 @@ export function PersonSummaryCrew(props: { person: Crew }) {
 
   return (
     <Link href={`/detail/person/${person.id}`} className="">
-      <div className="flex h-full w-24 flex-col items-center justify-center">
+      <div className="flex h-full w-32 flex-col items-center justify-center">
         <Image
           src={TMDB_IMAGE_URL(person_url)}
           width={100}

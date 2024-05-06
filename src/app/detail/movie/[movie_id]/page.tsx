@@ -9,12 +9,8 @@ import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetMovieDetail } from "~/server/queries";
-import { type Cast, type Crew, type MovieDetail } from "~/types/tmdb";
-import {
-  PersonSummaryCast,
-  PersonSummaryCrew,
-  RenderCastCrew,
-} from "../../_components/Summary";
+import { type MovieDetail } from "~/types/tmdb";
+import { RenderCastCrew } from "../../_components/Summary";
 
 export default async function MovieDetail(props: {
   params: { movie_id: number };
