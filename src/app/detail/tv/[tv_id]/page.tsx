@@ -1,8 +1,38 @@
 import Image from "next/image";
 import Link from "next/link";
-import { TMDB_IMAGE_URL } from "~/_utils/utils";
+import { NOT_FOUND_POSTER, TMDB_IMAGE_URL } from "~/_utils/utils";
 import { Badge } from "~/components/ui/badge";
 import { GetTVDetail } from "~/server/queries";
+import { type Season } from "~/types/tmdb";
+
+function DisplaySeason(props: { season: Season; name: string }) {
+  const { season, name } = props;
+
+  const season_poster_image_url = season.poster_path
+    ? season.poster_path
+    : NOT_FOUND_POSTER;
+
+  if (season.air_date === null) {
+    return <div>Season {season.season_number} is still in production</div>;
+  }
+
+  return (
+    <Link key={season.id} href={`/detail/tv/season/${season.id}`}>
+      <div>
+        <Image
+          src={TMDB_IMAGE_URL(season_poster_image_url)}
+          width={150}
+          height={250}
+          alt={`Poster ${name}-${season.id}`}
+        />
+        <div className="flex justify-between">
+          <div>{season.episode_count} episodes</div>
+          <div>{season.vote_average}/10</div>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 export default async function TVDetail(props: { params: { tv_id: number } }) {
   const id = props.params.tv_id;
@@ -12,10 +42,8 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
   const tv = await GetTVDetail(id);
   const background_image_url = tv.backdrop_path
     ? tv.backdrop_path
-    : "image_not_found.png";
-  const poster_image_url = tv.poster_path
-    ? tv.poster_path
-    : "image_not_found.png";
+    : NOT_FOUND_POSTER;
+  const poster_image_url = tv.poster_path ? tv.poster_path : NOT_FOUND_POSTER;
 
   return (
     <main className="p-4">
@@ -47,33 +75,10 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
           src={TMDB_IMAGE_URL(background_image_url)}
         />
       </div>
-      <div className="mt-4 flex flex-row rounded-md bg-white p-4 text-black">
-        {tv.seasons.map((season) => {
-          console.log(season);
-          let season_poster_image_url = season.poster_path
-            ? season.poster_path
-            : "image_not_found.png";
-
-          if (season_poster_image_url === null)
-            season_poster_image_url = "image_not_found.png";
-
-          return (
-            <Link key={season.id} href={`/detail/tv/season/${season.id}`}>
-              <div>
-                <Image
-                  src={TMDB_IMAGE_URL(season_poster_image_url)}
-                  width={150}
-                  height={250}
-                  alt={`Poster ${tv.name}-${season.id}`}
-                />
-                <div className="flex justify-between">
-                  <div>{season.season_number}</div>
-                  <div>{season.vote_average}/10</div>
-                </div>
-              </div>
-            </Link>
-          );
-        })}
+      <div className="mt-4 flex flex-row gap-2 rounded-md bg-white p-4 text-black">
+        {tv.seasons.map((season) => (
+          <DisplaySeason key={season.id} season={season} name={tv.name} />
+        ))}
       </div>
     </main>
   );
