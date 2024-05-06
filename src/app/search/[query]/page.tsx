@@ -62,7 +62,7 @@ function DisplayPerson(props: { result: PersonSearchType }) {
 function DipsplayTV(props: { result: TVResultType }) {
   const found = props.result;
   return (
-    <Link href={`/tv/${found.id}`}>
+    <Link href={`/detail/tv/${found.id}`}>
       <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600">
         <Image
           src={TMDB_IMAGE_URL(found.backdrop_path)}
@@ -123,7 +123,7 @@ export default async function SearchPage(props: { params: { query: string } }) {
           case "tv":
             return <DipsplayTV result={res} />;
           default:
-            return <div>something is missing</div>;
+            return <div>something is missing and I do not know what</div>;
         }
       })}
     </div>

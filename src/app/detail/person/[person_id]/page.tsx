@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  NOT_FOUND_POSTER,
   TMDB_IMAGE_URL,
   ageCalculator,
   displayHumanDate,
@@ -83,7 +84,7 @@ export default async function PersonDetail(props: {
           const movie = cred.release_date !== undefined;
           const url_image = cred.poster_path
             ? TMDB_IMAGE_URL(cred.poster_path)
-            : "/image_not_found.png";
+            : NOT_FOUND_POSTER;
 
           return (
             <Link

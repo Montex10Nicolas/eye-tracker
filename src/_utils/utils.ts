@@ -19,3 +19,5 @@ export function ageCalculator(d1: Date, d2: Date) {
 
   return years;
 }
+
+export const NOT_FOUND_POSTER = "poster_not_found.png";
