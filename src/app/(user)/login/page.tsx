@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+import { lucia } from "~/lib/auth";
 import { LoginAndCreateSession } from "~/server/queries";
 
 export default function Login() {
@@ -8,7 +10,19 @@ export default function Login() {
 
     console.log(`Submitted with ${username}-${password}`);
 
-    await LoginAndCreateSession(username, password);
+    const session_id = await LoginAndCreateSession(username, password);
+    if (session_id === undefined) {
+      throw new Error("Session is undefined");
+    }
+
+    const sessionCookie = lucia.createBlankSessionCookie();
+
+    console.log(sessionCookie);
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
   }
 
   return (

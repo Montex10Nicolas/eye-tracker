@@ -105,29 +105,6 @@ export async function GetTVDetail(id: number) {
   return data as TVDetail;
 }
 
-export async function LoginAndCreateSession(
-  username: string,
-  password: string,
-) {
-  const user = await db.query.userTable.findFirst({
-    where: (post, { eq, and }) =>
-      and(eq(post.username, username), eq(post.password, password)),
-  });
-
-  if (user === undefined) {
-    throw new Error("User does not exist");
-  }
-  try {
-    console.log(`User ID trying with ${user.id}`);
-
-    const session = await lucia.createSession(user.id, {});
-    return session;
-  } catch (e: unknown) {
-    console.log(`Error in session`);
-    console.log(e);
-  }
-}
-
 export async function RegisterAndCreateSession(
   username: string,
   password: string,
@@ -143,7 +120,7 @@ export async function RegisterAndCreateSession(
     throw new Error("idk something happend with the user creation");
   }
 
-  const session = await lucia.createSession(id, {});
+  const session = await lucia.createSession(id, { username: username });
 
-  return user;
+  return session.id;
 }
