@@ -44,6 +44,12 @@ export default function RootLayout({
               name="search"
             />
           </form>
+          <Link href={"/login"}>
+            <button type="submit">Login</button>
+          </Link>
+          <Link href={"/register"}>
+            <button type="submit">Register</button>
+          </Link>
         </div>
         {children}
       </body>

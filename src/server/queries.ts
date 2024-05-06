@@ -1,3 +1,5 @@
+import { generateIdFromEntropySize } from "lucia";
+import { lucia } from "~/lib/auth";
 import {
   type MovieDetail,
   type MovieResultType,
@@ -7,6 +9,8 @@ import {
   type TVDetail,
   type TVResultType,
 } from "~/types/tmdb";
+import { db } from "./db";
+import { sessionTable, userTable } from "./db/schema";
 
 const TMDB_URL = "https://api.themoviedb.org";
 const TMDB_TOKEN = process.env.TMDB_TOKEN;
@@ -99,4 +103,47 @@ export async function GetTVDetail(id: number) {
 
   const data: unknown = await response.json();
   return data as TVDetail;
+}
+
+export async function LoginAndCreateSession(
+  username: string,
+  password: string,
+) {
+  const user = await db.query.userTable.findFirst({
+    where: (post, { eq, and }) =>
+      and(eq(post.username, username), eq(post.password, password)),
+  });
+
+  if (user === undefined) {
+    throw new Error("User does not exist");
+  }
+  try {
+    console.log(`User ID trying with ${user.id}`);
+
+    const session = await lucia.createSession(user.id, {});
+    return session;
+  } catch (e: unknown) {
+    console.log(`Error in session`);
+    console.log(e);
+  }
+}
+
+export async function RegisterAndCreateSession(
+  username: string,
+  password: string,
+) {
+  const id = generateIdFromEntropySize(22);
+  const user = await db.insert(userTable).values({
+    username: username,
+    password: password,
+    id: id,
+  });
+
+  if (!user) {
+    throw new Error("idk something happend with the user creation");
+  }
+
+  const session = await lucia.createSession(id, {});
+
+  return user;
 }
