@@ -53,10 +53,10 @@ export default async function MovieDetail(props: {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="cast" className="mt-6">
-            <RenderCastCrew persons={movie.credits.cast} />
+            <RenderCastCrew persons={movie.credits.cast} cast={true} />
           </TabsContent>
           <TabsContent value="crew" className="mt-6">
-            <RenderCastCrew persons={movie.credits.crew} />
+            <RenderCastCrew persons={movie.credits.crew} cast={false} />
           </TabsContent>
         </Tabs>
       </ScrollArea>
