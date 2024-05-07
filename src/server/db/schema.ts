@@ -20,21 +20,6 @@ import { v4 as uuid } from "uuid";
  */
 export const createTable = pgTableCreator((name) => `siuwi-tracker_${name}`);
 
-export const posts = createTable(
-  "post",
-  {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 256 }),
-    createdAt: timestamp("created_at")
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updatedAt"),
-  },
-  (example) => ({
-    nameIndex: index("name_idx").on(example.name),
-  }),
-);
-
 export const userTable = createTable("user", {
   id: varchar("id", { length: 256 }).primaryKey(),
   username: varchar("username", { length: 256 }).notNull().unique(),
@@ -46,6 +31,7 @@ export const sessionTable = createTable("session", {
   userId: varchar("user_id", { length: 256 })
     .notNull()
     .references(() => userTable.id),
+  username: varchar("username", { length: 256 }),
   expiresAt: timestamp("expires_at", {
     withTimezone: true,
     mode: "date",

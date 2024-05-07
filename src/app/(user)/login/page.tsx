@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { lucia } from "~/lib/auth";
-import { LoginAndCreateSession } from "~/server/queries";
+import { db } from "~/server/db";
 
 export default function Login() {
   async function login(formData: FormData) {
@@ -10,19 +11,26 @@ export default function Login() {
 
     console.log(`Submitted with ${username}-${password}`);
 
-    const session_id = await LoginAndCreateSession(username, password);
-    if (session_id === undefined) {
-      throw new Error("Session is undefined");
+    const user = await db.query.userTable.findFirst({
+      where: (user, { eq, and }) =>
+        and(eq(user.password, password), eq(user.username, username)),
+    });
+
+    if (user === undefined) {
+      return <div>Username or password wrong</div>;
     }
 
-    const sessionCookie = lucia.createBlankSessionCookie();
+    const session = await lucia.createSession(user.id, {
+      username: user.username,
+    });
+    const sessionCookie = lucia.createSessionCookie(session.id);
 
-    console.log(sessionCookie);
     cookies().set(
       sessionCookie.name,
       sessionCookie.value,
       sessionCookie.attributes,
     );
+    redirect("/");
   }
 
   return (

@@ -5,12 +5,8 @@ import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetMovieDetail } from "~/server/queries";
-import { type Cast, type Crew, type MovieDetail } from "~/types/tmdb";
-import {
-  PersonSummaryCast,
-  PersonSummaryCrew,
-  RenderCastCrew,
-} from "../../_components/Summary";
+import { type MovieDetail } from "~/types/tmdb";
+import { RenderCastCrew } from "../../_components/Summary";
 
 export default async function MovieDetail(props: {
   params: { movie_id: number };
@@ -53,10 +49,10 @@ export default async function MovieDetail(props: {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="cast" className="mt-6">
-            <RenderCastCrew persons={movie.credits.cast} />
+            <RenderCastCrew cast={false} persons={movie.credits.cast} />
           </TabsContent>
           <TabsContent value="crew" className="mt-6">
-            <RenderCastCrew persons={movie.credits.crew} />
+            <RenderCastCrew cast={true} persons={movie.credits.crew} />
           </TabsContent>
         </Tabs>
       </ScrollArea>

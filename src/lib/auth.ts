@@ -10,6 +10,11 @@ export const lucia = new Lucia(adapter, {
       username: attributes.username,
     };
   },
+  getUserAttributes: function (attributes) {
+    return {
+      username: attributes.username,
+    };
+  },
   sessionCookie: {
     expires: false,
     attributes: {
@@ -24,15 +29,20 @@ declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
     DatabaseSessionAttributes: DatabaseSessionAttributes;
+    DatabaseUserAttributes: DatabaseUserAttributes;
   }
 }
 
 interface DatabaseSessionAttributes {
   username: string;
 }
+interface DatabaseUserAttributes {
+  username: string;
+}
 
 export const getUser = cache(async () => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
+  console.log("\n\nSessionid: ", sessionId, "\n\n");
   if (sessionId === null) return null;
   const { user, session } = await lucia.validateSession(sessionId);
   try {

@@ -10,7 +10,7 @@ import {
   type TVResultType,
 } from "~/types/tmdb";
 import { db } from "./db";
-import { sessionTable, userTable } from "./db/schema";
+import { userTable } from "./db/schema";
 
 export const TMDB_URL = "https://api.themoviedb.org";
 const TMDB_TOKEN = process.env.TMDB_TOKEN;

@@ -11,9 +11,8 @@ export default async function HomePage() {
   const result = await lucia.validateSession(sessionId);
 
   return (
-    <main>
-      <h1>Hello world</h1>
-      <code>{JSON.stringify(user, null, 2)}</code>
+    <main className="flex flex-col rounded-md bg-white p-4 text-black">
+      <code>User: {JSON.stringify(user, null, 2)}</code>
       <code>Result: {JSON.stringify(result, null, 2)}</code>
     </main>
   );
