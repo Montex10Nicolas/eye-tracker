@@ -122,10 +122,7 @@ export async function signup(username: string, password: string) {
 }
 
 export async function login(username: string, password: string) {
-  console.log(`received login request with ${username}|${password}`);
-
   if (typeof username !== "string" || username.length < 3) {
-    console.log("First check not passed");
     return new NextResponse("Invalid username", {
       status: 400,
     });
@@ -154,19 +151,10 @@ export async function login(username: string, password: string) {
   });
 
   if (!validPassword) {
-    console.log("invalid password");
     return new NextResponse("Invalid email or password", {
       status: 400,
     });
   }
-
-  console.log(
-    user.id,
-    user.username,
-    password,
-    validPassword,
-    user.password_hash,
-  );
 
   const session = await lucia.createSession(user.id, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
@@ -176,4 +164,18 @@ export async function login(username: string, password: string) {
     sessionCookie.attributes,
   );
   return redirect("/");
+}
+
+async function LogOut() {
+  "use server";
+  const user = await getUser();
+  const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
+  if (sessionId !== null) {
+    await lucia.invalidateSession(sessionId);
+  }
+  if (user !== null) {
+    await lucia.invalidateUserSessions(user.username);
+  }
+
+  cookies().delete(lucia.sessionCookieName);
 }

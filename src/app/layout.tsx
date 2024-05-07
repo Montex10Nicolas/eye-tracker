@@ -1,10 +1,10 @@
 import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
-import { cookies } from "next/headers";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getUser, lucia } from "~/lib/auth";
+import { getUser } from "~/lib/auth";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,27 +22,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  async function searchMovieSeries(formData: FormData) {
-    "use server";
-    const search = formData.get("search") as string;
-
-    redirect(`/search/${search}`);
-  }
-
-  async function LogOut() {
-    "use server";
-    const user = await getUser();
-    const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
-    if (sessionId !== null) {
-      await lucia.invalidateSession(sessionId);
-    }
-    if (user !== null) {
-      await lucia.invalidateUserSessions(user.username);
-    }
-
-    cookies().delete(lucia.sessionCookieName);
-  }
-
   const user = await getUser();
   const loggedIn = user !== null;
 
@@ -60,11 +39,11 @@ export default async function RootLayout({
           </div>
           <div className="ml-auto">
             {loggedIn ? (
-              <form action={LogOut}>
+              <Link href={"/profile"}>
                 <button className="rounded-md bg-sky-700 px-4 py-2 font-semibold  text-white">
-                  Log Out
+                  Profile
                 </button>
-              </form>
+              </Link>
             ) : (
               <Link href={"/login"}>
                 <button className="rounded-md bg-sky-700 px-4 py-2 font-semibold  text-white">
@@ -75,6 +54,22 @@ export default async function RootLayout({
           </div>
         </section>
         {children}
+        <footer className="bottom-0 mt-auto flex h-20 w-full items-center justify-between bg-slate-800 p-6">
+          <div>
+            Created by <span>Nicolas Montecchiani</span>
+          </div>
+          {/* logos */}
+          <div>
+            <a href="https://github.com/montex10nicolas" target="_blank">
+              <Image
+                src={"/github_logo.png"}
+                height={50}
+                width={50}
+                alt="github logo"
+              />
+            </a>
+          </div>
+        </footer>
       </body>
     </html>
   );
