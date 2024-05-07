@@ -8,10 +8,7 @@ export default function Login() {
     const username = formData.get("username") as string;
     const password = formData.get("password") as string;
 
-    console.log(`Login with ${username}|${password}`);
-
     const response = await login(username, password);
-    console.log(response);
   }
 
   return (

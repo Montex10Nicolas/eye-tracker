@@ -104,8 +104,6 @@ export async function signup(username: string, password: string) {
   const passwordHash = await hash(password, { ...PASSWORD_HASH_PAR });
   const userId = generateIdFromEntropySize(10);
 
-  console.log(userId, passwordHash, username, password);
-
   await db.insert(userTable).values({
     username: username,
     password_hash: passwordHash,
@@ -129,7 +127,6 @@ export async function login(username: string, password: string) {
   }
 
   if (typeof password !== "string" || password.length < 6) {
-    console.log("second check not passed");
     return new NextResponse("Invalid password", {
       status: 400,
     });

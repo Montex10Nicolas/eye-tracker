@@ -8,8 +8,6 @@ export default async function Page() {
     const username = formData.get("username") as string;
     const password = formData.get("password") as string;
 
-    console.log(`sign up with ${username} | ${password}`);
-
     await signup(username, password);
   }
 
