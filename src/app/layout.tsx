@@ -3,7 +3,6 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { getUser } from "~/lib/auth";
 
 const inter = Inter({
@@ -58,7 +57,6 @@ export default async function RootLayout({
           <div>
             Created by <span>Nicolas Montecchiani</span>
           </div>
-          {/* logos */}
           <div>
             <a href="https://github.com/montex10nicolas" target="_blank">
               <Image

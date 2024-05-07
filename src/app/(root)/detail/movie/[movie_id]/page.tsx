@@ -9,7 +9,6 @@ import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetMovieDetail } from "~/server/queries";
-import { type MovieDetail, type MovieDetail } from "~/types/tmdb_detail";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
 
