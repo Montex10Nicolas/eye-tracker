@@ -1,4 +1,3 @@
-import { generateIdFromEntropySize } from "lucia";
 import { lucia } from "~/lib/auth";
 import {
   type MovieDetail,
@@ -9,8 +8,6 @@ import {
   type TVDetail,
   type TVResultType,
 } from "~/types/tmdb";
-import { db } from "./db";
-import { userTable } from "./db/schema";
 
 export const TMDB_URL = "https://api.themoviedb.org";
 const TMDB_TOKEN = process.env.TMDB_TOKEN;
@@ -105,22 +102,7 @@ export async function GetTVDetail(id: number) {
   return data as TVDetail;
 }
 
-export async function RegisterAndCreateSession(
-  username: string,
-  password: string,
-) {
-  const id = generateIdFromEntropySize(22);
-  const user = await db.insert(userTable).values({
-    username: username,
-    password: password,
-    id: id,
-  });
-
-  if (!user) {
-    throw new Error("idk something happend with the user creation");
-  }
-
-  const session = await lucia.createSession(id, { username: username });
-
-  return session.id;
+export async function Logout(sessionId: string, userId: string) {
+  await lucia.invalidateSession(sessionId);
+  await lucia.invalidateUserSessions(userId);
 }

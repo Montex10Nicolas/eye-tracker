@@ -5,7 +5,7 @@ export default async function HomePage() {
   const user = await getUser();
   const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
 
-  if (!sessionId) {
+  if (!sessionId || user === null) {
     return <div>User null session null</div>;
   }
   const result = await lucia.validateSession(sessionId);
