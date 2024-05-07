@@ -81,11 +81,9 @@ export default async function Page(props: { params: { movie_id: number } }) {
         </TabsList>
         <ScrollArea className="h-[500] w-full overflow-hidden pt-2">
           <TabsContent value="cast" className="mt-6">
-            <RenderCastCrew persons={movie.credits.cast} cast={true} />
             <RenderCastCrew cast={false} persons={movie.credits.cast} />
           </TabsContent>
           <TabsContent value="crew" className="mt-6">
-            <RenderCastCrew persons={movie.credits.crew} cast={false} />
             <RenderCastCrew cast={true} persons={movie.credits.crew} />
           </TabsContent>
         </ScrollArea>
