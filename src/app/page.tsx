@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { getUser, lucia } from "~/lib/auth";
-import { DisplaySearchMultiple } from "./(root)/layout";
+import { DisplaySearchMultiple } from "./(root)/detail/_components/Search";
 
 export default async function HomePage() {
   const user = await getUser();
