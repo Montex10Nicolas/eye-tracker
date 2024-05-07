@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MISSING_PERSON, TMDB_IMAGE_URL } from "~/_utils/utils";
-import { type Cast, type Crew } from "~/types/tmdb";
+import { type Cast, type Crew } from "~/types/tmdb_detail";
 
 export function PersonSummaryCast(props: { person: Cast }) {
   const { person } = props;

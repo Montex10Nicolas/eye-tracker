@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-export function DisplaySearchMultiple() {
+export async function DisplaySearchMultiple() {
   async function searchMovieSeries(formData: FormData) {
     "use server";
     const search = formData.get("search") as string;
