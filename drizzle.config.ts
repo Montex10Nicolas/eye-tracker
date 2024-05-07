@@ -8,5 +8,5 @@ export default {
   dbCredentials: {
     connectionString: env.DATABASE_URL,
   },
-  tablesFilter: ["eye-tracker_*"],
+  tablesFilter: ["siuwi-tracker_*"],
 } satisfies Config;

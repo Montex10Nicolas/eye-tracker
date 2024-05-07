@@ -13,12 +13,19 @@ export default async function Provider(props: {
     ...Headers,
   });
 
+  console.log(url);
+
   const providers = (await response.json()) as WatchProvider;
   const {
-    results: {
-      IT: { flatrate, buy, rent },
-    },
+    results: { IT },
   } = providers;
+
+  if (IT === undefined) {
+    return <div>Not available in your country</div>;
+  }
+
+  const { flatrate, buy, rent } = IT;
+
   let all: FlatRentBuy[] = [];
   if (flatrate != undefined) all = [...all, ...flatrate];
   if (buy != undefined) all = [...all, ...buy];

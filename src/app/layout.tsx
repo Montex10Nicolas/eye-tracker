@@ -1,8 +1,10 @@
 import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getUser, lucia } from "~/lib/auth";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -15,7 +17,7 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -27,24 +29,51 @@ export default function RootLayout({
     redirect(`/search/${search}`);
   }
 
+  async function LogOut() {
+    "use server";
+    const user = await getUser();
+    const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
+    if (sessionId !== null) {
+      await lucia.invalidateSession(sessionId);
+    }
+    if (user !== null) {
+      await lucia.invalidateUserSessions(user.username);
+    }
+
+    cookies().delete(lucia.sessionCookieName);
+  }
+
+  const user = await getUser();
+  const loggedIn = user !== null;
+
   return (
     <html lang="en">
       <body
         className={`font-sans ${inter.variable} flex min-h-screen flex-col bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white`}
       >
-        <div className="flex w-full flex-col items-center justify-center gap-4 py-6">
-          <Link href={"/"}>
-            <h1 className="text-5xl">The Siuwi Tracker</h1>
-          </Link>
-          <form action={searchMovieSeries}>
-            <input
-              type="text"
-              className="w-96 rounded-2xl p-2 text-center text-black"
-              placeholder="Search a Movie a Series or a Person"
-              name="search"
-            />
-          </form>
-        </div>
+        <section className="mx-2 mb-6 flex flex-row items-center justify-between rounded-b-2xl bg-slate-200 px-6 py-2 text-black">
+          <div></div>
+          <div className="ml-auto text-3xl font-bold">
+            <Link className="cursor-pointer" href={"/"}>
+              <h1>Siuwi Tracker</h1>
+            </Link>
+          </div>
+          <div className="ml-auto">
+            {loggedIn ? (
+              <form action={LogOut}>
+                <button className="rounded-md bg-sky-700 px-4 py-2 font-semibold  text-white">
+                  Log Out
+                </button>
+              </form>
+            ) : (
+              <Link href={"/login"}>
+                <button className="rounded-md bg-sky-700 px-4 py-2 font-semibold  text-white">
+                  Sign In
+                </button>
+              </Link>
+            )}
+          </div>
+        </section>
         {children}
       </body>
     </html>

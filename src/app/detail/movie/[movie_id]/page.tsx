@@ -9,13 +9,11 @@ import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetMovieDetail } from "~/server/queries";
-import { type MovieDetail } from "~/types/tmdb";
+import { type MovieDetail, type MovieDetail } from "~/types/tmdb_detail";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
 
-export default async function MovieDetail(props: {
-  params: { movie_id: number };
-}) {
+export default async function Page(props: { params: { movie_id: number } }) {
   const id = props.params.movie_id;
 
   if (Number.isNaN(id)) {
@@ -84,9 +82,11 @@ export default async function MovieDetail(props: {
         <ScrollArea className="h-[500] w-full overflow-hidden pt-2">
           <TabsContent value="cast" className="mt-6">
             <RenderCastCrew persons={movie.credits.cast} cast={true} />
+            <RenderCastCrew cast={false} persons={movie.credits.cast} />
           </TabsContent>
           <TabsContent value="crew" className="mt-6">
             <RenderCastCrew persons={movie.credits.crew} cast={false} />
+            <RenderCastCrew cast={true} persons={movie.credits.crew} />
           </TabsContent>
         </ScrollArea>
       </Tabs>

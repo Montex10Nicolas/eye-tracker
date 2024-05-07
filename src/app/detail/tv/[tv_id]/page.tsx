@@ -4,7 +4,7 @@ import { NOT_FOUND_POSTER, TMDB_IMAGE_URL } from "~/_utils/utils";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { GetTVDetail, TMDB_URL } from "~/server/queries";
+import { Authorization, GetTVDetail, TMDB_URL } from "~/server/queries";
 import { type Season } from "~/types/tmdb_detail";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";

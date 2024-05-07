@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { lucia } from "~/lib/auth";
 import {
   type MovieDetail,
   type MovieResultType,
@@ -7,7 +8,7 @@ import {
   type Search,
   type TVDetail,
   type TVResultType,
-} from "~/types/tmdb";
+} from "~/types/tmdb_detail";
 
 export const TMDB_URL = "https://api.themoviedb.org";
 const TMDB_TOKEN = process.env.TMDB_TOKEN;
@@ -100,4 +101,9 @@ export async function GetTVDetail(id: number) {
 
   const data: unknown = await response.json();
   return data as TVDetail;
+}
+
+export async function Logout(sessionId: string, userId: string) {
+  await lucia.invalidateSession(sessionId);
+  await lucia.invalidateUserSessions(userId);
 }
