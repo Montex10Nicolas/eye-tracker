@@ -1,16 +1,6 @@
-import { cookies } from "next/headers";
-import { getUser, lucia } from "~/lib/auth";
 import { DisplaySearchMultiple } from "./(root)/detail/_components/Search";
 
 export default async function HomePage() {
-  const user = await getUser();
-  const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
-
-  if (!sessionId || user === null) {
-    return <div>User null session null</div>;
-  }
-  const result = await lucia.validateSession(sessionId);
-
   return (
     <main className="flex flex-col">
       <DisplaySearchMultiple />
