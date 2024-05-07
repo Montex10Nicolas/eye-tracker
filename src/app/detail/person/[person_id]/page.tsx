@@ -11,7 +11,7 @@ import {
   type MovieCredits,
   type PersonsCast,
   type TvCredits,
-} from "~/types/tmdb";
+} from "~/types/tmdb_detail";
 
 function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
   const all = [...movie.cast, ...movie.crew, ...tv.cast, ...tv.crew];

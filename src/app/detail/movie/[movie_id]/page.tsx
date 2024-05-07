@@ -10,6 +10,7 @@ import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetMovieDetail } from "~/server/queries";
 import { type MovieDetail } from "~/types/tmdb";
+import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
 
 export default async function MovieDetail(props: {
@@ -33,12 +34,16 @@ export default async function MovieDetail(props: {
           className="absolute left-0 top-0 z-[-1] h-full w-full object-cover opacity-45"
         />
         <div className="flex flex-row">
-          <Image
-            src={TMDB_IMAGE_URL(movie.poster_path)}
-            width={200}
-            height={100}
-            alt={`Poster ${movie.title}`}
-          />
+          <div className="flex flex-col gap-2">
+            <Image
+              src={TMDB_IMAGE_URL(movie.poster_path)}
+              width={300}
+              height={300}
+              alt={`Poster ${movie.title}`}
+              className="w-[250px] shrink-0"
+            />
+            <Provider id={id} type="movie" />
+          </div>
           <div className="ml-2 flex h-full flex-col gap-2">
             <h2 className="flex flex-row gap-2">
               <span className="font-semibold">{movie.title}</span> |{" "}

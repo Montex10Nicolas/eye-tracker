@@ -11,7 +11,7 @@ import {
   type PersonSearchType,
   type Search,
   type TVResultType,
-} from "~/types/tmdb";
+} from "~/types/tmdb_detail";
 
 // Probabli need to check with more series/movie/person that share names
 function sortByPopularity(

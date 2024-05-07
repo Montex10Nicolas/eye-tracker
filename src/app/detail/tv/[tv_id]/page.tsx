@@ -4,8 +4,9 @@ import { NOT_FOUND_POSTER, TMDB_IMAGE_URL } from "~/_utils/utils";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { GetTVDetail } from "~/server/queries";
-import { type Season } from "~/types/tmdb";
+import { GetTVDetail, TMDB_URL } from "~/server/queries";
+import { type Season } from "~/types/tmdb_detail";
+import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
 
 function DisplaySeason(props: { season: Season; name: string }) {
@@ -51,12 +52,15 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
   return (
     <main className="p-4">
       <section className="relative flex flex-row gap-4 overflow-hidden rounded-md border border-white p-4 text-white">
-        <Image
-          src={TMDB_IMAGE_URL(poster_image_url)}
-          alt={`Poster ${tv.name}`}
-          width={200}
-          height={300}
-        />
+        <div className="flex flex-col gap-1">
+          <Image
+            src={TMDB_IMAGE_URL(poster_image_url)}
+            alt={`Poster ${tv.name}`}
+            width={300}
+            height={300}
+          />
+          <Provider id={id} type="tv" />
+        </div>
         <div className="flex h-full flex-col">
           <span className="text-bold">
             {tv.name} <span className="italic text-slate-500">{tv.status}</span>

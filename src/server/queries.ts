@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import {
   type MovieDetail,
   type MovieResultType,
@@ -8,19 +9,23 @@ import {
   type TVResultType,
 } from "~/types/tmdb";
 
-const TMDB_URL = "https://api.themoviedb.org";
+export const TMDB_URL = "https://api.themoviedb.org";
 const TMDB_TOKEN = process.env.TMDB_TOKEN;
 
-const Authorization = `Bearer ${TMDB_TOKEN}`;
+export const Authorization = `Bearer ${TMDB_TOKEN}`;
+
+export const Headers = {
+  headers: {
+    Authorization: Authorization,
+  },
+};
 
 export async function searchTV(search: string) {
   const url = new URL("3/search/tv", TMDB_URL);
   url.searchParams.set("query", search);
 
   const response: Response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${TMDB_TOKEN}`,
-    },
+    ...Headers,
   });
 
   if (response.status !== 200) {
@@ -37,9 +42,7 @@ export async function MultiSearch(query: string) {
   url.searchParams.set("query", query);
 
   const response: Response = await fetch(url, {
-    headers: {
-      Authorization: Authorization,
-    },
+    ...Headers,
   });
 
   if (response.status !== 200) {
@@ -92,9 +95,7 @@ export async function GetTVDetail(id: number) {
   url.searchParams.set("append_to_response", "credits");
 
   const response = await fetch(url, {
-    headers: {
-      Authorization: Authorization,
-    },
+    ...Headers,
   });
 
   const data: unknown = await response.json();

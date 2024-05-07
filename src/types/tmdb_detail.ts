@@ -1,3 +1,5 @@
+import regions_json from "../_utils/available_region.json";
+
 export type Search<T> = {
   page: number;
   results: T[];
@@ -387,4 +389,24 @@ export interface SpokenLanguage {
   english_name: string;
   iso_639_1: string;
   name: string;
+}
+
+// WatchProviders
+export interface WatchProvider {
+  id: number;
+  results: Record<"US" | "IT", ProviderResult>;
+}
+
+export interface ProviderResult {
+  link: string;
+  flatrate?: FlatRentBuy[];
+  buy?: FlatRentBuy[];
+  rent?: FlatRentBuy[];
+}
+
+export interface FlatRentBuy {
+  logo_path: string;
+  provider_id: number;
+  provider_name: string;
+  display_priority: number;
 }
