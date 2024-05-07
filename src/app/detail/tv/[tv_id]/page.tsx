@@ -4,7 +4,7 @@ import { NOT_FOUND_POSTER, TMDB_IMAGE_URL } from "~/_utils/utils";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { GetTVDetail } from "~/server/queries";
+import { Authorization, GetTVDetail, TMDB_URL } from "~/server/queries";
 import { type Season } from "~/types/tmdb";
 import { RenderCastCrew } from "../../_components/Summary";
 
@@ -47,6 +47,21 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
     ? tv.backdrop_path
     : NOT_FOUND_POSTER;
   const poster_image_url = tv.poster_path ? tv.poster_path : NOT_FOUND_POSTER;
+
+  async function TVProvider() {
+    "use server";
+    const url = new URL(`/tv/${id}/watch/providers`, TMDB_URL);
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: Authorization,
+      },
+    });
+
+    return (await response.json()) as unknown;
+  }
+
+  const tv_providers = await TVProvider();
 
   return (
     <main className="p-4">

@@ -12,10 +12,10 @@ import {
 import { db } from "./db";
 import { sessionTable, userTable } from "./db/schema";
 
-const TMDB_URL = "https://api.themoviedb.org";
+export const TMDB_URL = "https://api.themoviedb.org";
 const TMDB_TOKEN = process.env.TMDB_TOKEN;
 
-const Authorization = `Bearer ${TMDB_TOKEN}`;
+export const Authorization = `Bearer ${TMDB_TOKEN}`;
 
 export async function searchTV(search: string) {
   const url = new URL("3/search/tv", TMDB_URL);
