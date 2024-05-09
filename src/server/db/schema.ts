@@ -1,7 +1,16 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { pgTableCreator, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+  integer,
+  json,
+  pgTableCreator,
+  serial,
+  smallint,
+  timestamp,
+  varchar,
+} from "drizzle-orm/pg-core";
+import { generateId } from "lucia";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -26,4 +35,21 @@ export const sessionTable = createTable("session", {
     withTimezone: true,
     mode: "date",
   }).notNull(),
+});
+
+export const movies = createTable("movie", {
+  id: varchar("id", { length: 256 }).primaryKey().notNull(),
+  movie_data: json("movie_data").notNull(),
+});
+
+export const watchedMovies = createTable("watched-movies", {
+  id: serial("id").primaryKey().notNull(),
+  userId: varchar("user_id", { length: 256 })
+    .notNull()
+    .references(() => userTable.id),
+  movideId: varchar("movie_id", { length: 256 })
+    .notNull()
+    .references(() => movies.id),
+  duration: smallint("duration").notNull(),
+  timeWatched: smallint("time_watched").notNull(),
 });
