@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
+import Profile from "~/components/profile";
 import { getUser } from "./(user)/action";
 
 const inter = Inter({
@@ -39,9 +40,7 @@ export default async function RootLayout({
           <div className="ml-auto">
             {loggedIn ? (
               <Link href={"/profile"}>
-                <button className="rounded-md bg-sky-700 px-4 py-2 font-semibold  text-white">
-                  Profile
-                </button>
+                <Profile />
               </Link>
             ) : (
               <Link href={"/login"}>

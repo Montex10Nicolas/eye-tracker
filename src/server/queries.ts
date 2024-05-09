@@ -1,4 +1,6 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { getUser } from "~/app/(user)/action";
 import { lucia } from "~/lib/auth";
 import {
   type MovieDetail,
@@ -92,6 +94,7 @@ export async function GetPersonDetail(id: number) {
 }
 
 export async function GetTVDetail(id: number) {
+  "use server";
   const url = new URL(`/3/tv/${id}`, TMDB_URL);
   url.searchParams.set("append_to_response", "credits");
 
@@ -103,7 +106,20 @@ export async function GetTVDetail(id: number) {
   return data as TVDetail;
 }
 
-export async function Logout(sessionId: string, userId: string) {
+export async function Logout() {
+  const user = await getUser();
+  const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
+
+  if (user === null || sessionId === null) redirect("/");
+
   await lucia.invalidateSession(sessionId);
-  await lucia.invalidateUserSessions(userId);
+  await lucia.invalidateUserSessions(user.id);
+
+  const sessionCookie = lucia.createBlankSessionCookie();
+  cookies().set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.attributes,
+  );
+  return redirect("/login");
 }
