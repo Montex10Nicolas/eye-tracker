@@ -33,6 +33,7 @@ export async function addToMovieWatched(
       duration: movie.runtime,
       timeWatched: 1,
       union: userId + movie.id.toString(),
+      dateWatched: new Date(),
     });
   } catch (e: unknown) {
     const err = e as DBErorr;

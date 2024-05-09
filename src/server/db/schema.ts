@@ -10,8 +10,6 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import { generateId } from "lucia";
-import { union } from "zod";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -54,4 +52,5 @@ export const watchedMovie = createTable("watched-movies", {
   union: varchar("union").unique().notNull(),
   duration: smallint("duration").notNull(),
   timeWatched: smallint("time_watched").notNull(),
+  dateWatched: timestamp("date_watched").notNull(),
 });

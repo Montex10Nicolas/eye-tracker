@@ -1,12 +1,7 @@
 "use client";
 import { AvatarImage } from "@radix-ui/react-avatar";
-import {
-  DropdownMenuContent,
-  DropdownMenuLabel,
-} from "@radix-ui/react-dropdown-menu";
+import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import SomeServerComponent from "./server";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -27,7 +22,7 @@ export default function Profile(props: { logout: () => Promise<never> }) {
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Avatar>
-            <AvatarImage src="/github.logo.png" />
+            <AvatarImage src={"/github_logo.png"} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
