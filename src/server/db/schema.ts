@@ -11,6 +11,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { generateId } from "lucia";
+import { union } from "zod";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -37,19 +38,20 @@ export const sessionTable = createTable("session", {
   }).notNull(),
 });
 
-export const movies = createTable("movie", {
-  id: varchar("id", { length: 256 }).primaryKey().notNull(),
+export const moviesTable = createTable("movie", {
   movie_data: json("movie_data").notNull(),
+  id: varchar("movie_id", {
+    length: 256,
+  })
+    .primaryKey()
+    .notNull(),
 });
 
-export const watchedMovies = createTable("watched-movies", {
+export const watchedMovie = createTable("watched-movies", {
   id: serial("id").primaryKey().notNull(),
-  userId: varchar("user_id", { length: 256 })
-    .notNull()
-    .references(() => userTable.id),
-  movideId: varchar("movie_id", { length: 256 })
-    .notNull()
-    .references(() => movies.id),
+  userId: varchar("user_id", { length: 256 }).references(() => userTable.id),
+  movieId: varchar("movie_id").references(() => moviesTable.id),
+  union: varchar("union").unique().notNull(),
   duration: smallint("duration").notNull(),
   timeWatched: smallint("time_watched").notNull(),
 });

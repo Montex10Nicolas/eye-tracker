@@ -16,6 +16,7 @@ export const PASSWORD_HASH_PAR = {
 };
 
 export const getUser = cache(async () => {
+  "use server";
   const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
   if (sessionId === null) return null;
   const { user, session } = await lucia.validateSession(sessionId);

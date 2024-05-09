@@ -1,9 +1,12 @@
+import { boolean } from "drizzle-orm/pg-core";
+import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import {
   NOT_FOUND_POSTER,
   TMDB_IMAGE_URL,
   displayHumanDate,
 } from "~/_utils/utils";
+import { getUser } from "~/app/(user)/action";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
@@ -11,14 +14,47 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetMovieDetail } from "~/server/queries";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
+import {
+  addMovie,
+  addToMovieWatched,
+  checkMovieWatched,
+  removeFromMovieWatched,
+} from "../../actions";
 
 export default async function Page(props: { params: { movie_id: number } }) {
   const id = props.params.movie_id;
 
+  const movie = await GetMovieDetail(id);
+  const user = await getUser();
+
+  const isLogged = user !== null;
+  let watched = false,
+    watchedId = -1;
+  if (isLogged) {
+    watchedId = (await checkMovieWatched(user.id, id.toString())) ?? -1;
+    watched = watchedId !== -1;
+  }
+
+  async function handleWatched(formData: FormData) {
+    "use server";
+    if (!user) {
+      throw new Error("You need to be logged in");
+    }
+
+    console.log("This user is trying to add a movei", user, movie);
+
+    if (watched) {
+      await removeFromMovieWatched(watchedId);
+      revalidatePath(`/detail/movie${movie.id}`);
+    } else {
+      await addToMovieWatched(user.id, movie, false);
+      revalidatePath(`/detail/movie${movie.id}`);
+    }
+  }
+
   if (Number.isNaN(id)) {
     throw new Error("Not a number");
   }
-  const movie = await GetMovieDetail(id);
   let background_image = movie.backdrop_path ? movie.backdrop_path : null;
   if (background_image === null) background_image = NOT_FOUND_POSTER;
 
@@ -64,6 +100,29 @@ export default async function Page(props: { params: { movie_id: number } }) {
               Rating {movie.vote_average.toFixed(1)} with {movie.vote_count}{" "}
               votes
             </div>
+            {isLogged ? (
+              <div>
+                <form action={handleWatched}>
+                  {!watched ? (
+                    <button
+                      type="submit"
+                      className="rounded-sm bg-sky-700 px-4 py-2"
+                    >
+                      add
+                    </button>
+                  ) : (
+                    <div>
+                      <button
+                        type="submit"
+                        className="rouned-sm rounded-sm bg-sky-700 px-4 py-2"
+                      >
+                        remove
+                      </button>
+                    </div>
+                  )}
+                </form>
+              </div>
+            ) : null}
             <div className="invisible absolute bottom-3 flex flex-row gap-4 lg:visible">
               <Provider id={id} type="movie" width={55} height={55} />
             </div>
