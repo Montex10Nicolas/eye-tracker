@@ -87,6 +87,7 @@ export async function signup(username: string, password: string) {
 }
 
 export async function login(username: string, password: string) {
+  "use server";
   if (typeof username !== "string" || username.length < 3) {
     return new NextResponse("Invalid username", {
       status: 400,
@@ -130,16 +131,23 @@ export async function login(username: string, password: string) {
   return redirect("/");
 }
 
-async function LogOut() {
+export async function Logout() {
   "use server";
   const user = await getUser();
   const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
-  if (sessionId !== null) {
-    await lucia.invalidateSession(sessionId);
-  }
-  if (user !== null) {
-    await lucia.invalidateUserSessions(user.username);
+
+  if (user === null || sessionId === null) {
+    return redirect("/");
   }
 
-  cookies().delete(lucia.sessionCookieName);
+  await lucia.invalidateSession(sessionId);
+  await lucia.invalidateUserSessions(user.id);
+
+  const sessionCookie = lucia.createBlankSessionCookie();
+  cookies().set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.attributes,
+  );
+  return redirect("/login");
 }

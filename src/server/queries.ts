@@ -105,28 +105,3 @@ export async function GetTVDetail(id: number) {
   const data: unknown = await response.json();
   return data as TVDetail;
 }
-
-export async function Logout() {
-  "use server";
-  console.log("logouthello???");
-  const user = await getUser();
-  const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
-
-  console.log("check");
-  if (user === null || sessionId === null) {
-    console.log("failed");
-    return redirect("/");
-  }
-
-  console.log("passed");
-  await lucia.invalidateSession(sessionId);
-  await lucia.invalidateUserSessions(user.id);
-
-  const sessionCookie = lucia.createBlankSessionCookie();
-  cookies().set(
-    sessionCookie.name,
-    sessionCookie.value,
-    sessionCookie.attributes,
-  );
-  return redirect("/login");
-}

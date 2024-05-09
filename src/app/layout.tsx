@@ -3,8 +3,8 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
+import { Logout } from "~/app/(user)/action";
 import Profile from "~/components/profile";
-import { Logout } from "~/server/queries";
 import { getUser } from "./(user)/action";
 
 const inter = Inter({
