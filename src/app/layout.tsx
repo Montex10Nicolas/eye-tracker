@@ -40,9 +40,7 @@ export default async function RootLayout({
           </div>
           <div className="ml-auto">
             {loggedIn ? (
-              <Link href={"/profile"}>
-                <Profile logout={Logout} />
-              </Link>
+              <Profile logout={Logout} />
             ) : (
               <Link href={"/login"}>
                 <button className="rounded-md bg-sky-700 px-4 py-2 font-semibold  text-white">
