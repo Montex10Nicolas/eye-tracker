@@ -107,11 +107,18 @@ export async function GetTVDetail(id: number) {
 }
 
 export async function Logout() {
+  "use server";
+  console.log("logouthello???");
   const user = await getUser();
   const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
 
-  if (user === null || sessionId === null) redirect("/");
+  console.log("check");
+  if (user === null || sessionId === null) {
+    console.log("failed");
+    return redirect("/");
+  }
 
+  console.log("passed");
   await lucia.invalidateSession(sessionId);
   await lucia.invalidateUserSessions(user.id);
 

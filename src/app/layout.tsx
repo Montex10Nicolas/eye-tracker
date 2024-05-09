@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import Profile from "~/components/profile";
+import { Logout } from "~/server/queries";
 import { getUser } from "./(user)/action";
 
 const inter = Inter({
@@ -40,7 +41,7 @@ export default async function RootLayout({
           <div className="ml-auto">
             {loggedIn ? (
               <Link href={"/profile"}>
-                <Profile />
+                <Profile logout={Logout} />
               </Link>
             ) : (
               <Link href={"/login"}>
