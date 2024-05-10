@@ -1,10 +1,4 @@
-import Image from "next/image";
-import Link from "next/link";
-import {
-  NOT_FOUND_POSTER,
-  TMDB_IMAGE_URL,
-  displayHumanDate,
-} from "~/_utils/utils";
+import { NOT_FOUND_POSTER } from "~/_utils/utils";
 import { MultiSearch } from "~/server/queries";
 import {
   type MovieResultType,
