@@ -16,75 +16,73 @@ import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { type TVDetail } from "~/types/tmdb_detail";
 import { addSeason } from "../actions";
 
-export function AppDrawer(props: {
+export function SeasonDrawer(props: {
   tv: TVDetail;
-  addSeason: (serieId: string, seasonNumber: number) => void;
+  addSeason: (serieId: string, seasonNumber: number[]) => void;
 }) {
   const { tv } = props;
   const { seasons } = tv;
 
-  const [selected, setSelected] = useState<number[]>([]);
+  const [selected, setSelected] = useState(
+    new Array<boolean>(tv.seasons.length).fill(false),
+  );
 
-  async function handleSubmit() {
-    // console.log("handle", selected);
-    // for (const seasonId of selected) {
-    //   tv.seasons.findIndex((c) => c.id === seasonId);
-    //   await addSeason(seasonId, seasonId);
-    // }
+  async function add() {
+    const tvId = tv.id.toString();
+    const arr: number[] = [];
+    let index = 0;
+    for (const i of selected) {
+      i ? arr.push(index++) : index++;
+    }
+    await addSeason(tvId, arr);
   }
 
   return (
     <Drawer>
       <DrawerTrigger asChild>
         <button className="mt-2 w-full rounded-md bg-sky-700 px-4 py-2 font-semibold uppercase text-white">
-          add
+          seasons
         </button>
       </DrawerTrigger>
       <DrawerContent className="w-full bg-slate-900">
         <div className="mx-auto w-[70%]">
           <DrawerHeader>
             <DrawerTitle>Select the season you have watched</DrawerTitle>
-            {/* <DrawerDescription>Set your daily activity goal.</DrawerDescription> */}
           </DrawerHeader>
           <div>
-            {/* <code>{JSON.stringify(selected, null, 2)}</code> */}
-            <div className="">
+            <div className="flex flex-row items-center justify-center gap-2">
               <label htmlFor="all">Select all season</label>
               <input
-                onChange={(c) => {
-                  if (c.target.checked) {
-                    setSelected(() => {
-                      const arr: number[] = [];
-                      for (const i of seasons) arr.push(i.id);
-                      return arr;
-                    });
-                  } else {
-                    setSelected([]);
-                  }
-                }}
                 type="checkbox"
                 name="all"
+                onChange={(input) => {
+                  const value = input.target.checked;
+                  setSelected((t) => {
+                    if (t.length < 0) return t;
+                    return value
+                      ? (new Array(t.length).fill(true) as boolean[])
+                      : (new Array(t.length).fill(false) as boolean[]);
+                  });
+                }}
               />
             </div>
             <ScrollArea className="h-60">
               <div className="flex gap-2">
                 {seasons.map((season) => {
-                  const index = selected.findIndex((c) => c === season.id);
                   return (
                     <div
                       key={season.id}
-                      className={`border-3 h-full w-32 cursor-pointer rounded-md border-sky-600 p-2 ${index != -1 ? "border" : ""}`}
+                      className={`border-3 h-full w-32 cursor-pointer rounded-md border-sky-600 p-2 ${selected[season.season_number] === true ? "border" : ""}`}
                       onClick={() => {
                         setSelected((c) => {
-                          return index === -1
-                            ? [...c, season.id]
-                            : [
-                                ...c.slice(0, index),
-                                ...c.slice(index + 1, c.length),
-                              ];
+                          const index = season.season_number;
+                          const copy = [...c];
+                          copy[index] = !copy[index];
+                          return copy;
                         });
                       }}
                     >
+                      <p>{season.season_number}</p>
                       <Image
                         src={TMDB_IMAGE_URL(season.poster_path)}
                         alt={season.id + season.name}
@@ -101,10 +99,21 @@ export function AppDrawer(props: {
           </div>
           <DrawerFooter>
             <button
-              onClick={handleSubmit}
+              onClick={add}
               className="rounded-sm bg-green-600 px-4 py-2 font-semibold uppercase"
             >
               Submit
+            </button>
+            <button
+              onClick={() =>
+                setSelected((t) => {
+                  if (t.length < 0) return t;
+                  return new Array(t.length).fill(false) as boolean[];
+                })
+              }
+              className="rounded-sm bg-orange-600 px-4 py-2 font-semibold uppercase"
+            >
+              reset
             </button>
             <DrawerClose asChild>
               <button className="rounded-sm bg-red-700 px-4 py-2 font-semibold uppercase">

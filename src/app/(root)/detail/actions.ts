@@ -164,8 +164,12 @@ export async function myWatchedMovie(limit = 25, offset: number) {
   return res;
 }
 
-export async function addSeason(serieId: string, season_number: number) {
+export async function addSeason(serieId: string, season_number: number[]) {
   "use server";
-  const seasonNumber = season_number.toString();
-  console.log(serieId, seasonNumber);
+
+  // console.log(
+  //   `User is trying to add season from ${serieId} with season count ${seasonNumber}`,
+  // );
+
+  console.log(serieId, season_number);
 }

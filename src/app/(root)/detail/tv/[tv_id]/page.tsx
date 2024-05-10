@@ -7,7 +7,7 @@ import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetTVDetail, getTvRecomendation } from "~/server/queries";
 import { type Season, type TVDetail } from "~/types/tmdb_detail";
-import { AppDrawer } from "../../_components/Dialog";
+import { SeasonDrawer } from "../../_components/Dialog";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
 import { addSeason } from "../../actions";
@@ -92,7 +92,7 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
             <Provider height={55} width={55} id={id} type="tv" />
           </div>
           <div>
-            <AppDrawer tv={tv} addSeason={addSeason} />
+            <SeasonDrawer tv={tv} addSeason={addSeason} />
           </div>
         </div>
       </section>
