@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
-import { getUser, myInfo } from "~/app/(user)/action";
+import { getUser, myInfo } from "~/app/(user)/user_action";
 import { type MovieDetail } from "~/types/tmdb_detail";
 import { myWatchedMovie } from "../detail/actions";
 

@@ -1,7 +1,3 @@
-import { cookies, headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { getUser } from "~/app/(user)/action";
-import { lucia } from "~/lib/auth";
 import {
   type MovieDetail,
   type MovieResultType,

@@ -1,5 +1,4 @@
 import { hash, verify } from "@node-rs/argon2";
-import { eq } from "drizzle-orm";
 import { generateIdFromEntropySize } from "lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -7,7 +6,7 @@ import { NextResponse } from "next/server";
 import { cache } from "react";
 import { lucia } from "~/lib/auth";
 import { db } from "~/server/db";
-import { moviesTable, userTable, userToMovie } from "~/server/db/schema";
+import { userTable } from "~/server/db/schema";
 
 export const PASSWORD_HASH_PAR = {
   memoryCost: 19456,

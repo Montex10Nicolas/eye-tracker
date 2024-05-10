@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Separator } from "~/components/ui/separator";
-import { login } from "../action";
+import { login } from "../user_action";
 
 export default async function Login() {
   async function handleSubmit(formData: FormData) {

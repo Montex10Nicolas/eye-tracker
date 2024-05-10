@@ -6,7 +6,7 @@ import {
   displayHumanDate,
 } from "~/_utils/utils";
 import { DisplayMovies } from "~/app/(root)/search/[query]/page";
-import { getUser } from "~/app/(user)/action";
+import { getUser } from "~/app/(user)/user_action";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";

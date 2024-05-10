@@ -3,9 +3,8 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import { Logout } from "~/app/(user)/action";
+import { Logout, getUser } from "~/app/(user)/user_action";
 import Profile from "~/components/profile";
-import { getUser } from "./(user)/action";
 
 const inter = Inter({
   subsets: ["latin"],

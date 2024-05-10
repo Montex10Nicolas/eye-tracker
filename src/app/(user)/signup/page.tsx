@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Separator } from "~/components/ui/separator";
-import { signup } from "../action";
+import { signup } from "../user_action";
 
 export default async function Page() {
   async function submit(formData: FormData) {
