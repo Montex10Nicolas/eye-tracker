@@ -14,7 +14,6 @@ import { GetMovieDetail } from "~/server/queries";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
 import {
-  addMovie,
   addToMovieWatched,
   checkMovieWatched,
   removeFromMovieWatched,
@@ -27,12 +26,9 @@ export default async function Page(props: { params: { movie_id: number } }) {
   const user = await getUser();
 
   const isLogged = user !== null;
-  let watched = false,
-    watchedId = -1;
+  let watched = false;
   if (isLogged) {
-    // watchedId = (await checkMovieWatched(user.id, id.toString())) ?? -1;
     watched = await checkMovieWatched(user.id, id.toString());
-    // watched = watchedId !== -1;
   }
 
   async function addMovie() {
@@ -53,7 +49,7 @@ export default async function Page(props: { params: { movie_id: number } }) {
       console.log("no user");
       return "need to be logged in";
     }
-    await removeFromMovieWatched(user?.id, movie, false);
+    await removeFromMovieWatched(user?.id, movie);
     revalidatePath(`/detail/movie${movie.id}`);
   }
 
@@ -102,8 +98,11 @@ export default async function Page(props: { params: { movie_id: number } }) {
               })}
             </div>
             <div className="mb-2 mt-auto flex">
-              Rating {movie.vote_average.toFixed(1)} with {movie.vote_count}{" "}
-              votes
+              <div className="space-x-2">
+                Rating <span>{movie.vote_average.toFixed(1)}</span> with
+                <span>{movie.vote_count}</span>
+                votes
+              </div>
               {isLogged ? (
                 <div className="ml-auto">
                   <>
@@ -146,6 +145,7 @@ export default async function Page(props: { params: { movie_id: number } }) {
           </div>
         </div>
       </section>
+      <section>
       <Tabs
         defaultValue="cast"
         className="relative mt-4 rounded-md border bg-white p-4 text-black"
@@ -161,14 +161,15 @@ export default async function Page(props: { params: { movie_id: number } }) {
         </TabsList>
         <ScrollArea className="h-[500] w-full overflow-hidden pt-2">
           <TabsContent value="cast" className="mt-6">
-            <RenderCastCrew cast={false} persons={movie.credits.cast} />
+            <RenderCastCrew cast={true} persons={movie.credits.cast} />
           </TabsContent>
           <TabsContent value="crew" className="mt-6">
-            <RenderCastCrew cast={true} persons={movie.credits.crew} />
+            <RenderCastCrew cast={false} persons={movie.credits.crew} />
           </TabsContent>
         </ScrollArea>
       </Tabs>
       <Separator className="my-3" />
+      </section>
     </main>
   );
 }

@@ -145,7 +145,7 @@ export async function removeFromMovieWatched(
   }
 }
 
-export async function myWatchedMovie() {
+export async function myWatchedMovie(limit = 25, offset: number) {
   "use server";
   const res = await db.query.userToMovie.findMany({
     with: {
@@ -157,6 +157,8 @@ export async function myWatchedMovie() {
       },
     },
     orderBy: desc(userToMovie.dateWatched),
+    limit: limit,
+    offset: offset,
   });
 
   return res;
