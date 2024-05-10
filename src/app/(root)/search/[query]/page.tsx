@@ -66,10 +66,7 @@ function DisplayPerson(props: {
   );
 }
 
-export function DisplayTV(props: {
-  result: TVResultType;
-  background_url: string;
-}) {
+function DisplayTV(props: { result: TVResultType; background_url: string }) {
   const { result: found, background_url } = props;
   return (
     <Link href={`/detail/tv/${found.id}`}>

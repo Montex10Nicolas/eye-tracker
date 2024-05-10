@@ -1,13 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NOT_FOUND_POSTER, TMDB_IMAGE_URL } from "~/_utils/utils";
-import { DisplayTV } from "~/app/(root)/search/[query]/page";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetTVDetail, getTvRecomendation } from "~/server/queries";
 import { type Season, type TVDetail } from "~/types/tmdb_detail";
 import { SeasonDrawer } from "../../_components/Dialog";
+import { DisplayTV } from "../../_components/Display";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
 import { addSeason } from "../../actions";
