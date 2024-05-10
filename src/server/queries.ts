@@ -4,6 +4,7 @@ import {
   type PersonDetailType,
   type PersonSearchType,
   type Search,
+  type SeasonDetail,
   type TVDetail,
   type TVResultType,
 } from "~/types/tmdb_detail";
@@ -126,4 +127,15 @@ export async function getMovieRecomendation(movId: number, page: number) {
   });
   const data: unknown = await response.json();
   return data as Search<MovieResultType>;
+}
+
+export async function getSeasonDetail(seasonId: string, season_number: number) {
+  const seasonNum = season_number.toString();
+  const url = new URL(`3/tv/${seasonId}/season/${seasonNum}`);
+
+  const response = await fetch(url, {
+    ...Headers,
+  });
+  const data: unknown = await response.json();
+  return data as SeasonDetail;
 }

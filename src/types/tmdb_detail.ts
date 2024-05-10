@@ -7,6 +7,7 @@ export type Search<T> = {
   total_results: number;
 };
 
+// Type return by the multi search for TV
 export type TVResultType = {
   adult: boolean;
   backdrop_path: string;
@@ -25,6 +26,7 @@ export type TVResultType = {
   media_type?: string;
 };
 
+// Type return by the multi search for Movie
 export type MovieResultType = {
   adult: boolean;
   backdrop_path: string;
@@ -43,6 +45,7 @@ export type MovieResultType = {
   media_type?: string;
 };
 
+// Type return by the multi search for Person
 export type PersonSearchType = {
   adult: boolean;
   gender: number;
@@ -288,7 +291,7 @@ export interface Profile {
   width: number;
 }
 
-//TV
+// TVDetail
 export interface TVDetail {
   adult: boolean;
   backdrop_path: string;
@@ -409,4 +412,34 @@ export interface FlatRentBuy {
   provider_id: number;
   provider_name: string;
   display_priority: number;
+}
+
+export interface SeasonDetail {
+  _id: string;
+  id: number;
+  air_date: string;
+  episodes: Episode[];
+  name: string;
+  overview: string;
+  poster_path: string;
+  season_number: number;
+  vote_average: number;
+}
+
+export interface Episode {
+  id: number;
+  aid_date: string;
+  episode_number: number;
+  name: string;
+  overview: string;
+  production_code: string;
+  runtime: number;
+  season_number: number;
+  show_id: number;
+  still_path: string;
+  vote_average: number;
+  vote_count: number;
+  crew: Crew[];
+  guest_cast: Cast[];
+  naem: string;
 }

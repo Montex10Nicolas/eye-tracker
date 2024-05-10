@@ -6,9 +6,11 @@ import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetTVDetail, getTvRecomendation } from "~/server/queries";
-import { type Season } from "~/types/tmdb_detail";
+import { type Season, type TVDetail } from "~/types/tmdb_detail";
+import { AppDrawer } from "../../_components/Dialog";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
+import { addSeason } from "../../actions";
 
 function DisplaySeason(props: { season: Season; name: string }) {
   const { season, name } = props;
@@ -77,8 +79,8 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
             {tv.name} <span className="italic text-slate-500">{tv.status}</span>
           </span>
           <div className="flex gap-2">
-            <span>Episode count: {tv.number_of_episodes}</span>
-            <span>Season count: {tv.number_of_seasons}</span>
+            <span>{tv.number_of_episodes} episodes</span> |
+            <span>{tv.number_of_seasons} seasons</span>
           </div>
           <div>
             {tv.genres.map((genre) => (
@@ -88,6 +90,9 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
           <p className="content-end">{tv.overview}</p>
           <div className="invisible absolute bottom-3 flex flex-row gap-4 lg:visible">
             <Provider height={55} width={55} id={id} type="tv" />
+          </div>
+          <div>
+            <AppDrawer tv={tv} addSeason={addSeason} />
           </div>
         </div>
       </section>

@@ -163,3 +163,9 @@ export async function myWatchedMovie(limit = 25, offset: number) {
 
   return res;
 }
+
+export async function addSeason(serieId: string, season_number: number) {
+  "use server";
+  const seasonNumber = season_number.toString();
+  console.log(serieId, seasonNumber);
+}
