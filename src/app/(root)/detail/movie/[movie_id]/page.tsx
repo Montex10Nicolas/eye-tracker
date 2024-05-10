@@ -101,45 +101,45 @@ export default async function Page(props: { params: { movie_id: number } }) {
                 );
               })}
             </div>
-            <div className="mt-auto">
+            <div className="mb-2 mt-auto flex">
               Rating {movie.vote_average.toFixed(1)} with {movie.vote_count}{" "}
               votes
-            </div>
-            {isLogged ? (
-              <div>
-                <>
-                  {!watched ? (
-                    <form action={addMovie}>
-                      <button
-                        type="submit"
-                        className="rounded-sm bg-sky-700 px-4 py-2"
-                      >
-                        add
-                      </button>
-                    </form>
-                  ) : (
-                    <div>
+              {isLogged ? (
+                <div className="ml-auto">
+                  <>
+                    {!watched ? (
                       <form action={addMovie}>
                         <button
                           type="submit"
-                          className="rounded-sm bg-sky-700 px-4 py-2"
+                          className="rounded-sm bg-sky-700 px-4 py-2 font-semibold uppercase"
                         >
                           add
                         </button>
                       </form>
-                      <form action={removeMovie}>
-                        <button
-                          type="submit"
-                          className="rounded-sm bg-sky-700 px-4 py-2"
-                        >
-                          remove
-                        </button>
-                      </form>
-                    </div>
-                  )}
-                </>
-              </div>
-            ) : null}
+                    ) : (
+                      <div className="flex gap-2">
+                        <form action={addMovie}>
+                          <button
+                            type="submit"
+                            className="rounded-sm bg-sky-700 px-4 py-2 font-semibold uppercase"
+                          >
+                            rewatch
+                          </button>
+                        </form>
+                        <form action={removeMovie}>
+                          <button
+                            type="submit"
+                            className="rounded-sm bg-red-700 px-4 py-2 font-semibold uppercase"
+                          >
+                            remove
+                          </button>
+                        </form>
+                      </div>
+                    )}
+                  </>
+                </div>
+              ) : null}
+            </div>
             <div className="invisible absolute bottom-3 flex flex-row gap-4 lg:visible">
               <Provider id={id} type="movie" width={55} height={55} />
             </div>
