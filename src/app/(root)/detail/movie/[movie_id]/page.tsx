@@ -5,13 +5,13 @@ import {
   TMDB_IMAGE_URL,
   displayHumanDate,
 } from "~/_utils/utils";
-import { DisplayMovies } from "~/app/(root)/search/[query]/page";
 import { getUser } from "~/app/(user)/user_action";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetMovieDetail, getMovieRecomendation } from "~/server/queries";
+import { DisplayMovies } from "../../_components/Display";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
 import {
