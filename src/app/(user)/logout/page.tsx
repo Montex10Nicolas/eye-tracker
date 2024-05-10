@@ -1,5 +1,6 @@
 "use server";
-import { Logout } from "~/server/queries";
+
+import { Logout } from "../user_action";
 
 export default async function Page() {
   "use server";

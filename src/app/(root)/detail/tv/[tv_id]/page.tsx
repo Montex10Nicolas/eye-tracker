@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NOT_FOUND_POSTER, TMDB_IMAGE_URL } from "~/_utils/utils";
-import { DipsplayTV } from "~/app/(root)/search/[query]/page";
+import { DisplayTV } from "~/app/(root)/search/[query]/page";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
@@ -131,7 +131,7 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
           {/* <code>{JSON.stringify(reccomendations, null, 2)}</code> */}
           {reccomendations.results.map((tv_reccomend) => {
             return (
-              <DipsplayTV
+              <DisplayTV
                 key={tv_reccomend.id}
                 result={tv_reccomend}
                 background_url={tv_reccomend.backdrop_path}

@@ -66,7 +66,7 @@ function DisplayPerson(props: {
   );
 }
 
-export function DipsplayTV(props: {
+export function DisplayTV(props: {
   result: TVResultType;
   background_url: string;
 }) {
@@ -149,7 +149,7 @@ export default async function SearchPage(props: { params: { query: string } }) {
             );
           case "tv":
             return (
-              <DipsplayTV result={res} background_url={background_image_url} />
+              <DisplayTV result={res} background_url={background_image_url} />
             );
           default:
             return <div>something is missing and I do not know what</div>;
