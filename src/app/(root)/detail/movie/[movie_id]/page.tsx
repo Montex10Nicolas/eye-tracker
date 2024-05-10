@@ -1,4 +1,3 @@
-import { boolean } from "drizzle-orm/pg-core";
 import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import {
@@ -31,25 +30,31 @@ export default async function Page(props: { params: { movie_id: number } }) {
   let watched = false,
     watchedId = -1;
   if (isLogged) {
-    watchedId = (await checkMovieWatched(user.id, id.toString())) ?? -1;
-    watched = watchedId !== -1;
+    // watchedId = (await checkMovieWatched(user.id, id.toString())) ?? -1;
+    watched = await checkMovieWatched(user.id, id.toString());
+    // watched = watchedId !== -1;
   }
 
-  async function handleWatched(formData: FormData) {
+  async function addMovie() {
     "use server";
     if (!user) {
-      throw new Error("You need to be logged in");
+      return "need to be logged in";
     }
+    await addToMovieWatched(user?.id, movie, false);
+    revalidatePath(`/detail/movie${movie.id}`);
+  }
 
-    // console.log("This user is trying to add a movei", user, movie);
+  async function removeMovie() {
+    "use server";
 
-    if (watched) {
-      await removeFromMovieWatched(user.id, movie.id);
-      revalidatePath(`/detail/movie${movie.id}`);
-    } else {
-      await addToMovieWatched(user.id, movie, false);
-      revalidatePath(`/detail/movie${movie.id}`);
+    console.log("remove movie");
+
+    if (!user) {
+      console.log("no user");
+      return "need to be logged in";
     }
+    await removeFromMovieWatched(user?.id, movie, false);
+    revalidatePath(`/detail/movie${movie.id}`);
   }
 
   if (Number.isNaN(id)) {
@@ -102,25 +107,37 @@ export default async function Page(props: { params: { movie_id: number } }) {
             </div>
             {isLogged ? (
               <div>
-                <form action={handleWatched}>
+                <>
                   {!watched ? (
-                    <button
-                      type="submit"
-                      className="rounded-sm bg-sky-700 px-4 py-2"
-                    >
-                      add
-                    </button>
-                  ) : (
-                    <div>
+                    <form action={addMovie}>
                       <button
                         type="submit"
-                        className="rouned-sm rounded-sm bg-sky-700 px-4 py-2"
+                        className="rounded-sm bg-sky-700 px-4 py-2"
                       >
-                        remove
+                        add
                       </button>
+                    </form>
+                  ) : (
+                    <div>
+                      <form action={addMovie}>
+                        <button
+                          type="submit"
+                          className="rounded-sm bg-sky-700 px-4 py-2"
+                        >
+                          add
+                        </button>
+                      </form>
+                      <form action={removeMovie}>
+                        <button
+                          type="submit"
+                          className="rounded-sm bg-sky-700 px-4 py-2"
+                        >
+                          remove
+                        </button>
+                      </form>
                     </div>
                   )}
-                </form>
+                </>
               </div>
             ) : null}
             <div className="invisible absolute bottom-3 flex flex-row gap-4 lg:visible">

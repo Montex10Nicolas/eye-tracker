@@ -1,14 +1,8 @@
 "use server";
-import { and, asc, desc, eq } from "drizzle-orm";
-import { watch } from "fs";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "~/server/db";
-import {
-  moviesTable,
-  userInfoTable,
-  userTable,
-  userToMovie,
-} from "~/server/db/schema";
-import { CODES_STATUS, type DBErorr } from "~/server/db/types";
+import { moviesTable, userInfoTable, userToMovie } from "~/server/db/schema";
+import { type DBErorr } from "~/server/db/types";
 import { type MovieDetail } from "~/types/tmdb_detail";
 
 export async function addMovie(movie: MovieDetail) {
@@ -23,17 +17,16 @@ export async function addToMovieWatched(
   movie: MovieDetail,
   again: boolean,
 ) {
-  const found = await db.query.moviesTable.findFirst({
+  const search_movie = await db.query.moviesTable.findFirst({
     where: (mov, { eq }) => eq(mov.id, movie.id.toString()),
   });
 
-  if (found === undefined) {
-    console.log("dind't found adding");
+  // If the movie does not exist add it
+  if (search_movie === undefined) {
     await addMovie(movie);
-  } else {
-    console.log("found");
   }
 
+  // Try to create the watched record, if already exist throw error
   try {
     await db.insert(userToMovie).values({
       movieId: movie.id.toString(),
@@ -43,7 +36,25 @@ export async function addToMovieWatched(
       dateWatched: new Date(),
     });
   } catch (e: unknown) {
-    console.log("this user has already seen this movie");
+    // Add update the watch count and duration
+    const movieId = movie.id.toString();
+    const record = await db.query.userToMovie.findFirst({
+      where: (rec, { eq, and }) =>
+        and(eq(rec.userId, userId), eq(rec.movieId, movieId)),
+    });
+    if (record === undefined) {
+      throw new Error("Record does not exist and it should");
+    }
+
+    const time_watched = record.timeWatched + 1;
+    await db
+      .update(userToMovie)
+      .set({
+        timeWatched: time_watched,
+      })
+      .where(
+        and(eq(userToMovie.userId, userId), eq(userToMovie.movieId, movieId)),
+      );
   }
 
   try {
@@ -52,10 +63,7 @@ export async function addToMovieWatched(
     });
 
     if (info === undefined) {
-      console.log("info is undefinedd wtf");
       throw new Error("Info is undefined");
-    } else {
-      console.log("info is not undefined");
     }
 
     const count = info.movieCountTotal + 1;
@@ -67,29 +75,74 @@ export async function addToMovieWatched(
       .where(eq(userInfoTable.id, info.id));
   } catch (e: unknown) {
     const err = e as DBErorr;
-    console.log("already exist", err.code);
   }
 }
 
 export async function checkMovieWatched(userId: string, movieId: string) {
-  return await db.query.userToMovie.findFirst({
-    where: (mov, { eq }) =>
-      and(eq(mov.userId, userId), eq(mov.movieId, movieId)),
-  });
+  return (
+    (await db.query.userToMovie.findFirst({
+      where: (mov, { eq }) =>
+        and(eq(mov.userId, userId), eq(mov.movieId, movieId)),
+    })) !== undefined
+  );
 }
 
 // This is complitely wrong
 // It just delete all movie does not check the user that is making the request
-export async function removeFromMovieWatched(userId: string, movieId: number) {
+export async function removeFromMovieWatched(
+  userId: string,
+  movie: MovieDetail,
+) {
   "use server";
-  return await db
-    .delete(userToMovie)
-    .where(
-      and(
-        eq(userToMovie.userId, userId),
-        eq(userToMovie.movieId, movieId.toString()),
-      ),
-    );
+  try {
+    const deleted = await db
+      .delete(userToMovie)
+      .where(
+        and(
+          eq(userToMovie.userId, userId),
+          eq(userToMovie.movieId, movie.id.toString()),
+        ),
+      )
+      .returning({
+        timeWatched: userToMovie.timeWatched,
+      });
+
+    if (deleted.length < 1 || deleted[0] === undefined) {
+      throw new Error("Deleted is less than 1");
+    }
+
+    const { timeWatched } = deleted[0];
+
+    const info = await db.query.userInfoTable.findFirst({
+      where: (info, { eq }) => eq(info.userId, userId),
+    });
+
+    if (info === undefined || info === null) {
+      throw new Error("info should be existing");
+    }
+
+    const movie_data = await db.query.moviesTable.findFirst({
+      where: (mov, { eq }) => eq(moviesTable.id, mov.id),
+    });
+
+    if (movie_data === undefined || movie_data === null) {
+      throw new Error("Movie cannot be null");
+    }
+
+    const runtime_to_remove = movie.runtime * timeWatched;
+    const runtime = info.movieDurationTotal - runtime_to_remove;
+    const time = info.movieCountTotal - timeWatched;
+
+    await db
+      .update(userInfoTable)
+      .set({
+        movieCountTotal: runtime,
+        movieDurationTotal: time,
+      })
+      .where(eq(userInfoTable.userId, userId));
+  } catch (e: unknown) {
+    console.log("Error while deleting", e);
+  }
 }
 
 export async function myWatchedMovie() {

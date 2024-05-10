@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
 import { getUser, myInfo } from "~/app/(user)/action";
 import { type MovieDetail } from "~/types/tmdb_detail";
@@ -69,22 +70,30 @@ export default async function Page() {
             if (user?.info !== null) {
               info = user?.info;
             } else {
-              return <div key={watch.id}>Info is null</div>;
+              return (
+                <div key={`${watch.userId}-${watch.movieId}`}>Info is null</div>
+              );
             }
           } else {
-            return <div key={watch.id}>Something wrong</div>;
+            return (
+              <div key={`${watch.userId}-${watch.movieId}`}>
+                Something wrong
+              </div>
+            );
           }
 
           return (
-            <div key={watch.id}>
-              <Image
-                src={TMDB_IMAGE_URL(movie.poster_path)}
-                alt={`Poster ${movie.title}`}
-                width={150}
-                height={150}
-              />
-              <div>{movie.title}</div>
-              <div>{watch.duration} minutes</div>
+            <div key={`${watch.userId}-${watch.movieId}`}>
+              <Link href={`/detail/movie/${watch.movieId}`}>
+                <Image
+                  src={TMDB_IMAGE_URL(movie.poster_path)}
+                  alt={`Poster ${movie.title}`}
+                  width={150}
+                  height={150}
+                />
+                <div>{movie.title}</div>
+                <div>{watch.duration} minutes</div>
+              </Link>
             </div>
           );
         })}
