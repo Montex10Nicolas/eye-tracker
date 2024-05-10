@@ -41,10 +41,10 @@ export default async function Page(props: { params: { movie_id: number } }) {
       throw new Error("You need to be logged in");
     }
 
-    console.log("This user is trying to add a movei", user, movie);
+    // console.log("This user is trying to add a movei", user, movie);
 
     if (watched) {
-      await removeFromMovieWatched(watchedId);
+      await removeFromMovieWatched(user.id, movie.id);
       revalidatePath(`/detail/movie${movie.id}`);
     } else {
       await addToMovieWatched(user.id, movie, false);

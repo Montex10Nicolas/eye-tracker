@@ -1,4 +1,5 @@
 import { hash, verify } from "@node-rs/argon2";
+import { eq } from "drizzle-orm";
 import { generateIdFromEntropySize } from "lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -6,7 +7,7 @@ import { NextResponse } from "next/server";
 import { cache } from "react";
 import { lucia } from "~/lib/auth";
 import { db } from "~/server/db";
-import { userTable } from "~/server/db/schema";
+import { moviesTable, userTable, userToMovie } from "~/server/db/schema";
 
 export const PASSWORD_HASH_PAR = {
   memoryCost: 19456,
@@ -150,4 +151,10 @@ export async function Logout() {
     sessionCookie.attributes,
   );
   return redirect("/login");
+}
+
+export async function myInfo(userId: string) {
+  return await db.query.userInfoTable.findFirst({
+    where: (info, { eq }) => eq(info.userId, userId),
+  });
 }
