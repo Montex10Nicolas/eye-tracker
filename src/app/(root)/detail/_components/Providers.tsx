@@ -50,7 +50,10 @@ export default async function Provider(props: {
     <>
       {final.map((provider) => {
         return (
-          <div key={provider.provider_id} className="cursor-pointer">
+          <div
+            key={provider.provider_id}
+            className="overflow-hidden rounded-sm"
+          >
             <Image
               src={TMDB_IMAGE_URL(provider.logo_path)}
               width={width}

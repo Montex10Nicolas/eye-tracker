@@ -43,9 +43,11 @@ export async function searchTV(search: string) {
 export async function MultiSearch(query: string) {
   const url = new URL("3/search/multi", TMDB_URL);
   url.searchParams.set("query", query);
+  url.searchParams.set("include_adult", "false");
 
   const response: Response = await fetch(url, {
     ...Headers,
+    cache: "no-cache",
   });
 
   if (response.status !== 200) {
@@ -104,4 +106,28 @@ export async function GetTVDetail(id: number) {
 
   const data: unknown = await response.json();
   return data as TVDetail;
+}
+
+export async function getTvRecomendation(tvId: number, page: number) {
+  const id = tvId.toString();
+  const url = new URL(`/3/tv/${id}/recommendations`, TMDB_URL);
+  url.searchParams.set("page", page.toString());
+
+  const response = await fetch(url, {
+    ...Headers,
+  });
+  const data: unknown = await response.json();
+  return data as Search<TVResultType>;
+}
+
+export async function getMovieRecomendation(movId: number, page: number) {
+  const id = movId.toString();
+  const url = new URL(`/3/movie/${id}/recommendations`, TMDB_URL);
+  url.searchParams.set("page", page.toString());
+
+  const response = await fetch(url, {
+    ...Headers,
+  });
+  const data: unknown = await response.json();
+  return data as Search<MovieResultType>;
 }

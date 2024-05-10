@@ -66,7 +66,10 @@ function DisplayPerson(props: {
   );
 }
 
-function DipsplayTV(props: { result: TVResultType; background_url: string }) {
+export function DipsplayTV(props: {
+  result: TVResultType;
+  background_url: string;
+}) {
   const { result: found, background_url } = props;
   return (
     <Link href={`/detail/tv/${found.id}`}>
@@ -90,7 +93,7 @@ function DipsplayTV(props: { result: TVResultType; background_url: string }) {
   );
 }
 
-function DisplayMovies(props: {
+export function DisplayMovies(props: {
   result: MovieResultType;
   background_url: string;
 }) {

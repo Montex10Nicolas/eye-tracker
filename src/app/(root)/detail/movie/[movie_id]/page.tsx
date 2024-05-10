@@ -5,12 +5,13 @@ import {
   TMDB_IMAGE_URL,
   displayHumanDate,
 } from "~/_utils/utils";
+import { DisplayMovies } from "~/app/(root)/search/[query]/page";
 import { getUser } from "~/app/(user)/action";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { GetMovieDetail } from "~/server/queries";
+import { GetMovieDetail, getMovieRecomendation } from "~/server/queries";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
 import {
@@ -23,6 +24,7 @@ export default async function Page(props: { params: { movie_id: number } }) {
   const id = props.params.movie_id;
 
   const movie = await GetMovieDetail(id);
+  const reccomendations = await getMovieRecomendation(id, 1);
   const user = await getUser();
 
   const isLogged = user !== null;
@@ -75,6 +77,7 @@ export default async function Page(props: { params: { movie_id: number } }) {
               height={300}
               alt={`Poster ${movie.title}`}
               className="min-w-28 shrink-0"
+              priority={true}
             />
             <div className="flex flex-row justify-around gap-1 lg:sr-only">
               <Provider id={id} type="movie" width={100} height={100} />
@@ -85,6 +88,9 @@ export default async function Page(props: { params: { movie_id: number } }) {
               <span className="font-semibold">{movie.title}</span> |{" "}
               <span className="italic text-slate-400">
                 {movie.status} {displayHumanDate(movie.release_date)}
+              </span>
+              <span className="semibold">
+                {movie.adult ? "18+" : "everyone"}
               </span>
             </h2>
             <div>{movie.overview}</div>
@@ -146,29 +152,44 @@ export default async function Page(props: { params: { movie_id: number } }) {
         </div>
       </section>
       <section>
-      <Tabs
-        defaultValue="cast"
-        className="relative mt-4 rounded-md border bg-white p-4 text-black"
-      >
-        <h1 className="text-xl font-semibold">Credits</h1>
-        <TabsList className="mt-2 flex w-full flex-row border bg-black">
-          <TabsTrigger value="cast" className="w-full uppercase">
-            <span>cast</span>
-          </TabsTrigger>
-          <TabsTrigger value="crew" className="w-full uppercase">
-            <span>crew</span>
-          </TabsTrigger>
-        </TabsList>
-        <ScrollArea className="h-[500] w-full overflow-hidden pt-2">
-          <TabsContent value="cast" className="mt-6">
-            <RenderCastCrew cast={true} persons={movie.credits.cast} />
-          </TabsContent>
-          <TabsContent value="crew" className="mt-6">
-            <RenderCastCrew cast={false} persons={movie.credits.crew} />
-          </TabsContent>
-        </ScrollArea>
-      </Tabs>
-      <Separator className="my-3" />
+        <Tabs
+          defaultValue="cast"
+          className="relative mt-4 rounded-md border bg-white p-4 text-black"
+        >
+          <h1 className="text-xl font-semibold">Credits</h1>
+          <TabsList className="mt-2 flex w-full flex-row border bg-black">
+            <TabsTrigger value="cast" className="w-full uppercase">
+              <span>cast</span>
+            </TabsTrigger>
+            <TabsTrigger value="crew" className="w-full uppercase">
+              <span>crew</span>
+            </TabsTrigger>
+          </TabsList>
+          <ScrollArea className="h-[500] w-full overflow-hidden pt-2">
+            <TabsContent value="cast" className="mt-6">
+              <RenderCastCrew cast={true} persons={movie.credits.cast} />
+            </TabsContent>
+            <TabsContent value="crew" className="mt-6">
+              <RenderCastCrew cast={false} persons={movie.credits.crew} />
+            </TabsContent>
+          </ScrollArea>
+        </Tabs>
+        <Separator className="my-3" />
+      </section>
+      <section>
+        <h2>Reccomendations</h2>
+        <div className="flex flex-row flex-wrap gap-4 bg-white p-4 text-black">
+          {/* <code>{JSON.stringify(reccomendations, null, 2)}</code> */}
+          {reccomendations.results.map((tv_reccomend) => {
+            return (
+              <DisplayMovies
+                key={tv_reccomend.id}
+                result={tv_reccomend}
+                background_url={tv_reccomend.backdrop_path}
+              />
+            );
+          })}
+        </div>
       </section>
     </main>
   );

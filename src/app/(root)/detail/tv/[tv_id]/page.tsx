@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NOT_FOUND_POSTER, TMDB_IMAGE_URL } from "~/_utils/utils";
+import { DipsplayTV } from "~/app/(root)/search/[query]/page";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { GetTVDetail } from "~/server/queries";
+import { GetTVDetail, getTvRecomendation } from "~/server/queries";
 import { type Season } from "~/types/tmdb_detail";
 import Provider from "../../_components/Providers";
 import { RenderCastCrew } from "../../_components/Summary";
@@ -44,6 +45,8 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
     throw new Error("Not a valid id");
   }
   const tv = await GetTVDetail(id);
+  const reccomendations = await getTvRecomendation(id, 1);
+
   const background_image_url = tv.backdrop_path
     ? tv.backdrop_path
     : NOT_FOUND_POSTER;
@@ -116,6 +119,21 @@ export default async function TVDetail(props: { params: { tv_id: number } }) {
             </TabsContent>
           </ScrollArea>
         </Tabs>
+      </section>
+      <section>
+        <h2>Reccomendations</h2>
+        <div className="flex flex-row flex-wrap gap-4 bg-white p-4 text-black">
+          {/* <code>{JSON.stringify(reccomendations, null, 2)}</code> */}
+          {reccomendations.results.map((tv_reccomend) => {
+            return (
+              <DipsplayTV
+                key={tv_reccomend.id}
+                result={tv_reccomend}
+                background_url={tv_reccomend.backdrop_path}
+              />
+            );
+          })}
+        </div>
       </section>
     </main>
   );
