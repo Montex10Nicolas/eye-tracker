@@ -52,6 +52,21 @@ function handleVisualizationMinute(start: number) {
   );
 }
 
+function Summary(props: { info: Info }) {
+  const { info } = props;
+  return (
+    <section className="m-4 rounded-md bg-white p-4 text-slate-950">
+      <div>Movie count: {info.movieCountTotal}</div>
+      <div className="flex ">
+        Movie duration:
+        {handleVisualizationMinute(
+          info.movieDurationTotal + info.tvDurationTotal,
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default async function Page() {
   const user = await getUser();
   let info: Info;
@@ -59,7 +74,18 @@ export default async function Page() {
   const offset = 0;
 
   if (user === null) {
-    return <div>Not logged in</div>;
+    return (
+      <div className="m-4 rounded-md bg-white p-4 text-black">
+        <p className="mx-auto text-xl">
+          You need to be logged in to see your profile
+        </p>
+        <Link href={"/login"}>
+          <button className="mt-4 w-full rounded-sm bg-sky-600 px-4 py-2 font-semibold uppercase text-white">
+            go to login
+          </button>
+        </Link>
+      </div>
+    );
   } else {
     const temp = await myInfo(user.id);
     if (temp === undefined) {
@@ -69,78 +95,52 @@ export default async function Page() {
   }
 
   const myMovies = await myWatchedMovie(LIMIT, offset);
-  if (myMovies === null) {
-    return <div>Movies null</div>;
-  }
+  const hasMovies = myMovies.length !== 0;
 
   return (
     <main className="flex flex-col">
-      <section className="m-4 rounded-md bg-white p-4 text-slate-950">
-        <div>Movie count: {info.movieCountTotal}</div>
-        <div className="flex ">
-          Movie duration:
-          {handleVisualizationMinute(
-            info.movieDurationTotal + info.tvDurationTotal,
-          )}
-        </div>
-      </section>
+      <Summary info={info} />
       <section className="m-4 flex flex-row flex-wrap gap-4 rounded-md bg-white p-4 text-black">
-        {myMovies.map((watch) => {
-          const check_movie = watch.movie?.movie_data;
-          const user = watch.user;
+        {hasMovies ? (
+          myMovies.map((watch) => {
+            const movie = watch.movie.movie_data as MovieDetail;
 
-          let movie: MovieDetail;
-          let info: unknown;
-          if (
-            (check_movie !== undefined && check_movie !== null) ||
-            user !== null
-          ) {
-            movie = check_movie as MovieDetail;
-            if (user?.info !== null) {
-              info = user?.info;
-            } else {
-              return (
-                <div key={`${watch.userId}-${watch.movieId}`}>Info is null</div>
-              );
-            }
-          } else {
+            const [toHours, minutes] = generic(watch.duration, 60);
+            const [, hours] = generic(toHours, 60);
             return (
-              <div key={`${watch.userId}-${watch.movieId}`}>
-                Something wrong
+              <div
+                className="border-1 min-w-fit border border-black"
+                key={`${watch.userId}-${watch.movieId}`}
+              >
+                <Link href={`/detail/movie/${watch.movieId}`}>
+                  <Image
+                    src={TMDB_IMAGE_URL(movie.poster_path)}
+                    alt={`Poster ${movie.title}`}
+                    width={150}
+                    height={150}
+                  />
+                  <div className="p-1">
+                    <div>{movie.title}</div>
+                    <div className="">
+                      runtime:{" "}
+                      <span className="ml-auto">
+                        {addZero(hours)}:{addZero(minutes)}
+                      </span>
+                    </div>
+                    <div>
+                      Watched: {watch.timeWatched} time{" "}
+                      {watch.timeWatched > 1 ? "s" : ""}
+                    </div>
+                  </div>
+                </Link>
               </div>
             );
-          }
-          const [toHours, minutes] = generic(watch.duration, 60);
-          const [, hours] = generic(toHours, 60);
-          return (
-            <div
-              className="border-1 min-w-fit border border-black"
-              key={`${watch.userId}-${watch.movieId}`}
-            >
-              <Link href={`/detail/movie/${watch.movieId}`}>
-                <Image
-                  src={TMDB_IMAGE_URL(movie.poster_path)}
-                  alt={`Poster ${movie.title}`}
-                  width={150}
-                  height={150}
-                />
-                <div className="p-1">
-                  <div>{movie.title}</div>
-                  <div className="">
-                    runtime:{" "}
-                    <span className="ml-auto">
-                      {addZero(hours)}:{addZero(minutes)}
-                    </span>
-                  </div>
-                  <div>
-                    Watched: {watch.timeWatched} time{" "}
-                    {watch.timeWatched > 1 ? "s" : ""}
-                  </div>
-                </div>
-              </Link>
-            </div>
-          );
-        })}
+          })
+        ) : (
+          <div>
+            <h1>Start add movies and series to track them</h1>
+          </div>
+        )}
       </section>
     </main>
   );

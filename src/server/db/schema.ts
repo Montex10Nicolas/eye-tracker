@@ -67,17 +67,13 @@ export const moviesTable = createTable("movie", {
   movie_data: json("movie_data").notNull(),
 });
 
-export const moviesTableRelationship = relations(
-  moviesTable,
-  ({ one, many }) => ({
-    watvchedBy: many(userToMovie),
-  }),
-);
+export const moviesTableRelations = relations(moviesTable, ({ many }) => ({
+  watchedBy: many(userToMovie),
+}));
 
 export const userToMovie = createTable(
   "watched-movies",
   {
-    // union: varchar("union").notNull().primaryKey(),
     userId: varchar("user_id", { length: 256 })
       .notNull()
       .references(() => userTable.id),
@@ -104,5 +100,41 @@ export const userToMovieRelations = relations(userToMovie, ({ one }) => ({
   movie: one(moviesTable, {
     fields: [userToMovie.movieId],
     references: [moviesTable.id],
+  }),
+}));
+
+export const tvSeasonTable = createTable("tv-season", {
+  id: varchar("id", {
+    length: 256,
+  }).primaryKey(),
+  season_data: json("season_data").notNull(),
+});
+
+export const tvSeasonRelations = relations(tvSeasonTable, ({ many }) => ({
+  watchedBy: many(tvSeasonWatch),
+}));
+
+export const tvSeasonWatch = createTable("tv-watch-season", {
+  userId: varchar("user_id", { length: 256 })
+    .notNull()
+    .references(() => userTable.id),
+  seasonId: varchar("season_id", { length: 256 })
+    .notNull()
+    .references(() => tvSeasonTable.id),
+  episode_count: integer("episode_count").notNull(),
+  time_watched: smallint("time_watched").notNull(),
+  duration: integer("duration").notNull(),
+  started: timestamp("started").notNull(),
+  finished: timestamp("finished"),
+});
+
+export const tvSeasonWatchRelations = relations(tvSeasonWatch, ({ one }) => ({
+  user: one(userTable, {
+    fields: [tvSeasonWatch.userId],
+    references: [userTable.id],
+  }),
+  season: one(tvSeasonTable, {
+    fields: [tvSeasonWatch.seasonId],
+    references: [tvSeasonTable.id],
   }),
 }));
