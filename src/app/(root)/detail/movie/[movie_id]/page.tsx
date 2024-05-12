@@ -45,10 +45,7 @@ export default async function Page(props: { params: { movie_id: number } }) {
   async function removeMovie() {
     "use server";
 
-    console.log("remove movie");
-
     if (!user) {
-      console.log("no user");
       return "need to be logged in";
     }
     await removeFromMovieWatched(user?.id, movie);

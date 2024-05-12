@@ -13,12 +13,19 @@ import {
   DrawerTrigger,
 } from "~/components/ui/drawer";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { type TVDetail } from "~/types/tmdb_detail";
-import { addSeason } from "../actions";
+import { getSeasonDetail } from "~/server/queries";
+import {
+  type Season,
+  type SeasonDetail,
+  type TVDetail,
+} from "~/types/tmdb_detail";
+import { addAll } from "../actions";
+import { RenderCastCrew } from "./Summary";
 
 // Display a drawer with all episodes etc
-export function SeasonDrawer(props: {
+
+/*
+function deprecatedSeasonDrawer(props: {
   tv: TVDetail;
   addSeason: (serieId: string, seasonNumber: number[]) => void;
 }) {
@@ -128,28 +135,4 @@ export function SeasonDrawer(props: {
     </Drawer>
   );
 }
-export function Bho() {
-  return (
-    <section className="mt-4 overflow-hidden rounded-md bg-white p-4 text-black">
-      <h2 className="text-xl font-semibold">Credits</h2>
-      <Tabs defaultValue="cast" className="relative mt-6">
-        <TabsList className="flex w-full flex-row bg-black">
-          <TabsTrigger value="cast" className="w-full">
-            Cast
-          </TabsTrigger>
-          <TabsTrigger value="crew" className="w-full">
-            Crew
-          </TabsTrigger>
-        </TabsList>
-        <ScrollArea className="h-[500] w-full">
-          <TabsContent value="cast" className="mt-6">
-            <RenderCastCrew persons={tv.credits.cast} cast={true} />
-          </TabsContent>
-          <TabsContent value="crew" className="mt-6">
-            <RenderCastCrew persons={tv.credits.crew} cast={false} />
-          </TabsContent>
-        </ScrollArea>
-      </Tabs>
-    </section>
-  );
-}
+*/

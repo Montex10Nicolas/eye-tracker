@@ -14,7 +14,6 @@ export default function Profile(props: { logout: () => Promise<never> }) {
   const { logout } = props;
 
   async function handleSubmit() {
-    console.log("handle submit");
     await logout();
   }
 

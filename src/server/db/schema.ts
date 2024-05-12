@@ -40,7 +40,7 @@ export const userInfoTable = createTable("user_info", {
   id: varchar("id", { length: 256 }).primaryKey().default(generateId(32)),
   userId: varchar("user_id", { length: 256 })
     .unique()
-    .references(() => userTable.id),
+    .references(() => userTable.id, { onDelete: "cascade" }),
   movieDurationTotal: integer("movie_duration_total").notNull().default(0),
   movieCountTotal: integer("movie_count_total").notNull().default(0),
   tvDurationTotal: integer("tv_duration_total").notNull().default(0),
@@ -51,7 +51,7 @@ export const sessionTable = createTable("session", {
   id: varchar("id", { length: 256 }).primaryKey(),
   userId: varchar("user_id", { length: 256 })
     .notNull()
-    .references(() => userTable.id),
+    .references(() => userTable.id, { onDelete: "cascade" }),
   expiresAt: timestamp("expires_at", {
     withTimezone: true,
     mode: "date",
@@ -76,10 +76,10 @@ export const userToMovie = createTable(
   {
     userId: varchar("user_id", { length: 256 })
       .notNull()
-      .references(() => userTable.id),
+      .references(() => userTable.id, { onDelete: "cascade" }),
     movieId: varchar("movie_id", { length: 256 })
       .notNull()
-      .references(() => moviesTable.id),
+      .references(() => moviesTable.id, { onDelete: "cascade" }),
     duration: smallint("duration").notNull(),
     timeWatched: smallint("time_watched").notNull(),
     dateWatched: timestamp("date_watched").notNull(),
@@ -107,6 +107,7 @@ export const episodeTable = createTable("episode", {
   id: varchar("id", {
     length: 256,
   }).primaryKey(),
+  seasonId: varchar("season_id", { length: 256 }).notNull(),
   episodeDate: json("episode_date"),
 });
 
@@ -114,13 +115,14 @@ export const episodeRelations = relations(episodeTable, ({ many }) => ({
   watchedBy: many(episodeWatched),
 }));
 
-export const episodeWatched = createTable("episode-watched", {
+export const episodeWatched = createTable("tv-watched", {
+  id: varchar("id", { length: 256 }).primaryKey().default(generateId(32)),
   userId: varchar("user_id", { length: 256 })
     .notNull()
-    .references(() => userTable.id),
+    .references(() => userTable.id, { onDelete: "cascade" }),
   episodeId: varchar("episode_id", { length: 256 })
     .notNull()
-    .references(() => episodeTable.id),
+    .references(() => episodeTable.id, { onDelete: "cascade" }),
   duration: smallint("duration").notNull(),
 });
 

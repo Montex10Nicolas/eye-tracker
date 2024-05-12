@@ -3,10 +3,11 @@ import { generateIdFromEntropySize } from "lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
+import { userInfo } from "os";
 import { cache } from "react";
 import { lucia } from "~/lib/auth";
 import { db } from "~/server/db";
-import { userTable } from "~/server/db/schema";
+import { userInfoTable, userTable } from "~/server/db/schema";
 
 export const PASSWORD_HASH_PAR = {
   memoryCost: 19456,
@@ -76,6 +77,11 @@ export async function signup(username: string, password: string) {
     password_hash: passwordHash,
     id: userId,
   });
+
+  await db.insert(userInfoTable).values({
+    userId: userId,
+  });
+
   const session = await lucia.createSession(userId, {});
   const sessionCookie = lucia.createSessionCookie(session.id);
   cookies().set(

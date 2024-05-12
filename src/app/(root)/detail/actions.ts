@@ -1,9 +1,20 @@
 "use server";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "~/server/db";
-import { moviesTable, userInfoTable, userToMovie } from "~/server/db/schema";
+import {
+  episodeTable,
+  episodeWatched,
+  moviesTable,
+  userInfoTable,
+  userToMovie,
+} from "~/server/db/schema";
 import { type DBErorr } from "~/server/db/types";
-import { type MovieDetail } from "~/types/tmdb_detail";
+import { getSeasonDetail } from "~/server/queries";
+import {
+  type Episode,
+  type MovieDetail,
+  type Season,
+} from "~/types/tmdb_detail";
 
 export async function addMovie(movie: MovieDetail) {
   await db.insert(moviesTable).values({
@@ -164,12 +175,92 @@ export async function myWatchedMovie(limit = 25, offset: number) {
   return res;
 }
 
-export async function addSeason(serieId: string, season_number: number[]) {
+// Given a season add all the episodes
+export async function addWholeSeason(season: Season, serieId: string) {
   "use server";
 
-  // console.log(
-  //   `User is trying to add season from ${serieId} with season count ${seasonNumber}`,
-  // );
+  const detail = await getSeasonDetail(serieId, season.season_number);
 
-  console.log(serieId, season_number);
+  const { episodes } = detail;
+
+  const final: unknown[] = [];
+  for (const episode of episodes) {
+    const res: {
+      id: string;
+      seasonId: string;
+      episodeDate: unknown;
+    }[] = await db
+      .insert(episodeTable)
+      .values({
+        id: episode.id.toString(),
+        episodeDate: episode,
+        seasonId: season.id.toString(),
+      })
+      .returning();
+
+    final.push(res[0]);
+  }
+  return final as {
+    id: string;
+    seasonId: string;
+    episodeDate: unknown;
+  }[];
+}
+
+export async function addSeasonToWatched(
+  season: Season,
+  userId: string,
+  serieId: string,
+) {
+  "use server";
+
+  const seasonId = season.id.toString();
+
+  let epi = await db.query.episodeTable.findMany({
+    where: (episode, { eq }) => eq(episode.seasonId, seasonId),
+  });
+
+  if (epi === undefined || epi.length === 0) {
+    epi = await addWholeSeason(season, serieId);
+  }
+
+  const episodes = epi as {
+    id: string;
+    seasonId: string;
+    episodeDate: Episode;
+  }[];
+
+  let runtime = 0;
+  for (const episode of episodes) {
+    const data = episode.episodeDate;
+
+    const run = data.runtime;
+    runtime = runtime + run;
+
+    await db.insert(episodeWatched).values({
+      userId: userId,
+      episodeId: episode.id,
+      duration: run,
+    });
+  }
+
+  const userInfo = await db.query.userInfoTable.findFirst({
+    where: (user, { eq }) => eq(userInfoTable.userId, userId),
+  });
+
+  if (userInfo === undefined) {
+    throw new Error("Userinfo not found wtf");
+  }
+
+  const { id, tvCountTotal, tvDurationTotal } = userInfo;
+  const newDuration = runtime + tvDurationTotal;
+  const newCount = tvCountTotal + episodes.length;
+
+  await db
+    .update(userInfoTable)
+    .set({
+      tvDurationTotal: newDuration,
+      tvCountTotal: newCount,
+    })
+    .where(eq(userInfoTable.id, id));
 }
