@@ -130,12 +130,19 @@ export async function getMovieRecomendation(movId: number, page: number) {
 }
 
 export async function getSeasonDetail(seasonId: string, season_number: number) {
+  "use server";
   const seasonNum = season_number.toString();
-  const url = new URL(`3/tv/${seasonId}/season/${seasonNum}`);
+  const url = new URL(`3/tv/${seasonId}/season/${seasonNum}`, TMDB_URL);
+
+  console.log("Requesting ", url);
 
   const response = await fetch(url, {
     ...Headers,
+    cache: "no-cache",
   });
+
+  console.log(response.status, response.statusText);
+
   const data: unknown = await response.json();
   return data as SeasonDetail;
 }

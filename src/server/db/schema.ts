@@ -103,38 +103,34 @@ export const userToMovieRelations = relations(userToMovie, ({ one }) => ({
   }),
 }));
 
-export const tvSeasonTable = createTable("tv-season", {
+export const episodeTable = createTable("episode", {
   id: varchar("id", {
     length: 256,
   }).primaryKey(),
-  season_data: json("season_data").notNull(),
+  episodeDate: json("episode_date"),
 });
 
-export const tvSeasonRelations = relations(tvSeasonTable, ({ many }) => ({
-  watchedBy: many(tvSeasonWatch),
+export const episodeRelations = relations(episodeTable, ({ many }) => ({
+  watchedBy: many(episodeWatched),
 }));
 
-export const tvSeasonWatch = createTable("tv-watch-season", {
+export const episodeWatched = createTable("episode-watched", {
   userId: varchar("user_id", { length: 256 })
     .notNull()
     .references(() => userTable.id),
-  seasonId: varchar("season_id", { length: 256 })
+  episodeId: varchar("episode_id", { length: 256 })
     .notNull()
-    .references(() => tvSeasonTable.id),
-  episode_count: integer("episode_count").notNull(),
-  time_watched: smallint("time_watched").notNull(),
-  duration: integer("duration").notNull(),
-  started: timestamp("started").notNull(),
-  finished: timestamp("finished"),
+    .references(() => episodeTable.id),
+  duration: smallint("duration").notNull(),
 });
 
-export const tvSeasonWatchRelations = relations(tvSeasonWatch, ({ one }) => ({
+export const episodeWatRelations = relations(episodeWatched, ({ one }) => ({
   user: one(userTable, {
-    fields: [tvSeasonWatch.userId],
+    fields: [episodeWatched.userId],
     references: [userTable.id],
   }),
-  season: one(tvSeasonTable, {
-    fields: [tvSeasonWatch.seasonId],
-    references: [tvSeasonTable.id],
+  episode: one(episodeTable, {
+    fields: [episodeWatched.episodeId],
+    references: [episodeTable.id],
   }),
 }));
