@@ -5,6 +5,14 @@ export interface DBErorr extends Error {
   routing: string;
 }
 
+export interface SeasonsWatchedDB {
+  id: string;
+  seasonId: string;
+  userId: string;
+  serieId: string;
+  status: "not_started" | "watching" | "completed";
+}
+
 export const CODES_STATUS: number[] = [23505];
 
 export function generateErrorMessage(code: number) {

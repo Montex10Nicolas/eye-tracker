@@ -134,6 +134,7 @@ export async function getMovieRecomendation(movId: number, page: number) {
   return data as Search<MovieResultType>;
 }
 
+// Get of a specified season all details including all the episodes
 export async function getSeasonDetail(serieId: string, season_number: number) {
   "use server";
   const seasonNum = season_number.toString();

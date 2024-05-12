@@ -117,6 +117,35 @@ export const userToMovieRelations = relations(userToMovie, ({ one }) => ({
   }),
 }));
 
+export const seasonTable = createTable("tv-season", {
+  id: varchar("id").primaryKey().notNull(),
+  season_data: json("season_data").$type<Season>().notNull(),
+});
+
+export const seasonRelations = relations(seasonTable, ({ many }) => ({
+  episodes: many(episodeTable),
+}));
+
+export const seasonWatched = createTable("tv-season-watched", {
+  id: varchar("id", { length: 256 }).primaryKey(),
+  seasonId: varchar("season_id")
+    .references(() => seasonTable.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    })
+    .notNull(),
+  userId: varchar("user_id")
+    .references(() => userTable.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    })
+    .notNull(),
+  serieId: varchar("serie_id", { length: 256 }).notNull(),
+  status: text("status", {
+    enum: ["not_started", "watching", "completed"],
+  }).notNull(),
+});
+
 export const episodeTable = createTable("tv-episode", {
   id: varchar("id", {
     length: 256,
@@ -139,8 +168,7 @@ export const episodeRelations = relations(episodeTable, ({ many, one }) => ({
 }));
 
 export const episodeWatched = createTable("tv-watched", {
-  cazzo: serial("id").primaryKey(),
-  id: varchar("id", { length: 256 }),
+  id: varchar("id").primaryKey(),
   userId: varchar("user_id", { length: 256 })
     .notNull()
     .references(() => userTable.id, {
@@ -166,25 +194,3 @@ export const episodeWatRelations = relations(episodeWatched, ({ one }) => ({
     references: [episodeTable.id],
   }),
 }));
-
-export const seasonTable = createTable("tv-season", {
-  id: varchar("id").primaryKey().notNull(),
-  season_data: json("season_data").$type<Season>().notNull(),
-});
-
-export const seasonRelations = relations(seasonTable, ({ many }) => ({
-  episodes: many(episodeTable),
-}));
-
-export const seasonWatched = createTable("tv-season-watched", {
-  id: varchar("id", { length: 256 }).primaryKey().default(generateId(32)),
-  seasonId: varchar("season_id").references(() => seasonTable.id, {
-    onDelete: "cascade",
-    onUpdate: "cascade",
-  }),
-  userId: varchar("user_id").references(() => userTable.id, {
-    onDelete: "cascade",
-    onUpdate: "cascade",
-  }),
-  status: text("status", { enum: ["watching", "completed"] }),
-});

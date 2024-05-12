@@ -1,17 +1,13 @@
 import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
+import { type SeasonsWatchedDB } from "~/server/db/types";
 import { GetTVDetail } from "~/server/queries";
-import {
-  type Credits,
-  type Season,
-  type TVDetail,
-  type User,
-} from "~/types/tmdb_detail";
+import { type Season, type TVDetail, type User } from "~/types/tmdb_detail";
 import { SeasonButtons } from "../../_components/Buttons";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
 import Provider from "../../_components/Providers";
-import { addAllSeasonToWatched } from "../../actions";
+import { addAllSeasonToWatched, myWatchedSeason } from "../../actions";
 
 async function DisplayInfo(props: { tv: TVDetail }) {
   const { tv } = props;
@@ -80,8 +76,9 @@ async function DisplaySeason(props: {
   seasons: Season[];
   user: User | null;
   tvId: string;
+  watched: SeasonsWatchedDB[] | null;
 }) {
-  const { seasons, user, tvId } = props;
+  const { seasons, user, tvId, watched } = props;
   const loggedIn = user !== null;
 
   return (
@@ -91,6 +88,11 @@ async function DisplaySeason(props: {
       <div className="relative flex flex-row flex-wrap gap-4 rounded-sm">
         {seasons.map((season) => {
           const seasonId = season.id.toString();
+
+          const hasWatched =
+            watched?.findIndex((w) => w.seasonId === season.id.toString()) !==
+            -1;
+
           return (
             <div
               key={seasonId}
@@ -118,6 +120,7 @@ async function DisplaySeason(props: {
                     season={season}
                     userId={user.id}
                     serieId={tvId}
+                    hasWatched={hasWatched}
                   />
                 </div>
               ) : null}
@@ -135,10 +138,22 @@ export default async function Page(props: { params: { tv_id: string } }) {
   const tv = await GetTVDetail(tv_id);
   const user = await getUser();
 
+  const userId = user?.id;
+
+  const seasonWatched: SeasonsWatchedDB[] | null = await myWatchedSeason(
+    userId,
+    tv_id,
+  );
+
   return (
     <div className="mx-auto mb-6 mt-4 w-[75%] text-black">
       <DisplayInfo tv={tv} />
-      <DisplaySeason seasons={tv.seasons} user={user} tvId={tv_id} />
+      <DisplaySeason
+        seasons={tv.seasons}
+        watched={seasonWatched}
+        user={user}
+        tvId={tv_id}
+      />
       <DisplayCredits credits={tv.credits} />
     </div>
   );
