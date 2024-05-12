@@ -19,7 +19,7 @@ import {
 import { DisplayTV } from "../../_components/Display";
 import { SeasonDrawer } from "../../_components/Drawer";
 import Provider from "../../_components/Providers";
-import { RenderCastCrew } from "../../_components/Summary";
+import { DisplayCastCrew } from "../../_components/Summary";
 import { addAll } from "../../actions";
 
 function Info(props: {
@@ -137,10 +137,10 @@ export async function Credits(props: { tv: TVDetail }) {
         </TabsList>
         <ScrollArea className="h-[500] w-full">
           <TabsContent value="cast" className="mt-6">
-            <RenderCastCrew persons={tv.credits.cast} cast={true} />
+            <DisplayCastCrew persons={tv.credits.cast} cast={true} />
           </TabsContent>
           <TabsContent value="crew" className="mt-6">
-            <RenderCastCrew persons={tv.credits.crew} cast={false} />
+            <DisplayCastCrew persons={tv.credits.crew} cast={false} />
           </TabsContent>
         </ScrollArea>
       </Tabs>

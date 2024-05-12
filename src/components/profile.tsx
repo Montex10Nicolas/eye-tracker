@@ -2,6 +2,7 @@
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -12,9 +13,14 @@ import { Separator } from "./ui/separator";
 
 export default function Profile(props: { logout: () => Promise<never> }) {
   const { logout } = props;
+  const router = useRouter();
 
   async function handleSubmit() {
     await logout();
+  }
+
+  async function goToProfile() {
+    router.push("/profile");
   }
 
   return (
@@ -28,7 +34,10 @@ export default function Profile(props: { logout: () => Promise<never> }) {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="flex w-32 cursor-pointer flex-col items-center rounded-md bg-sky-300 text-black">
-          <DropdownMenuItem className="w-full cursor-pointer">
+          <DropdownMenuItem
+            className="w-full cursor-pointer"
+            onClick={goToProfile}
+          >
             <Link href={"/profile"}>Profile</Link>
           </DropdownMenuItem>
           <Separator orientation="horizontal" className="bg-black" />

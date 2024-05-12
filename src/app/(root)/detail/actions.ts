@@ -207,7 +207,7 @@ export async function addWholeSeason(season: Season, serieId: string) {
   }[];
 }
 
-export async function addSeasonToWatched(
+export async function addAllSeasonToWatched(
   season: Season,
   userId: string,
   serieId: string,
@@ -260,7 +260,7 @@ export async function addSeasonToWatched(
     .update(userInfoTable)
     .set({
       tvDurationTotal: newDuration,
-      tvCountTotal: newCount,
+      tvEpisodeCount: newCount,
     })
     .where(eq(userInfoTable.id, id));
 }

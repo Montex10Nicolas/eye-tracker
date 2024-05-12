@@ -1,11 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
+import { Badge } from "~/components/ui/badge";
+import { ScrollArea } from "~/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
+  type Credits,
+  type Genre,
   type MovieResultType,
   type PersonSearchType,
   type TVResultType,
 } from "~/types/tmdb_detail";
+import { DisplayCastCrew } from "./Summary";
 
 function convertGender(gender: number) {
   switch (gender) {
@@ -96,5 +102,56 @@ export function DisplayMovies(props: {
         </div>
       </div>
     </Link>
+  );
+}
+
+export function DisplayCredits(props: { credits: Credits }) {
+  const {
+    credits: { cast, crew },
+  } = props;
+  const hasCast = cast.length > 0,
+    hasCrew = crew.length > 0;
+  return (
+    <section className="mt-4 flex flex-col rounded-md bg-white p-4 text-black">
+      <h1 className="">Credits</h1>
+      <hr className="mb-4" />
+      <Tabs defaultValue="cast" className="relative mt-6 w-full">
+        <TabsList className="flex w-full flex-row bg-black">
+          <TabsTrigger value="cast" className="w-full">
+            Cast
+          </TabsTrigger>
+          <TabsTrigger value="crew" className="w-full">
+            Crew
+          </TabsTrigger>
+        </TabsList>
+        <ScrollArea className="h-[500] w-full">
+          <TabsContent value="cast" className="mt-6">
+            {hasCast ? (
+              <DisplayCastCrew persons={cast} cast={true} />
+            ) : (
+              <div>No info about this cast</div>
+            )}
+          </TabsContent>
+          <TabsContent value="crew" className="mt-6">
+            {hasCrew ? (
+              <DisplayCastCrew persons={crew} cast={false} />
+            ) : (
+              <div>No info about this crew</div>
+            )}
+          </TabsContent>
+        </ScrollArea>
+      </Tabs>
+    </section>
+  );
+}
+
+export function DisplayGenres(props: { genres: Genre[] }) {
+  const { genres } = props;
+  return (
+    <div>
+      {genres.map((genre) => {
+        return <Badge key={genre.id}>{genre.name}</Badge>;
+      })}
+    </div>
   );
 }

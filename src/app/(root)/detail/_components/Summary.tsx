@@ -57,7 +57,7 @@ export function PersonSummaryCrew(props: { person: Crew }) {
   );
 }
 
-export function RenderCastCrew(props: {
+export function DisplayCastCrew(props: {
   persons: Crew[] | Cast[];
   cast: boolean;
 }) {

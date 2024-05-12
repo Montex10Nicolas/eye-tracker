@@ -1,11 +1,17 @@
 import Image from "next/image";
-import { TMDB_IMAGE_URL } from "~/_utils/utils";
+import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { GetTVDetail } from "~/server/queries";
-import { type Season, type TVDetail, type User } from "~/types/tmdb_detail";
-import { Buttons } from "../../_components/Buttons";
+import {
+  type Credits,
+  type Season,
+  type TVDetail,
+  type User,
+} from "~/types/tmdb_detail";
+import { SeasonButtons } from "../../_components/Buttons";
+import { DisplayCredits, DisplayGenres } from "../../_components/Display";
 import Provider from "../../_components/Providers";
-import { addSeasonToWatched } from "../../actions";
+import { addAllSeasonToWatched } from "../../actions";
 
 async function DisplayInfo(props: { tv: TVDetail }) {
   const { tv } = props;
@@ -18,29 +24,47 @@ async function DisplayInfo(props: { tv: TVDetail }) {
         <div className="min-w-[50%]">
           <Image
             src={TMDB_IMAGE_URL(poster_url)}
-            width={150}
-            height={150}
+            width={130}
+            height={130}
             alt={tv.name}
             priority
+            className="w-full object-cover"
           />
-          <div className="mt-2 grid w-full grid-flow-col gap-5 [&>*]:overflow-hidden [&>*]:rounded-md">
+          <div className="grid w-full grid-flow-col gap-5 p-1 [&>*]:overflow-hidden [&>*]:rounded-md">
             <Provider id={tv.id} type="tv" />
           </div>
         </div>
       </div>
 
-      <div className="">
+      <div className="flex flex-col">
         <div className="space-x-2">
           <span className="font-bold">{tv.name}</span>
           <span>|</span>
           <span className="italic text-slate-400">{tv.status}</span>
         </div>
 
-        <div>
+        <div className="flex flex-col flex-wrap gap-1">
           <p>
-            <span className="text-slate-300">Overview: </span> {tv.overview}
+            <span className="italic text-slate-300">Language(s): </span>
+            <span>{tv.languages.join("-").toUpperCase()}</span>
           </p>
+          <p>
+            <span className="italic text-slate-300">Runtime: </span>
+            <span>{tv.episode_run_time}</span>m
+          </p>
+          <p className="">
+            <span className="italic text-slate-300">From: </span>
+            <span>{displayHumanDate(tv.first_air_date)}</span>
+            <span className="italic text-slate-300"> To: </span>
+            <span>{displayHumanDate(tv.last_air_date)}</span>
+          </p>
+          <div>
+            <DisplayGenres genres={tv.genres} />
+          </div>
         </div>
+        <p className="mb-4 mt-auto">
+          <span className=" text-slate-300">Overview: </span> {tv.overview}
+        </p>
       </div>
 
       <img
@@ -61,42 +85,46 @@ async function DisplaySeason(props: {
   const loggedIn = user !== null;
 
   return (
-    <div className="relative mt-4 flex flex-row flex-wrap gap-4 rounded-md bg-white p-4 text-black">
-      {seasons.map((season) => {
-        const seasonId = season.id.toString();
-        return (
-          <div
-            key={season.id}
-            className="relative w-32 shrink-0 border border-slate-900"
-          >
-            <Image
-              src={TMDB_IMAGE_URL(season.poster_path)}
-              alt={season.name}
-              width={200}
-              height={200}
-              className="h-44"
-            />
-            <div className="flex flex-row flex-wrap justify-between gap-1">
-              <div>{season.name}</div>
-              <div>{season.episode_count} episodes</div>
-            </div>
-            <div className="absolute right-0 top-0 w-16 rounded-bl-xl bg-white p-2 text-center font-bold">
-              {season.vote_average}/10
-            </div>
-
-            {loggedIn ? (
-              <div className="flex w-full flex-row gap-2 p-1">
-                <Buttons
-                  addSeason={addSeasonToWatched}
-                  season={season}
-                  userId={user.id}
-                  serieId={tvId}
-                />
+    <div className="mt-4 flex flex-col gap-1 rounded-md bg-white p-4 text-black">
+      <h2>Seasons: </h2>
+      <hr className="mb-3" />
+      <div className="relative flex flex-row flex-wrap gap-4 rounded-sm">
+        {seasons.map((season) => {
+          const seasonId = season.id.toString();
+          return (
+            <div
+              key={seasonId}
+              className="relative w-32 shrink-0 border border-slate-900"
+            >
+              <Image
+                src={TMDB_IMAGE_URL(season.poster_path)}
+                alt={season.name}
+                width={200}
+                height={200}
+                className="h-44"
+              />
+              <div className="flex flex-row flex-wrap justify-between gap-1">
+                <div>{season.name}</div>
+                <div>{season.episode_count} episodes</div>
               </div>
-            ) : null}
-          </div>
-        );
-      })}
+              <div className="absolute right-0 top-0 w-16 rounded-bl-xl bg-white p-2 text-center font-bold">
+                {season.vote_average}/10
+              </div>
+
+              {loggedIn ? (
+                <div className="flex w-full flex-row gap-2 p-1">
+                  <SeasonButtons
+                    addAllSeason={addAllSeasonToWatched}
+                    season={season}
+                    userId={user.id}
+                    serieId={tvId}
+                  />
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -108,9 +136,10 @@ export default async function Page(props: { params: { tv_id: string } }) {
   const user = await getUser();
 
   return (
-    <div className="m-4 text-black">
+    <div className="mx-auto mb-6 mt-4 w-[75%] text-black">
       <DisplayInfo tv={tv} />
       <DisplaySeason seasons={tv.seasons} user={user} tvId={tv_id} />
+      <DisplayCredits credits={tv.credits} />
     </div>
   );
 }

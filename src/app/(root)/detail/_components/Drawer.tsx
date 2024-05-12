@@ -20,7 +20,7 @@ import {
   type TVDetail,
 } from "~/types/tmdb_detail";
 import { addAll } from "../actions";
-import { RenderCastCrew } from "./Summary";
+import { DisplayCastCrew } from "./Summary";
 
 // Display a drawer with all episodes etc
 

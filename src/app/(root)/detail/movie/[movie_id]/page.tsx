@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { GetMovieDetail, getMovieRecomendation } from "~/server/queries";
 import { DisplayMovies } from "../../_components/Display";
 import Provider from "../../_components/Providers";
-import { RenderCastCrew } from "../../_components/Summary";
+import { DisplayCastCrew } from "../../_components/Summary";
 import {
   addToMovieWatched,
   checkMovieWatched,
@@ -164,10 +164,10 @@ export default async function Page(props: { params: { movie_id: number } }) {
           </TabsList>
           <ScrollArea className="h-[500] w-full overflow-hidden pt-2">
             <TabsContent value="cast" className="mt-6">
-              <RenderCastCrew cast={true} persons={movie.credits.cast} />
+              <DisplayCastCrew cast={true} persons={movie.credits.cast} />
             </TabsContent>
             <TabsContent value="crew" className="mt-6">
-              <RenderCastCrew cast={false} persons={movie.credits.crew} />
+              <DisplayCastCrew cast={false} persons={movie.credits.crew} />
             </TabsContent>
           </ScrollArea>
         </Tabs>
