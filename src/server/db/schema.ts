@@ -130,7 +130,7 @@ export const seriesRelations = relations(seriesTable, ({ many }) => ({
 
 export const seriesWatchedTable = createTable("tv-series-watched", {
   id: varchar("id", { length: 256 }).primaryKey(),
-  seriesId: varchar("series_id", { length: 256 })
+  serieId: varchar("serie_id", { length: 256 })
     .notNull()
     .references(() => seriesTable.id, {
       onDelete: "cascade",
@@ -152,7 +152,7 @@ export const seriesWatchedRelations = relations(
   ({ one }) => ({
     serie: one(seriesTable, {
       references: [seriesTable.id],
-      fields: [seriesWatchedTable.seriesId],
+      fields: [seriesWatchedTable.serieId],
     }),
     user: one(userTable, {
       references: [userTable.id],
@@ -249,6 +249,12 @@ export const episodeWatchedTable = createTable("tv-episode-watched", {
   userId: varchar("user_id", { length: 256 })
     .notNull()
     .references(() => userTable.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
+  seasonId: varchar("season_id", { length: 256 })
+    .notNull()
+    .references(() => seasonTable.id, {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),

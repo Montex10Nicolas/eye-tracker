@@ -21,7 +21,7 @@ export interface SerieType {
 
 export interface SeriesWatchedTableType {
   id: string;
-  seriesId: string;
+  serieId: string;
   userId: string;
   status: "not_started" | "watching" | "completed";
 }
