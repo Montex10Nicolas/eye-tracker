@@ -1,29 +1,23 @@
 "use client";
 
-import { type Season } from "~/types/tmdb_detail";
+import { type Season, type TVDetail } from "~/types/tmdb_detail";
 
 type ActionAddAll = (
   season: Season,
-  serieId: string,
   userId: string,
+  serie: TVDetail,
 ) => Promise<void>;
 
 export function SeasonButtons(props: {
   addAllSeason: ActionAddAll;
   season: Season;
   userId: string;
-  serieId: string;
+  serie: TVDetail;
   hasWatched: boolean;
 }) {
-  const {
-    addAllSeason: addSeason,
-    season,
-    userId,
-    serieId,
-    hasWatched,
-  } = props;
+  const { addAllSeason: addSeason, season, userId, serie, hasWatched } = props;
   async function addCompleted() {
-    await addSeason(season, userId, serieId);
+    await addSeason(season, userId, serie);
   }
 
   async function less() {

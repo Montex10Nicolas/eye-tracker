@@ -7,7 +7,7 @@ import { type Season, type TVDetail, type User } from "~/types/tmdb_detail";
 import { SeasonButtons } from "../../_components/Buttons";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
 import Provider from "../../_components/Providers";
-import { addAllSeasonToWatched, myWatchedSeason } from "../../actions";
+import { addSeasonToWatched, myWatchedSeason } from "../../actions";
 
 async function DisplayInfo(props: { tv: TVDetail }) {
   const { tv } = props;
@@ -76,9 +76,10 @@ async function DisplaySeason(props: {
   seasons: Season[];
   user: User | null;
   tvId: string;
+  tv: TVDetail;
   watched: SeasonsWatchedDB[] | null;
 }) {
-  const { seasons, user, tvId, watched } = props;
+  const { seasons, user, tv, watched } = props;
   const loggedIn = user !== null;
 
   return (
@@ -116,10 +117,10 @@ async function DisplaySeason(props: {
               {loggedIn ? (
                 <div className="flex w-full flex-row gap-2 p-1">
                   <SeasonButtons
-                    addAllSeason={addAllSeasonToWatched}
+                    addAllSeason={addSeasonToWatched}
                     season={season}
                     userId={user.id}
-                    serieId={tvId}
+                    serie={tv}
                     hasWatched={hasWatched}
                   />
                 </div>
@@ -140,15 +141,14 @@ export default async function Page(props: { params: { tv_id: string } }) {
 
   const userId = user?.id;
 
-  const seasonWatched: SeasonsWatchedDB[] | null = await myWatchedSeason(
-    userId,
-    tv_id,
-  );
+  const seasonWatched: SeasonsWatchedDB[] | null =
+    await myWatchedSeason(userId);
 
   return (
     <div className="mx-auto mb-6 mt-4 w-[75%] text-black">
       <DisplayInfo tv={tv} />
       <DisplaySeason
+        tv={tv}
         seasons={tv.seasons}
         watched={seasonWatched}
         user={user}

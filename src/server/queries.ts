@@ -145,8 +145,6 @@ export async function getSeasonDetail(serieId: string, season_number: number) {
     cache: "no-cache",
   });
 
-  console.log(response);
-
   const data: unknown = await response.json();
   return data as SeasonDetail;
 }

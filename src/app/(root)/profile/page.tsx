@@ -1,9 +1,11 @@
+import { Divide } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
 import { getUser, myInfo } from "~/app/(user)/user_action";
+import { type UserInfo } from "~/server/db/types";
 import { type MovieDetail } from "~/types/tmdb_detail";
-import { myWatchedMovie } from "../detail/actions";
+import { myWatchedMovie, myWatchedTV } from "../detail/actions";
 
 // interface MyMovies {
 //   id: number;
@@ -18,15 +20,6 @@ import { myWatchedMovie } from "../detail/actions";
 //   };
 //   movie: MovieDetail;
 // }
-
-interface Info {
-  id: string;
-  userId: string | null;
-  movieDurationTotal: number;
-  movieCountTotal: number;
-  tvDurationTotal: number;
-  tvCountTotal: number;
-}
 
 function generic(n: number, divident: number): [number, number] {
   const whole = Math.floor(n / divident);
@@ -52,7 +45,7 @@ function handleVisualizationMinute(start: number) {
   );
 }
 
-function Summary(props: { info: Info }) {
+function Summary(props: { info: UserInfo }) {
   const { info } = props;
   return (
     <section className="m-4 rounded-md bg-white p-4 text-slate-950">
@@ -69,7 +62,7 @@ function Summary(props: { info: Info }) {
 
 export default async function Page() {
   const user = await getUser();
-  let info: Info;
+  let info: UserInfo;
   const LIMIT = 25;
   const offset = 0;
 
@@ -89,13 +82,16 @@ export default async function Page() {
   } else {
     const temp = await myInfo(user.id);
     if (temp === undefined) {
-      return <div>No info found</div>;
+      throw new Error("Wtf if user is logged info should always exist");
     }
     info = temp;
   }
 
-  const myMovies = await myWatchedMovie(LIMIT, offset);
+  const myMovies = await myWatchedMovie(user.id, LIMIT, offset);
   const hasMovies = myMovies.length !== 0;
+
+  const myTv = await myWatchedTV(user.id, LIMIT, offset);
+  const hasTv = myTv.length !== 0;
 
   return (
     <main className="flex flex-col">
@@ -103,7 +99,7 @@ export default async function Page() {
       <section className="m-4 flex flex-row flex-wrap gap-4 rounded-md bg-white p-4 text-black">
         {hasMovies ? (
           myMovies.map((watch) => {
-            const movie = watch.movie.movie_data as MovieDetail;
+            const movie = watch.movie.movie_data;
 
             const [toHours, minutes] = generic(watch.duration, 60);
             const [, hours] = generic(toHours, 60);
@@ -138,7 +134,17 @@ export default async function Page() {
           })
         ) : (
           <div>
-            <h1>Start add movies and series to track them</h1>
+            <h1>No movie found</h1>
+          </div>
+        )}
+
+        {hasTv ? (
+          <div>
+            <code>{JSON.stringify(myTv, null, 2)}</code>
+          </div>
+        ) : (
+          <div>
+            <h1>No TV Found</h1>
           </div>
         )}
       </section>

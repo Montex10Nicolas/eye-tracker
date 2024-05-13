@@ -1,23 +1,38 @@
 "use server";
 import { and, desc, eq } from "drizzle-orm";
 import { generateId, generateIdFromEntropySize } from "lucia";
+import {
+  getOrCreateFullTVData,
+  getOrCreateTV,
+  updateInfo,
+} from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
   episodeTable,
-  episodeWatched,
+  episodeWatchedTable,
   moviesTable,
   seasonTable,
-  seasonWatched,
+  seasonWatchedTable,
+  seriesTable,
+  seriesWatchedTable,
   userInfoTable,
   userTable,
   userToMovie,
 } from "~/server/db/schema";
-import { type DBErorr } from "~/server/db/types";
+import {
+  type DBErorr,
+  type SeasonType,
+  type SeasonsWatchedDB,
+  type SerieDBType,
+  type SeriesWatchedTableType,
+  type UserInfo,
+} from "~/server/db/types";
 import { getSeasonDetail } from "~/server/queries";
 import {
   type Episode,
   type MovieDetail,
   type Season,
+  type TVDetail,
 } from "~/types/tmdb_detail";
 
 export async function addMovie(movie: MovieDetail) {
@@ -158,7 +173,11 @@ export async function removeFromMovieWatched(
   }
 }
 
-export async function myWatchedMovie(limit = 25, offset: number) {
+export async function myWatchedMovie(
+  userId: string,
+  limit = 25,
+  offset: number,
+) {
   "use server";
   const results = await db.query.userToMovie.findMany({
     with: {
@@ -169,6 +188,8 @@ export async function myWatchedMovie(limit = 25, offset: number) {
         },
       },
     },
+    where: (user, { eq }) => eq(user.userId, userId),
+
     orderBy: desc(userToMovie.dateWatched),
     limit: limit,
     offset: offset,
@@ -177,102 +198,32 @@ export async function myWatchedMovie(limit = 25, offset: number) {
   return results;
 }
 
-// SEASONS
+export async function myWatchedTV(userId: string, limit = 25, offset: number) {
+  "use server";
+
+  const results = await db.query.seasonWatchedTable.findMany({
+    where: (sesWat, { eq }) => eq(seasonWatchedTable.userId, userId),
+    with: {
+      season: true,
+    },
+  });
+
+  return results;
+}
+
+export async function myWatchedSeason(userId: string | undefined) {
+  if (userId === undefined) return null;
+  return await db.query.seasonWatchedTable.findMany({
+    where: (_, { eq }) => eq(seasonWatchedTable.userId, userId),
+  });
+}
 
 // Add season to DB
-async function addSeason(season: Season) {
-  "use server";
-  const seasonId = season.id.toString();
-  const returned = await db
-    .insert(seasonTable)
-    .values({
-      id: seasonId,
-      season_data: season,
-    })
-    .returning();
-  return returned[0];
-}
-
 // Add all eps of a season to DB
-async function addEpisodes(season: Season, serieId: string) {
-  "use server";
-  const seasonId = season.id.toString();
-  const seasonDet = await getSeasonDetail(serieId, season.season_number);
 
-  const episodes: { id: string; seasonId: string; episodeDate: Episode }[] = [];
-  for (const episode of seasonDet.episodes) {
-    const ep_id = episode.id.toString();
+// Create all the DB for a serie and it's season
 
-    const res = await db
-      .insert(episodeTable)
-      .values({
-        id: ep_id,
-        seasonId: seasonId,
-        episodeDate: episode,
-      })
-      .returning();
-
-    if (res[0] !== undefined) {
-      console.log("\n\ninserting res\n\n");
-    }
-  }
-
-  console.log("Final ", episodes);
-
-  return episodes;
-}
-
-async function checkOrCreateTV(season: Season, serieId: string) {
-  "use server";
-  const seasonId = season.id.toString();
-
-  let seasonDB = await db.query.seasonTable.findFirst({
-    where: (ses, { eq }) => eq(seasonTable.id, seasonId),
-  });
-
-  if (seasonDB === undefined) {
-    console.log("Season does not exist creating");
-    seasonDB = await addSeason(season);
-  }
-
-  let episodes = await db.query.episodeTable.findMany({
-    where: (epi, { eq }) => eq(episodeTable.seasonId, seasonId),
-  });
-
-  if (episodes === undefined || episodes.length < season.episode_count) {
-    console.log("Episode don't exist or too short");
-    episodes = await addEpisodes(season, serieId);
-  }
-
-  if (seasonDB === undefined || episodes === undefined) return null;
-
-  return { seasonDB: seasonDB, episodes: episodes };
-}
-
-async function createTvWatched(
-  seasonId: string,
-  userId: string,
-  serieId: string,
-) {
-  "use server";
-  const id = generateId(32);
-  console.log("Random id", id);
-
-  const tvWatched = await db
-    .insert(seasonWatched)
-    .values({
-      id: id,
-      seasonId: seasonId,
-      userId: userId,
-      status: "watching",
-      serieId: serieId,
-    })
-    .returning();
-
-  if (tvWatched[0] === undefined) throw new Error("WTF");
-  return tvWatched[0];
-}
-
+// Get a list of episode and add it to the Watch
 async function addEpisodeToWatched(
   episodes: {
     id: string;
@@ -285,74 +236,46 @@ async function addEpisodeToWatched(
   const seasonId = episodes[0]?.seasonId;
   if (seasonId === undefined) throw new Error("fjdklfjsdkl action 277");
 
+  const episode_count = episodes.length;
+  let episode_runtime = 0;
   for (const episode of episodes) {
     const episodeId = episode.id.toString();
     const data = episode.episodeDate;
 
     const id = generateId(32);
 
-    await db.insert(episodeWatched).values({
+    await db.insert(episodeWatchedTable).values({
       id: id,
       userId: userId,
       episodeId: episodeId,
       duration: data.runtime,
     });
+
+    episode_runtime += data.runtime;
   }
 
+  await updateInfo(userId, "add", 0, 0, episode_runtime, episode_count, 1, -1);
+
+  // Add check if is completed
   await db
-    .update(seasonWatched)
+    .update(seasonWatchedTable)
     .set({
       status: "completed",
     })
     .where(
       and(
-        eq(seasonWatched.userId, userId),
-        eq(seasonWatched.seasonId, seasonId),
+        eq(seasonWatchedTable.userId, userId),
+        eq(seasonWatchedTable.seasonId, seasonId),
       ),
     );
 }
 
-export async function addAllSeasonToWatched(
+export async function addSeasonToWatched(
   season: Season,
   userId: string,
-  serieId: string,
+  serie: TVDetail,
 ) {
   "use server";
-  const seasonId = season.id.toString();
 
-  const check = await checkOrCreateTV(season, serieId);
-  if (check === null) {
-    throw new Error("WTF");
-  }
-
-  const { seasonDB, episodes } = check;
-
-  let watchSeason = await db.query.seasonWatched.findFirst({
-    where: (mov, { eq, and }) =>
-      and(eq(mov.seasonId, seasonId), eq(mov.userId, userId)),
-  });
-  // if it does not exist we need to create a new thing
-  if (watchSeason === undefined) {
-    watchSeason = await createTvWatched(seasonId, userId, serieId);
-  }
-
-  await db
-    .update(seasonWatched)
-    .set({
-      status: "watching",
-    })
-    .where(eq(seasonWatched.seasonId, seasonDB.id));
-
-  await addEpisodeToWatched(episodes, userId);
-}
-
-export async function myWatchedSeason(
-  userId: string | undefined,
-  serieId: string,
-) {
-  if (userId === undefined) return null;
-  return await db.query.seasonWatched.findMany({
-    where: (_, { eq }) =>
-      and(eq(seasonWatched.userId, userId), eq(seasonWatched.serieId, serieId)),
-  });
+  const all = await getOrCreateFullTVData(season, serie);
 }

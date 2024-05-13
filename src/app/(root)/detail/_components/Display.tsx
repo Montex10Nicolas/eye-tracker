@@ -148,7 +148,7 @@ export function DisplayCredits(props: { credits: Credits }) {
 export function DisplayGenres(props: { genres: Genre[] }) {
   const { genres } = props;
   return (
-    <div>
+    <div className="flex gap-2 text-center">
       {genres.map((genre) => {
         return <Badge key={genre.id}>{genre.name}</Badge>;
       })}
