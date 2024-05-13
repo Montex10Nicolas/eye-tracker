@@ -1,8 +1,9 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { generateId } from "lucia";
 import { db } from "~/server/db";
 import {
   episodeTable,
+  episodeWatchedTable,
   seasonTable,
   seasonWatchedTable,
   seriesTable,
@@ -204,7 +205,6 @@ async function createEpisode(seasonId: string, episode: Episode) {
       episodeDate: episode,
     })
     .returning();
-
   if (res[0] === undefined) {
     throw new Error("episode should not be undefined");
   }
@@ -223,6 +223,33 @@ async function createEpisodes(season: Season, serieId: string) {
   }
 
   return episodes;
+}
+
+async function createEpisodeWatched(userId: string, episode: Episode) {
+  const epId = episode.id.toString();
+
+  const episodeWatch = await db.query.episodeWatchedTable.findFirst({
+    where: (ses, { and, eq }) =>
+      and(eq(ses.userId, userId), eq(ses.episodeId, epId)),
+  });
+
+  if (episodeWatch === undefined) {
+    await db.insert(episodeWatchedTable).values({
+      id: generateId(32),
+      duration: episode.runtime,
+      episodeId: epId,
+      userId: userId,
+    });
+  }
+}
+
+export async function createEpisodesWatched(
+  userId: string,
+  episodes: Episode[],
+) {
+  for (const episode of episodes) {
+    await createEpisodeWatched(userId, episode);
+  }
 }
 
 async function getOrCreateTV(serieId: string, serie: TVDetail) {
@@ -250,6 +277,8 @@ async function getOrCreateSeason(
   if (seasonDB === undefined) {
     seasonDB = await createTVSeason(seasonId, season, serieId, serieName);
   }
+
+  return seasonDB;
 }
 
 async function getOrCreateEpisodes(
@@ -287,4 +316,63 @@ export async function getOrCreateFullTVData(season: Season, serie: TVDetail) {
     season: season_db,
     episodes: episodes,
   };
+}
+
+export async function getOrCreateTVSeasonWatched(
+  userId: string,
+  serieId: string,
+  seasonId: string,
+) {
+  let seasonWatched = await db.query.seasonWatchedTable.findFirst({
+    where: (season, { and, eq }) =>
+      and(
+        eq(seasonWatchedTable.seasonId, seasonId),
+        eq(seasonWatchedTable.userId, userId),
+      ),
+  });
+
+  if (seasonWatched === undefined) {
+    seasonWatched = await createTVSeasonsWatched(seasonId, userId, serieId);
+  }
+
+  return seasonWatched;
+}
+
+export async function updateSerieWatch(
+  serieId: string,
+  userId: string,
+  status: "watching" | "completed",
+) {
+  await getOrCreateTVSeriesWatched(serieId, userId);
+
+  await db
+    .update(seriesWatchedTable)
+    .set({ status: status })
+    .where(
+      and(
+        eq(seriesWatchedTable.seriesId, serieId),
+        eq(seriesWatchedTable.userId, userId),
+      ),
+    );
+}
+
+export async function updateSeasonWatch(
+  seasonId: string,
+  serieId: string,
+  userId: string,
+  status: "watching" | "completed",
+) {
+  await getOrCreateTVSeasonWatched(userId, serieId, seasonId);
+
+  await db
+    .update(seasonWatchedTable)
+    .set({
+      status: status,
+    })
+    .where(
+      and(
+        eq(seasonWatchedTable.seasonId, seasonId),
+        eq(seasonWatchedTable.userId, userId),
+      ),
+    );
 }

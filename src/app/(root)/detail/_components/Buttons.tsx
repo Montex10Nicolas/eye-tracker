@@ -29,7 +29,7 @@ export function SeasonButtons(props: {
       <button
         onClick={addCompleted}
         className="disabled: h-full w-full rounded-sm bg-green-600 font-semibold uppercase text-white disabled:bg-gray-700"
-        disabled={hasWatched}
+        // disabled={hasWatched}
       >
         add
       </button>

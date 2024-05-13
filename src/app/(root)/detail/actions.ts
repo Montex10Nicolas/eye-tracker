@@ -2,9 +2,11 @@
 import { and, desc, eq } from "drizzle-orm";
 import { generateId, generateIdFromEntropySize } from "lucia";
 import {
+  createEpisodesWatched,
   getOrCreateFullTVData,
   getOrCreateTV,
   updateInfo,
+  updateSeasonWatch,
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
@@ -278,4 +280,19 @@ export async function addSeasonToWatched(
   "use server";
 
   const all = await getOrCreateFullTVData(season, serie);
+  const episodes_db = all.episodes;
+
+  const seasonId = season.id.toString(),
+    serieId = serie.id.toString();
+  await updateSeasonWatch(seasonId, serieId, userId, "watching");
+
+  const episodes: Episode[] = [];
+  for (const ep of episodes_db) {
+    episodes.push(ep.episodeDate);
+  }
+
+  await createEpisodesWatched(userId, episodes);
+
+  // Check if season is completed
+  // Check if series is completed
 }
