@@ -44,7 +44,6 @@ export async function getOrCreateInfo(userId: string) {
 
 export async function updateInfo(
   userId: string,
-  operation: "add" | "set",
   movieDurationTotal = 0,
   movieCountTotal = 0,
   tvDurationTotal = 0,
@@ -52,33 +51,18 @@ export async function updateInfo(
   tvSeasonCompleted = 0,
   tvSeasonWatching = 0,
 ) {
-  if (operation === "set") {
-    await db
-      .update(userInfoTable)
-      .set({
-        movieCountTotal: movieCountTotal,
-        movieDurationTotal: movieDurationTotal,
-        tvEpisodeCount: tvEpisodeCount,
-        tvDurationTotal: tvDurationTotal,
-        tvSeasonWatching: tvSeasonWatching,
-        tvSeasonCompleted: tvSeasonCompleted,
-      })
-      .where(eq(userInfoTable.userId, userId));
-    return;
-  }
-
   const info = await getOrCreateInfo(userId);
 
-  function v(ope: typeof operation, start: number, finish: number): number {
+  function v(start: number, finish: number): number {
     return start + finish;
   }
 
-  const newCount = v(operation, info.movieCountTotal, movieCountTotal),
-    newDuration = v(operation, info.movieDurationTotal, movieDurationTotal),
-    newTVCount = v(operation, info.tvEpisodeCount, tvEpisodeCount),
-    newTvDuration = v(operation, info.tvDurationTotal, tvDurationTotal),
-    newTVWatching = v(operation, info.tvSeasonWatching, tvSeasonWatching),
-    newTVCompleted = v(operation, info.tvSeasonCompleted, tvSeasonCompleted);
+  const newCount = v(info.movieCountTotal, movieCountTotal),
+    newDuration = v(info.movieDurationTotal, movieDurationTotal),
+    newTVCount = v(info.tvEpisodeCount, tvEpisodeCount),
+    newTvDuration = v(info.tvDurationTotal, tvDurationTotal),
+    newTVWatching = v(info.tvSeasonWatching, tvSeasonWatching),
+    newTVCompleted = v(info.tvSeasonCompleted, tvSeasonCompleted);
   await db
     .update(userInfoTable)
     .set({
@@ -241,9 +225,11 @@ async function createEpisodeWatched(
   });
 
   if (episodeWatch === undefined) {
+    const dur = episode.runtime ?? 0;
+
     await db.insert(episodeWatchedTable).values({
       id: generateId(32),
-      duration: episode.runtime,
+      duration: dur,
       episodeId: epId,
       userId: userId,
       seasonId: seasonId,
@@ -267,11 +253,11 @@ export async function createEpisodesWatched(
 
     if (added) {
       ep_count++;
-      duration += episode.runtime;
+      duration += episode.runtime ?? 0;
     }
   }
 
-  await updateInfo(userId, "add", 0, 0, duration, ep_count, 1, -1);
+  await updateInfo(userId, 0, 0, duration, ep_count, 1, -1);
 }
 
 async function getOrCreateSeason(
@@ -444,4 +430,32 @@ export async function checkSeriesCompleted(userId: string, serieId: string) {
   });
 
   return season_count === seasons.length;
+}
+
+export async function updateInfoWatchComp(userId: string) {
+  const all = await db.query.seasonWatchedTable.findMany({
+    where: (season, { eq, and, or }) =>
+      and(
+        eq(seasonWatchedTable.userId, userId),
+        or(
+          eq(seasonWatchedTable.status, "completed"),
+          eq(seasonWatchedTable.status, "watching"),
+        ),
+      ),
+  });
+
+  let watching = 0,
+    completed = 0;
+  for (const res of all) {
+    if (res.status === "watching") watching++;
+    if (res.status === "completed") completed++;
+  }
+
+  await db
+    .update(userInfoTable)
+    .set({
+      tvSeasonCompleted: completed,
+      tvSeasonWatching: watching,
+    })
+    .where(eq(userInfoTable.userId, userId));
 }

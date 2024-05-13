@@ -6,6 +6,7 @@ import {
   createEpisodesWatched,
   getOrCreateFullTVData,
   getOrCreateTVSeriesWatched,
+  updateInfoWatchComp,
   updateSeasonWatch,
   updateSerieWatch,
 } from "~/_utils/actions_helpers";
@@ -220,7 +221,7 @@ export async function addSeasonToWatched(
   const seasonId = season.id.toString(),
     serieId = serie.id.toString();
   await updateSeasonWatch(seasonId, serieId, userId, "watching");
-  await updateSeasonWatch(seasonId, serieId, userId, "watching");
+  await updateSerieWatch(serieId, userId, "watching");
 
   const episodes: Episode[] = [];
   for (const ep of episodes_db) {
@@ -245,4 +246,6 @@ export async function addSeasonToWatched(
   } else {
     await updateSerieWatch(serieId, userId, "watching");
   }
+
+  await updateInfoWatchComp(userId);
 }
