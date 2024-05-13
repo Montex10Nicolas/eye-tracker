@@ -94,7 +94,7 @@ export const userToMovie = createTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-    duration: smallint("duration").notNull(),
+    duration: smallint("duration").notNull().default(-1),
     timeWatched: smallint("time_watched").notNull(),
     dateWatched: timestamp("date_watched").notNull(),
   },
@@ -264,7 +264,7 @@ export const episodeWatchedTable = createTable("tv-episode-watched", {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
-  duration: smallint("duration").notNull(),
+  duration: smallint("duration").notNull().default(-1),
 });
 
 export const episodeWatRelations = relations(

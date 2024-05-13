@@ -1,40 +1,22 @@
 "use server";
 import { and, desc, eq } from "drizzle-orm";
-import { generateId, generateIdFromEntropySize } from "lucia";
 import {
   checkSeasonCompleted,
   checkSeriesCompleted,
   createEpisodesWatched,
   getOrCreateFullTVData,
-  getOrCreateTV,
-  getOrCreateTVSeries,
   getOrCreateTVSeriesWatched,
-  updateInfo,
   updateSeasonWatch,
   updateSerieWatch,
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
-  episodeTable,
-  episodeWatchedTable,
   moviesTable,
-  seasonTable,
   seasonWatchedTable,
-  seriesTable,
-  seriesWatchedTable,
   userInfoTable,
-  userTable,
   userToMovie,
 } from "~/server/db/schema";
-import {
-  type DBErorr,
-  type SeasonType,
-  type SeasonsWatchedDB,
-  type SerieDBType,
-  type SeriesWatchedTableType,
-  type UserInfo,
-} from "~/server/db/types";
-import { getSeasonDetail } from "~/server/queries";
+import { type DBErorr } from "~/server/db/types";
 import {
   type Episode,
   type MovieDetail,
