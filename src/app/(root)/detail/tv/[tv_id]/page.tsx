@@ -1,16 +1,26 @@
 import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
-import { type SeasonsWatchedDB } from "~/server/db/types";
+import {
+  type SeasonWatchedType,
+  type SerieWatchedType,
+} from "~/server/db/types";
 import { GetTVDetail } from "~/server/queries";
 import { type Season, type TVDetail, type User } from "~/types/tmdb_detail";
 import { SeasonButtons } from "../../_components/Buttons";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
 import Provider from "../../_components/Providers";
-import { addSeasonToWatched, myWatchedSeason } from "../../actions";
+import {
+  addSeasonToWatched,
+  getUserWatchedTVAndSeason,
+  type SeriesAndSeasons,
+} from "../../actions";
 
-async function DisplayInfo(props: { tv: TVDetail }) {
-  const { tv } = props;
+async function DisplayInfo(props: {
+  tv: TVDetail;
+  serieWatched: SerieWatchedType | undefined;
+}) {
+  const { tv, serieWatched } = props;
   const back_url = tv.backdrop_path;
   const poster_url = tv.poster_path;
 
@@ -58,6 +68,9 @@ async function DisplayInfo(props: { tv: TVDetail }) {
             <DisplayGenres genres={tv.genres} />
           </div>
         </div>
+        <p>
+          <code>{JSON.stringify(serieWatched, null, 2)}</code>
+        </p>
         <p className="mb-4 mt-auto">
           <span className=" text-slate-300">Overview: </span> {tv.overview}
         </p>
@@ -73,13 +86,13 @@ async function DisplayInfo(props: { tv: TVDetail }) {
 }
 
 async function DisplaySeason(props: {
-  seasons: Season[];
   user: User | null;
-  tvId: string;
   tv: TVDetail;
-  watched: SeasonsWatchedDB[] | null;
+  tvId: string;
+  seasons: Season[];
+  seasonsWatched: SeasonWatchedType[] | undefined;
 }) {
-  const { seasons, user, tv, watched } = props;
+  const { seasons, user, tv, seasonsWatched } = props;
   const loggedIn = user !== null;
 
   return (
@@ -90,9 +103,11 @@ async function DisplaySeason(props: {
         {seasons.map((season) => {
           const seasonId = season.id.toString();
 
-          const hasWatched =
-            watched?.findIndex((w) => w.seasonId === season.id.toString()) !==
-            -1;
+          const seasonWatched = seasonsWatched?.find((season) => {
+            console.log(`ID: ${seasonId} - WATCHED: ${season.id}`);
+
+            return season.seasonId === seasonId ? season : undefined;
+          });
 
           return (
             <div
@@ -113,7 +128,6 @@ async function DisplaySeason(props: {
               <div className="absolute right-0 top-0 w-16 rounded-bl-xl bg-white p-2 text-center font-bold">
                 {season.vote_average}/10
               </div>
-
               {loggedIn ? (
                 <div className="flex w-full flex-row gap-2 p-1">
                   <SeasonButtons
@@ -121,7 +135,7 @@ async function DisplaySeason(props: {
                     season={season}
                     userId={user.id}
                     serie={tv}
-                    hasWatched={hasWatched}
+                    seasonWatched={seasonWatched}
                   />
                 </div>
               ) : null}
@@ -141,19 +155,20 @@ export default async function Page(props: { params: { tv_id: string } }) {
 
   const userId = user?.id;
 
-  const seasonWatched: SeasonsWatchedDB[] | null =
-    await myWatchedSeason(userId);
+  const seriesAndSeasonWatched: SeriesAndSeasons | undefined =
+    await getUserWatchedTVAndSeason(userId, tv_id);
 
   return (
     <div className="mx-auto mb-6 mt-4 w-[75%] text-black">
-      <DisplayInfo tv={tv} />
+      <DisplayInfo tv={tv} serieWatched={seriesAndSeasonWatched?.serie} />
       <DisplaySeason
-        tv={tv}
-        seasons={tv.seasons}
-        watched={seasonWatched}
         user={user}
+        tv={tv}
         tvId={tv_id}
+        seasons={tv.seasons}
+        seasonsWatched={seriesAndSeasonWatched?.seasons}
       />
+
       <DisplayCredits credits={tv.credits} />
     </div>
   );

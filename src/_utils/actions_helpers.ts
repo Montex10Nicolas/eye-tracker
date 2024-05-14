@@ -210,7 +210,7 @@ async function createEpisodes(season: Season, serieId: string) {
   return episodes;
 }
 
-async function createEpisodeWatched(
+async function getOrCreateEpisodeWatched(
   userId: string,
   seasonId: string,
   episode: Episode,
@@ -247,7 +247,7 @@ export async function createEpisodesWatched(
   let ep_count = 0,
     duration = 0;
   for (const episode of episodes) {
-    const added = await createEpisodeWatched(userId, seasonId, episode);
+    const added = await getOrCreateEpisodeWatched(userId, seasonId, episode);
 
     if (added) {
       ep_count++;

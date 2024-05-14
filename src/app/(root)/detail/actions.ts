@@ -1,5 +1,6 @@
 "use server";
 import { and, desc, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import {
   checkSeasonCompleted,
   checkSeriesCompleted,
@@ -17,7 +18,11 @@ import {
   userInfoTable,
   userToMovie,
 } from "~/server/db/schema";
-import { type DBErorr } from "~/server/db/types";
+import {
+  type DBErorr,
+  type SeasonWatchedType,
+  type SerieWatchedType,
+} from "~/server/db/types";
 import {
   type Episode,
   type MovieDetail,
@@ -188,6 +193,30 @@ export async function myWatchedMovie(
   return results;
 }
 
+export interface SeriesAndSeasons {
+  serie: SerieWatchedType;
+  seasons: SeasonWatchedType[];
+}
+
+// Return info about a series and it's season in relation to a user
+export async function getUserWatchedTVAndSeason(
+  userId: string | undefined,
+  serieId: string,
+) {
+  if (userId === undefined) return undefined;
+
+  const serie = await getOrCreateTVSeriesWatched(serieId, userId);
+  const seasons = await db.query.seasonWatchedTable.findMany({
+    where: (ses, { and, eq }) =>
+      and(eq(ses.userId, userId), eq(ses.serieId, serieId)),
+  });
+
+  return {
+    serie,
+    seasons,
+  };
+}
+
 export async function myWatchedTV(userId: string, limit = 25, offset: number) {
   "use server";
 
@@ -208,15 +237,20 @@ export async function myWatchedSeason(userId: string | undefined) {
   });
 }
 
+// Is episodesID = [] = add all episodes
+// Otherwhise only add the
 export async function addSeasonToWatched(
   season: Season,
   userId: string,
   serie: TVDetail,
+  episodesId: string[],
 ) {
   "use server";
 
-  const all = await getOrCreateFullTVData(season, serie);
-  const episodes_db = all.episodes;
+  const addAllEp = episodesId.length === 0;
+
+  const data = await getOrCreateFullTVData(season, serie);
+  const episodes_db = data.episodes;
 
   const seasonId = season.id.toString(),
     serieId = serie.id.toString();
@@ -225,7 +259,16 @@ export async function addSeasonToWatched(
 
   const episodes: Episode[] = [];
   for (const ep of episodes_db) {
-    episodes.push(ep.episodeDate);
+    const watched = episodesId.findIndex((id) => {
+      id === ep.id;
+    });
+
+    if (addAllEp || watched !== -1) {
+      console.log(
+        `${ep.episodeDate.episode_number} watched with ${ep.id} as asked in ${watched} ${episodesId[watched]}`,
+      );
+      episodes.push(ep.episodeDate);
+    }
   }
 
   await createEpisodesWatched(userId, seasonId, episodes);
@@ -248,4 +291,6 @@ export async function addSeasonToWatched(
   }
 
   await updateInfoWatchComp(userId);
+
+  revalidatePath(`/tv/detail/${serieId}`);
 }

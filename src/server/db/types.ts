@@ -55,6 +55,21 @@ export interface SerieDBType {
   serie_data: TVDetail;
 }
 
+export interface SerieWatchedType {
+  id: string;
+  userId: string;
+  serieId: string;
+  status: "not_started" | "watching" | "completed";
+}
+
+export interface SeasonWatchedType {
+  id: string;
+  userId: string;
+  serieId: string;
+  status: "not_started" | "watching" | "completed";
+  seasonId: string;
+}
+
 export const CODES_STATUS: number[] = [23505];
 
 export function generateErrorMessage(code: number) {
