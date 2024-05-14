@@ -11,8 +11,6 @@ import {
   userInfoTable,
 } from "~/server/db/schema";
 import {
-  type SeasonType,
-  type SerieDBType,
   type SerieType,
   type SeriesWatchedTableType,
   type UserInfo,
