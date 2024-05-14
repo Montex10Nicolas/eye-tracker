@@ -203,7 +203,9 @@ export async function getUserWatchedTVAndSeason(
   userId: string | undefined,
   serieId: string,
 ) {
-  if (userId === undefined) return undefined;
+  if (userId === undefined) {
+    return undefined;
+  }
 
   const serie = await getOrCreateTVSeriesWatched(serieId, userId);
   const seasons = await db.query.seasonWatchedTable.findMany({
@@ -264,9 +266,6 @@ export async function addSeasonToWatched(
     });
 
     if (addAllEp || watched !== -1) {
-      console.log(
-        `${ep.episodeDate.episode_number} watched with ${ep.id} as asked in ${watched} ${episodesId[watched]}`,
-      );
       episodes.push(ep.episodeDate);
     }
   }

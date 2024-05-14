@@ -1,3 +1,4 @@
+import { getOrCreateTVSeries } from "~/_utils/actions_helpers";
 import {
   type MovieDetail,
   type MovieResultType,
@@ -72,8 +73,8 @@ export async function GetMovieDetail(id: number) {
     throw new Error("Smething went wrong");
   }
 
-  const data: unknown = await response.json();
-  return data as MovieDetail;
+  const data = (await response.json()) as MovieDetail;
+  return data;
 }
 
 export async function GetPersonDetail(id: number) {
@@ -98,6 +99,7 @@ export async function GetPersonDetail(id: number) {
 
 export async function GetTVDetail(id: string) {
   "use server";
+
   const url = new URL(`/3/tv/${id}`, TMDB_URL);
   url.searchParams.set("append_to_response", "credits");
 
@@ -105,8 +107,9 @@ export async function GetTVDetail(id: string) {
     ...Headers,
   });
 
-  const data: unknown = await response.json();
-  return data as TVDetail;
+  const data: TVDetail = (await response.json()) as TVDetail;
+  await getOrCreateTVSeries(data.id.toString(), data);
+  return data;
 }
 
 export async function getTvRecomendation(tvId: number, page: number) {

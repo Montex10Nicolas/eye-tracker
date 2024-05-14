@@ -10,8 +10,8 @@ export function displayHumanDate(date: string | null) {
   return `${parts[2]}/${parts[1]}/${parts[0]}`;
 }
 
-export const TMDB_IMAGE_URL = function (image_url: string) {
-  if (image_url === NOT_FOUND_POSTER) {
+export const TMDB_IMAGE_URL = function (image_url: string | null) {
+  if (image_url === NOT_FOUND_POSTER || image_url === null) {
     return NOT_FOUND_POSTER;
   } else if (image_url === MISSING_PERSON) {
     return MISSING_PERSON;

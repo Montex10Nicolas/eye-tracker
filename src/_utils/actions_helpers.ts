@@ -4,6 +4,7 @@ import { db } from "~/server/db";
 import {
   episodeTable,
   episodeWatchedTable,
+  moviesTable,
   seasonTable,
   seasonWatchedTable,
   seriesTable,
@@ -16,7 +17,12 @@ import {
   type UserInfo,
 } from "~/server/db/types";
 import { getSeasonDetail } from "~/server/queries";
-import { type Episode, type Season, type TVDetail } from "~/types/tmdb_detail";
+import {
+  type Episode,
+  type MovieDetail,
+  type Season,
+  type TVDetail,
+} from "~/types/tmdb_detail";
 
 export async function getOrCreateInfo(userId: string) {
   let info: UserInfo | undefined = await db.query.userInfoTable.findFirst({
@@ -74,7 +80,58 @@ export async function updateInfo(
     .where(eq(userInfoTable.userId, userId));
 }
 
-async function getOrCreateTVSeries(serieId: string, series: TVDetail) {
+async function updateMovie(movieId: string, movie: MovieDetail) {
+  const mov = await db
+    .update(moviesTable)
+    .set({
+      movie_data: movie,
+    })
+    .where(eq(moviesTable.id, movieId))
+    .returning();
+  if (mov[0] === undefined) throw new Error("Movie should be able to update");
+  return mov[0];
+}
+
+async function createMovie(movieId: string, movie: MovieDetail) {
+  const mov = await db
+    .insert(moviesTable)
+    .values({
+      id: movieId,
+      movie_data: movie,
+    })
+    .returning();
+  if (mov[0] !== undefined) {
+    return mov[0];
+  }
+}
+
+export async function getOrCreateMovie(movieId: string, movie: MovieDetail) {
+  let movie_db = await db.query.moviesTable.findFirst({
+    where: (mov, { eq }) => eq(mov.id, movieId),
+  });
+
+  if (movie_db === undefined) {
+    movie_db = await createMovie(movieId, movie);
+  }
+
+  movie_db = await updateMovie(movieId, movie);
+
+  return movie_db;
+}
+
+async function updateSeries(serieId: string, serie: TVDetail) {
+  const serie_db = await db
+    .update(seriesTable)
+    .set({
+      serie_data: serie,
+    })
+    .where(eq(seriesTable.id, serieId))
+    .returning();
+  if (serie_db[0] === undefined) throw new Error("How serie is undefined");
+  return serie_db[0];
+}
+
+export async function getOrCreateTVSeries(serieId: string, series: TVDetail) {
   let tvSeries = await db.query.seriesTable.findFirst({
     where: (serie, { eq }) => eq(serie.id, serieId),
   });
@@ -82,6 +139,8 @@ async function getOrCreateTVSeries(serieId: string, series: TVDetail) {
   if (tvSeries === undefined) {
     tvSeries = await createTVSeries(serieId, series);
   }
+
+  tvSeries = await updateSeries(serieId, series);
 
   return tvSeries;
 }

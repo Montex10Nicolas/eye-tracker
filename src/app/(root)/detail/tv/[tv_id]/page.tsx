@@ -68,9 +68,6 @@ async function DisplayInfo(props: {
             <DisplayGenres genres={tv.genres} />
           </div>
         </div>
-        <p>
-          <code>{JSON.stringify(serieWatched, null, 2)}</code>
-        </p>
         <p className="mb-4 mt-auto">
           <span className=" text-slate-300">Overview: </span> {tv.overview}
         </p>
@@ -97,15 +94,13 @@ async function DisplaySeason(props: {
 
   return (
     <div className="mt-4 flex flex-col gap-1 rounded-md bg-white p-4 text-black">
-      <h2>Seasons: </h2>
+      <h1>Seasons</h1>
       <hr className="mb-3" />
       <div className="relative flex flex-row flex-wrap gap-4 rounded-sm">
         {seasons.map((season) => {
           const seasonId = season.id.toString();
 
           const seasonWatched = seasonsWatched?.find((season) => {
-            console.log(`ID: ${seasonId} - WATCHED: ${season.id}`);
-
             return season.seasonId === seasonId ? season : undefined;
           });
 
@@ -129,7 +124,7 @@ async function DisplaySeason(props: {
                 {season.vote_average}/10
               </div>
               {loggedIn ? (
-                <div className="flex w-full flex-row gap-2 p-1">
+                <div className="flex w-full flex-col gap-2 p-1">
                   <SeasonButtons
                     addAllSeason={addSeasonToWatched}
                     season={season}
