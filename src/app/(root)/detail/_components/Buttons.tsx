@@ -24,6 +24,11 @@ export function SeasonButtons(props: {
     await addAllSeason(season, userId, serie, all);
   }
 
+  async function removeAll() {
+    const all = new Array(season.episode_count).fill(false) as boolean[];
+    await addAllSeason(season, userId, serie, all);
+  }
+
   return (
     <>
       <button
@@ -34,7 +39,10 @@ export function SeasonButtons(props: {
         add
       </button>
       {seasonWatched?.status === "completed" ? (
-        <button className="h-full w-full rounded-sm bg-red-600 font-semibold uppercase">
+        <button
+          onClick={removeAll}
+          className="h-full w-full rounded-sm bg-red-600 font-semibold uppercase"
+        >
           remove
         </button>
       ) : null}
