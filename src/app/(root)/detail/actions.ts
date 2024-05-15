@@ -13,6 +13,7 @@ import {
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
+  episodeWatchedTable,
   moviesTable,
   seasonWatchedTable,
   userInfoTable,
@@ -195,7 +196,27 @@ export async function myWatchedMovie(
 
 export interface SeriesAndSeasons {
   serie: SerieWatchedType;
-  seasons: SeasonWatchedType[];
+  seasons: SeasonWatchWithEpisodes[];
+}
+
+export interface SeasonWatchWithEpisodes {
+  episode: {
+    id: string;
+    userId: string;
+    duration: number;
+    seasonId: string;
+    episodeId: string;
+    episode: {
+      id: string;
+      seasonId: string;
+      episodeDate: Episode;
+    };
+  }[];
+  id: string;
+  userId: string;
+  serieId: string;
+  status: "not_started" | "watching" | "completed";
+  seasonId: string;
 }
 
 // Return info about a series and it's season in relation to a user
@@ -208,14 +229,34 @@ export async function getUserWatchedTVAndSeason(
   }
 
   const serie = await getOrCreateTVSeriesWatched(serieId, userId);
+
   const seasons = await db.query.seasonWatchedTable.findMany({
     where: (ses, { and, eq }) =>
       and(eq(ses.userId, userId), eq(ses.serieId, serieId)),
   });
 
+  const seasonWatchWithEpisodes: SeasonWatchWithEpisodes[] = [];
+  for (const season of seasons) {
+    const s_id = season.seasonId.toString();
+
+    const episode_watched = await db.query.episodeWatchedTable.findMany({
+      where: (ep, { and, eq }) =>
+        and(eq(ep.userId, userId), eq(ep.seasonId, s_id)),
+      with: {
+        episode: true,
+      },
+    });
+
+    const a = {
+      ...season,
+      episode: episode_watched,
+    };
+    seasonWatchWithEpisodes.push(a);
+  }
+
   return {
     serie,
-    seasons,
+    seasons: seasonWatchWithEpisodes,
   };
 }
 
@@ -245,11 +286,9 @@ export async function addSeasonToWatched(
   season: Season,
   userId: string,
   serie: TVDetail,
-  episodesId: string[],
+  episodesId: number[],
 ) {
   "use server";
-
-  const addAllEp = episodesId.length === 0;
 
   const data = await getOrCreateFullTVData(season, serie);
   const episodes_db = data.episodes;
@@ -259,15 +298,16 @@ export async function addSeasonToWatched(
   await updateSeasonWatch(seasonId, serieId, userId, "watching");
   await updateSerieWatch(serieId, userId, "watching");
 
-  const episodes: Episode[] = [];
-  for (const ep of episodes_db) {
-    const watched = episodesId.findIndex((id) => {
-      id === ep.id;
-    });
-
-    if (addAllEp || watched !== -1) {
-      episodes.push(ep.episodeDate);
+  let episodes: Episode[] = [];
+  for (const index of episodesId) {
+    const data = episodes_db[index];
+    if (data === undefined) {
+      continue;
     }
+    episodes.push(data.episodeDate);
+  }
+  if (episodesId.length === 0) {
+    episodes = episodes_db.map((ep) => ep.episodeDate);
   }
 
   await createEpisodesWatched(userId, seasonId, episodes);

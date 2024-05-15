@@ -1,13 +1,14 @@
 "use client";
 
-import { type SeasonWatchedType } from "~/server/db/types";
 import { type Season, type TVDetail } from "~/types/tmdb_detail";
+import { type SeasonWatchWithEpisodes } from "../actions";
+import SeasonDrawer from "./Drawer";
 
-type ActionAddAll = (
+export type ActionAddAll = (
   season: Season,
   userId: string,
   serie: TVDetail,
-  episodesId: string[],
+  episodesId: number[],
 ) => Promise<void>;
 
 export function SeasonButtons(props: {
@@ -15,15 +16,11 @@ export function SeasonButtons(props: {
   season: Season;
   userId: string;
   serie: TVDetail;
-  seasonWatched: SeasonWatchedType | undefined;
+  seasonWatched: SeasonWatchWithEpisodes | undefined;
 }) {
   const { addAllSeason, season, userId, serie, seasonWatched } = props;
   async function addAll() {
     await addAllSeason(season, userId, serie, []);
-  }
-
-  async function less() {
-    console.log("less");
   }
 
   return (
@@ -41,12 +38,13 @@ export function SeasonButtons(props: {
         </button>
       ) : null}
 
-      <button
-        onClick={less}
-        className="h-full w-full rounded-sm bg-sky-600 font-semibold uppercase text-white"
-      >
-        edit
-      </button>
+      <SeasonDrawer
+        addAllSeason={addAllSeason}
+        season={season}
+        serie={serie}
+        userId={userId}
+        seasonWatched={seasonWatched}
+      />
     </>
   );
 }

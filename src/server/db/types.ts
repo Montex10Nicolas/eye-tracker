@@ -1,4 +1,4 @@
-import { type Season, type TVDetail } from "~/types/tmdb_detail";
+import { type Episode, type Season, type TVDetail } from "~/types/tmdb_detail";
 
 export interface DBErorr extends Error {
   severity_local: string;
@@ -68,6 +68,7 @@ export interface SeasonWatchedType {
   serieId: string;
   status: "not_started" | "watching" | "completed";
   seasonId: string;
+  episodes: Episode[];
 }
 
 export const CODES_STATUS: number[] = [23505];

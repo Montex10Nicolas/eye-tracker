@@ -479,10 +479,11 @@ export async function checkSeriesCompleted(userId: string, serieId: string) {
   const season_count = serie.serie.serie_data.seasons.length;
 
   const seasons = await db.query.seasonWatchedTable.findMany({
-    where: (seaWa, { and, eq }) =>
+    where: (_, { and, eq }) =>
       and(
         eq(seasonWatchedTable.userId, userId),
         eq(seasonWatchedTable.serieId, serieId),
+        eq(seasonWatchedTable.status, "completed"),
       ),
   });
 
