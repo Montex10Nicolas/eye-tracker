@@ -2,14 +2,15 @@
 import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
-  checkSeasonCompleted,
-  checkSeriesCompleted,
+  checkIfSeasonIsCompleted,
+  checkIfSerieIsCompleted,
   createEpisodesWatched,
+  createOrDeleteEpisodeWatched,
   getOrCreateFullTVData,
   getOrCreateTVSeriesWatched,
   updateInfoWatchComp,
-  updateSeasonWatch,
-  updateSerieWatch,
+  updateOrCreateSeasonWatch,
+  updateOrCreateSerieWatch,
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
@@ -286,47 +287,59 @@ export async function addSeasonToWatched(
   season: Season,
   userId: string,
   serie: TVDetail,
-  episodesId: number[],
+  boolEp: boolean[],
 ) {
   "use server";
 
   const data = await getOrCreateFullTVData(season, serie);
-  const episodes_db = data.episodes;
+  let episodes_db = data.episodes;
 
   const seasonId = season.id.toString(),
     serieId = serie.id.toString();
-  await updateSeasonWatch(seasonId, serieId, userId, "watching");
-  await updateSerieWatch(serieId, userId, "watching");
+  await updateOrCreateSeasonWatch(seasonId, serieId, userId, "watching");
+  await updateOrCreateSerieWatch(serieId, userId, "watching");
 
-  let episodes: Episode[] = [];
-  for (const index of episodesId) {
-    const data = episodes_db[index];
-    if (data === undefined) {
-      continue;
-    }
-    episodes.push(data.episodeDate);
-  }
-  if (episodesId.length === 0) {
-    episodes = episodes_db.map((ep) => ep.episodeDate);
+  episodes_db = episodes_db.sort((a, b) => {
+    const ep_num_a = a.episodeDate.episode_number;
+    const ep_num_b = b.episodeDate.episode_number;
+    return ep_num_a - ep_num_b;
+  });
+
+  for (let i = 0; i < episodes_db.length; i++) {
+    const ep = episodes_db[i]?.episodeDate;
+    console.log(`${i}: ${episodes_db[i]?.id} ${ep?.id} ${ep?.episode_number}`);
   }
 
-  await createEpisodesWatched(userId, seasonId, episodes);
+  let index = 0;
+  for (const value of boolEp) {
+    const episode = episodes_db[index++];
+    console.log(
+      `Index: ${index} ${episode?.id} ${episode?.episodeDate.episode_number}`,
+    );
+    if (episode === undefined) continue;
+
+    await createOrDeleteEpisodeWatched(
+      userId,
+      seasonId,
+      episode.episodeDate,
+      value,
+    );
+  }
 
   await getOrCreateTVSeriesWatched(serieId, userId);
 
-  const isSeasonCompleted = await checkSeasonCompleted(userId, seasonId);
+  const isSeasonCompleted = await checkIfSeasonIsCompleted(userId, seasonId);
   if (isSeasonCompleted) {
-    await updateSeasonWatch(seasonId, serieId, userId, "completed");
+    await updateOrCreateSeasonWatch(seasonId, serieId, userId, "completed");
   } else {
-    await updateSeasonWatch(seasonId, serieId, userId, "watching");
+    await updateOrCreateSeasonWatch(seasonId, serieId, userId, "watching");
   }
 
-  const isSeriesCompleted = await checkSeriesCompleted(userId, serieId);
-
+  const isSeriesCompleted = await checkIfSerieIsCompleted(userId, serieId);
   if (isSeriesCompleted) {
-    await updateSerieWatch(serieId, userId, "completed");
+    await updateOrCreateSerieWatch(serieId, userId, "completed");
   } else {
-    await updateSerieWatch(serieId, userId, "watching");
+    await updateOrCreateSerieWatch(serieId, userId, "watching");
   }
 
   await updateInfoWatchComp(userId);

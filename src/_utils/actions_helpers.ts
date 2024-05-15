@@ -238,7 +238,7 @@ async function createTVSeason(
   return season_db[0];
 }
 
-async function createEpisode(seasonId: string, episode: Episode) {
+async function createSingleEpisode(seasonId: string, episode: Episode) {
   const ep_id = episode.id.toString();
 
   const res = await db
@@ -255,18 +255,38 @@ async function createEpisode(seasonId: string, episode: Episode) {
   return res[0];
 }
 
-async function createEpisodes(season: Season, serieId: string) {
+async function createMultiEpisode(season: Season, serieId: string) {
   "use server";
   const seasonId = season.id.toString();
   const seasonDet = await getSeasonDetail(serieId, season.season_number);
 
   const episodes: { id: string; seasonId: string; episodeDate: Episode }[] = [];
   for (const episode of seasonDet.episodes) {
-    const ep_db = await createEpisode(seasonId, episode);
+    const ep_db = await createSingleEpisode(seasonId, episode);
     episodes.push(ep_db);
   }
 
   return episodes;
+}
+
+async function createEpisodeWatched(
+  userId: string,
+  episodeId: string,
+  seasonId: string,
+  duration: number,
+) {
+  const ep_watched = await db
+    .insert(episodeWatchedTable)
+    .values({
+      id: generateId(32),
+      duration: duration,
+      episodeId: episodeId,
+      userId: userId,
+      seasonId: seasonId,
+    })
+    .returning();
+
+  if (ep_watched[0] !== undefined) return ep_watched[0];
 }
 
 async function getOrCreateEpisodeWatched(
@@ -276,26 +296,25 @@ async function getOrCreateEpisodeWatched(
 ) {
   const epId = episode.id.toString();
 
-  const episodeWatch = await db.query.episodeWatchedTable.findFirst({
+  let episodeWatch = await db.query.episodeWatchedTable.findFirst({
     where: (ses, { and, eq }) =>
       and(eq(ses.userId, userId), eq(ses.episodeId, epId)),
   });
 
   if (episodeWatch === undefined) {
-    const dur = episode.runtime ?? 0;
+    const episode_duration = episode.runtime ?? 0;
+    episodeWatch = await createEpisodeWatched(
+      userId,
+      epId,
+      seasonId,
+      episode_duration,
+    );
 
-    await db.insert(episodeWatchedTable).values({
-      id: generateId(32),
-      duration: dur,
-      episodeId: epId,
-      userId: userId,
-      seasonId: seasonId,
-    });
-
-    return true;
+    // This is probably bad but it will do for now
+    await updateInfo(userId, 0, 0, episode_duration, 1, 0);
   }
 
-  return false;
+  return episodeWatch;
 }
 
 export async function createEpisodesWatched(
@@ -315,6 +334,41 @@ export async function createEpisodesWatched(
   }
 
   await updateInfo(userId, 0, 0, duration, ep_count, 1, -1);
+}
+
+async function deleteSingleEpisodeWatched(
+  userId: string,
+  seasonId: string,
+  episode: Episode,
+) {
+  const episodeId = episode.id.toString();
+  const episodeWatched = await db.query.episodeWatchedTable.findFirst({
+    where: (ep) => and(eq(ep.episodeId, episodeId), eq(ep.userId, userId)),
+  });
+
+  if (episodeWatched === undefined) return;
+  const deleteRecord = await db
+    .delete(episodeWatchedTable)
+    .where(eq(episodeWatchedTable.id, episodeWatched.id))
+    .returning();
+  if (deleteRecord[0] === undefined) return;
+  const episodeDeleted = deleteRecord[0];
+  const duration = -episodeDeleted.duration;
+
+  await updateInfo(userId, 0, 0, duration, -1, 0, 0);
+}
+
+export async function createOrDeleteEpisodeWatched(
+  userId: string,
+  seasonId: string,
+  episode: Episode,
+  add: boolean,
+) {
+  if (add) {
+    await getOrCreateEpisodeWatched(userId, seasonId, episode);
+  } else {
+    await deleteSingleEpisodeWatched(userId, seasonId, episode);
+  }
 }
 
 async function getOrCreateSeason(
@@ -344,7 +398,7 @@ async function getOrCreateEpisodes(
   });
 
   if (episode_db === undefined || episode_db.length === 0) {
-    episode_db = await createEpisodes(season, serieId);
+    episode_db = await createMultiEpisode(season, serieId);
   }
 
   return episode_db;
@@ -392,7 +446,7 @@ export async function getOrCreateTVSeasonWatched(
   return seasonWatched;
 }
 
-export async function updateSerieWatch(
+export async function updateOrCreateSerieWatch(
   serieId: string,
   userId: string,
   status: "watching" | "completed",
@@ -410,7 +464,7 @@ export async function updateSerieWatch(
     );
 }
 
-export async function updateSeasonWatch(
+export async function updateOrCreateSeasonWatch(
   seasonId: string,
   serieId: string,
   userId: string,
@@ -431,7 +485,10 @@ export async function updateSeasonWatch(
     );
 }
 
-export async function checkSeasonCompleted(userId: string, seasonId: string) {
+export async function checkIfSeasonIsCompleted(
+  userId: string,
+  seasonId: string,
+) {
   const season = await db.query.seasonWatchedTable.findFirst({
     where: (ses, { and, eq }) =>
       and(
@@ -460,7 +517,7 @@ export async function checkSeasonCompleted(userId: string, seasonId: string) {
   return ep_count === episodes.length;
 }
 
-export async function checkSeriesCompleted(userId: string, serieId: string) {
+export async function checkIfSerieIsCompleted(userId: string, serieId: string) {
   const serie = await db.query.seriesWatchedTable.findFirst({
     where: (ser, { and, eq }) =>
       and(

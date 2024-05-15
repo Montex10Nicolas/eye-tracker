@@ -8,7 +8,7 @@ export type ActionAddAll = (
   season: Season,
   userId: string,
   serie: TVDetail,
-  episodesId: number[],
+  episodesId: boolean[],
 ) => Promise<void>;
 
 export function SeasonButtons(props: {
@@ -20,7 +20,8 @@ export function SeasonButtons(props: {
 }) {
   const { addAllSeason, season, userId, serie, seasonWatched } = props;
   async function addAll() {
-    await addAllSeason(season, userId, serie, []);
+    const all = new Array(season.episode_count).fill(true) as boolean[];
+    await addAllSeason(season, userId, serie, all);
   }
 
   return (

@@ -97,16 +97,18 @@ async function DisplaySeason(props: {
   const loggedIn = user !== null;
 
   return (
-    <div className="mt-4 flex flex-col gap-1 rounded-md bg-white p-4 text-black">
+    <section className="mt-4 flex flex-col gap-1 rounded-md bg-white p-4 text-black">
       <h1>Seasons</h1>
       <hr className="mb-3" />
-      <div className="relative flex flex-row flex-wrap gap-4 rounded-sm">
+      <section className="relative flex flex-row flex-wrap gap-4 rounded-sm">
         {seasons.map((season) => {
           const seasonId = season.id.toString();
 
           const seasonWatched = seasonsWatched?.find((season) => {
             return season.seasonId === seasonId ? season : undefined;
           });
+
+          const episodeNumber = seasonWatched?.episode.length ?? 0;
 
           return (
             <div
@@ -123,6 +125,7 @@ async function DisplaySeason(props: {
               <div className="flex flex-row flex-wrap justify-between gap-1">
                 <div>{season.name}</div>
                 <div>{season.episode_count} episodes</div>
+                <div>Watched {episodeNumber}</div>
               </div>
               <div className="absolute right-0 top-0 w-16 rounded-bl-xl bg-white p-2 text-center font-bold">
                 {season.vote_average}/10
@@ -141,8 +144,8 @@ async function DisplaySeason(props: {
             </div>
           );
         })}
-      </div>
-    </div>
+      </section>
+    </section>
   );
 }
 

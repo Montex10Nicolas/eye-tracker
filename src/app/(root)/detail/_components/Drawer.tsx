@@ -34,10 +34,6 @@ export default function SeasonDrawer(props: {
     const array = new Array(season.episode_count).fill(false) as boolean[];
     const episodes = seasonWatched.episode;
     for (const episode of episodes) {
-      console.log(
-        "You have watched",
-        episode.episode.episodeDate.episode_number,
-      );
       const number = episode.episode.episodeDate.episode_number - 1;
       array[number] = true;
     }
@@ -45,13 +41,8 @@ export default function SeasonDrawer(props: {
     return array;
   });
 
-  const episodeNumbers: number[] = [];
-  for (let index = 0; index < selected.length; index++) {
-    if (selected[index]) episodeNumbers.push(index);
-  }
-
   async function add() {
-    await addAllSeason(season, userId, serie, episodeNumbers);
+    await addAllSeason(season, userId, serie, selected);
   }
 
   return (
@@ -125,7 +116,7 @@ export default function SeasonDrawer(props: {
             <button
               onClick={add}
               className="rounded-sm bg-green-600 px-4 py-2 font-semibold uppercase disabled:bg-slate-600"
-              disabled={episodeNumbers.length === 0}
+              // disabled={episodeNumbers.length === 0}
             >
               Submit
             </button>
@@ -136,7 +127,7 @@ export default function SeasonDrawer(props: {
                 })
               }
               className="rounded-sm bg-orange-600 px-4 py-2 font-semibold uppercase disabled:bg-slate-600"
-              disabled={episodeNumbers.length === 0}
+              // disabled={episodeNumbers.length === 0}
             >
               reset
             </button>
