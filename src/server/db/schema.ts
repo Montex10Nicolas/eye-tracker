@@ -17,7 +17,7 @@ import {
   type Episode,
   type MovieDetail,
   type Season,
-  type TVDetail,
+  type Serie,
 } from "~/types/tmdb_detail";
 
 /**
@@ -120,7 +120,7 @@ export const userToMovieRelations = relations(movieWatchedTable, ({ one }) => ({
 export const seriesTable = createTable("tv-series-table", {
   id: varchar("id", { length: 256 }).notNull().primaryKey(),
   name: varchar("name", { length: 256 }).notNull(),
-  serie_data: json("serie_data").$type<TVDetail>().notNull(),
+  serie_data: json("serie_data").$type<Serie>().notNull(),
 });
 
 export const seriesRelations = relations(seriesTable, ({ many }) => ({

@@ -297,7 +297,7 @@ export interface Profile {
 }
 
 // TVDetail
-export interface TVDetail {
+export interface Serie {
   adult: boolean;
   backdrop_path: string;
   created_by: CreatedBy[];

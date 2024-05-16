@@ -29,7 +29,7 @@ import {
   type Episode,
   type MovieDetail,
   type Season,
-  type TVDetail,
+  type Serie,
 } from "~/types/tmdb_detail";
 
 export async function addMovie(movie: MovieDetail) {
@@ -65,7 +65,7 @@ export async function addToMovieWatched(
   } catch (e: unknown) {
     // Add update the watch count and duration
     const movieId = movie.id.toString();
-    const record = await db.query.userToMovie.findFirst({
+    const record = await db.query.movieWatchedTable.findFirst({
       where: (rec, { eq, and }) =>
         and(eq(rec.userId, userId), eq(rec.movieId, movieId)),
     });
@@ -110,7 +110,7 @@ export async function addToMovieWatched(
 
 export async function checkMovieWatched(userId: string, movieId: string) {
   return (
-    (await db.query.userToMovie.findFirst({
+    (await db.query.movieWatchedTable.findFirst({
       where: (mov, { eq }) =>
         and(eq(mov.userId, userId), eq(mov.movieId, movieId)),
     })) !== undefined
@@ -122,6 +122,7 @@ export async function removeFromMovieWatched(
   movie: MovieDetail,
 ) {
   "use server";
+  console.log("remove");
   try {
     const deleted = await db
       .delete(movieWatchedTable)
@@ -179,7 +180,7 @@ export async function myWatchedMovie(
   offset: number,
 ) {
   "use server";
-  const results = await db.query.userToMovie.findMany({
+  const results = await db.query.movieWatchedTable.findMany({
     with: {
       movie: true,
       user: {
@@ -190,7 +191,7 @@ export async function myWatchedMovie(
     },
     where: (user, { eq }) => eq(user.userId, userId),
 
-    orderBy: desc(movieWatchedTable.dateWatched),
+    orderBy: desc(movieWatchedTable.watchedAt),
     limit: limit,
     offset: offset,
   });
@@ -289,7 +290,7 @@ export async function myWatchedSeason(userId: string | undefined) {
 export async function addSeasonToWatched(
   season: Season,
   userId: string,
-  serie: TVDetail,
+  serie: Serie,
   boolEp: boolean[],
 ) {
   "use server";

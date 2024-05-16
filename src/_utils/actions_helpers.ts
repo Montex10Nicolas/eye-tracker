@@ -21,7 +21,7 @@ import {
   type Episode,
   type MovieDetail,
   type Season,
-  type TVDetail,
+  type Serie,
 } from "~/types/tmdb_detail";
 
 export async function getOrCreateInfo(userId: string) {
@@ -119,7 +119,7 @@ export async function getOrCreateMovie(movieId: string, movie: MovieDetail) {
   return movie_db;
 }
 
-async function updateSeries(serieId: string, serie: TVDetail) {
+async function updateSeries(serieId: string, serie: Serie) {
   const serie_db = await db
     .update(seriesTable)
     .set({
@@ -131,7 +131,7 @@ async function updateSeries(serieId: string, serie: TVDetail) {
   return serie_db[0];
 }
 
-export async function getOrCreateTVSeries(serieId: string, series: TVDetail) {
+export async function getOrCreateTVSeries(serieId: string, series: Serie) {
   let tvSeries = await db.query.seriesTable.findFirst({
     where: (serie, { eq }) => eq(serie.id, serieId),
   });
@@ -161,7 +161,7 @@ export async function getOrCreateTVSeriesWatched(
   return tvSeriesWatched;
 }
 
-async function createTVSeries(serieId: string, series: TVDetail) {
+async function createTVSeries(serieId: string, series: Serie) {
   const serie = await db
     .insert(seriesTable)
     .values({
@@ -405,7 +405,7 @@ async function getOrCreateEpisodes(
 }
 
 // Create series, season and episode data if they don't exist
-export async function getOrCreateFullTVData(season: Season, serie: TVDetail) {
+export async function getOrCreateFullTVData(season: Season, serie: Serie) {
   "use server";
   const serieId = serie.id.toString();
   const seasonId = season.id.toString();

@@ -13,14 +13,14 @@ import {
   DrawerTrigger,
 } from "~/components/ui/drawer";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
-import { type Season, type TVDetail } from "~/types/tmdb_detail";
+import { type Season, type Serie } from "~/types/tmdb_detail";
 import { type SeasonWatchWithEpisodes } from "../actions";
 import { type ActionAddAll } from "./Buttons";
 
 export default function SeasonDrawer(props: {
   season: Season;
   userId: string;
-  serie: TVDetail;
+  serie: Serie;
   addAllSeason: ActionAddAll;
   seasonWatched: SeasonWatchWithEpisodes | undefined;
 }) {

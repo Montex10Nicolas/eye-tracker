@@ -6,7 +6,7 @@ import {
   type SerieWatchedType,
 } from "~/server/db/types";
 import { GetTVDetail } from "~/server/queries";
-import { type Season, type TVDetail, type User } from "~/types/tmdb_detail";
+import { type Season, type Serie, type User } from "~/types/tmdb_detail";
 import { SeasonButtons } from "../../_components/Buttons";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
 import Provider from "../../_components/Providers";
@@ -18,7 +18,7 @@ import {
 } from "../../actions";
 
 async function DisplayInfo(props: {
-  tv: TVDetail;
+  tv: Serie;
   serieWatched: SerieWatchedType | undefined;
 }) {
   const { tv, serieWatched } = props;
@@ -88,7 +88,7 @@ async function DisplayInfo(props: {
 
 async function DisplaySeason(props: {
   user: User | null;
-  tv: TVDetail;
+  tv: Serie;
   tvId: string;
   seasons: Season[];
   seasonsWatched: SeasonWatchWithEpisodes[] | undefined;

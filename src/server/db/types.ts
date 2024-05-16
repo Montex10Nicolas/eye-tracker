@@ -1,4 +1,4 @@
-import { type Episode, type Season, type TVDetail } from "~/types/tmdb_detail";
+import { type Episode, type Season, type Serie } from "~/types/tmdb_detail";
 
 export interface DBErorr extends Error {
   severity_local: string;
@@ -16,7 +16,7 @@ export enum Status {
 export interface SerieType {
   id: string;
   name: string;
-  serie_data: TVDetail;
+  serie_data: Serie;
 }
 
 export interface SeriesWatchedTableType {
@@ -52,7 +52,7 @@ export interface UserInfo {
 
 export interface SerieDBType {
   id: string;
-  serie_data: TVDetail;
+  serie_data: Serie;
 }
 
 export interface SerieWatchedType {

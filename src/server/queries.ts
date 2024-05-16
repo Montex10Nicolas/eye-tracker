@@ -6,7 +6,7 @@ import {
   type PersonSearchType,
   type Search,
   type SeasonDetail,
-  type TVDetail,
+  type Serie,
   type TVResultType,
 } from "~/types/tmdb_detail";
 
@@ -107,7 +107,7 @@ export async function GetTVDetail(id: string) {
     ...Headers,
   });
 
-  const data: TVDetail = (await response.json()) as TVDetail;
+  const data: Serie = (await response.json()) as Serie;
   await getOrCreateTVSeries(data.id.toString(), data);
   return data;
 }

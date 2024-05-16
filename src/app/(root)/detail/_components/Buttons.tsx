@@ -1,13 +1,13 @@
 "use client";
 
-import { type Season, type TVDetail } from "~/types/tmdb_detail";
+import { type Season, type Serie } from "~/types/tmdb_detail";
 import { type SeasonWatchWithEpisodes } from "../actions";
 import SeasonDrawer from "./Drawer";
 
 export type ActionAddAll = (
   season: Season,
   userId: string,
-  serie: TVDetail,
+  serie: Serie,
   episodesId: boolean[],
 ) => Promise<void>;
 
@@ -15,7 +15,7 @@ export function SeasonButtons(props: {
   addAllSeason: ActionAddAll;
   season: Season;
   userId: string;
-  serie: TVDetail;
+  serie: Serie;
   seasonWatched: SeasonWatchWithEpisodes | undefined;
 }) {
   const { addAllSeason, season, userId, serie, seasonWatched } = props;

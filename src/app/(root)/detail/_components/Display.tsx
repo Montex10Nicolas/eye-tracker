@@ -86,7 +86,7 @@ export function DisplayMovies(props: {
   const { result: found, background_url } = props;
   return (
     <Link href={`/detail/movie/${found.id}`}>
-      <div className="min-h-[300px] max-w-[200px] cursor-pointer overflow-hidden bg-sky-600 hover:border-yellow-600 ">
+      <div className="min-h-[300px] max-w-[200px] cursor-pointer overflow-hidden border border-black text-black">
         <Image
           src={TMDB_IMAGE_URL(background_url)}
           width={500}
