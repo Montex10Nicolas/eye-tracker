@@ -1,7 +1,7 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   integer,
   json,
@@ -76,10 +76,10 @@ export const moviesTable = createTable("movie", {
 });
 
 export const moviesTableRelations = relations(moviesTable, ({ many }) => ({
-  watchedBy: many(userToMovie),
+  watchedBy: many(movieWatchedTable),
 }));
 
-export const userToMovie = createTable(
+export const movieWatchedTable = createTable(
   "movies-watched",
   {
     userId: varchar("user_id", { length: 256 })
@@ -96,7 +96,7 @@ export const userToMovie = createTable(
       }),
     duration: smallint("duration").notNull().default(-1),
     timeWatched: smallint("time_watched").notNull(),
-    dateWatched: timestamp("date_watched").notNull(),
+    watchedAt: timestamp("watched_at").default(sql`timezone('utc', now())`),
   },
   (uToM) => ({
     union: primaryKey({
@@ -106,13 +106,13 @@ export const userToMovie = createTable(
   }),
 );
 
-export const userToMovieRelations = relations(userToMovie, ({ one }) => ({
+export const userToMovieRelations = relations(movieWatchedTable, ({ one }) => ({
   user: one(userTable, {
-    fields: [userToMovie.userId],
+    fields: [movieWatchedTable.userId],
     references: [userTable.id],
   }),
   movie: one(moviesTable, {
-    fields: [userToMovie.movieId],
+    fields: [movieWatchedTable.movieId],
     references: [moviesTable.id],
   }),
 }));
@@ -265,6 +265,7 @@ export const episodeWatchedTable = createTable("tv-episode-watched", {
       onUpdate: "cascade",
     }),
   duration: smallint("duration").notNull().default(-1),
+  watchedAt: timestamp("watched_at").default(sql`timezone('utc', now())`),
 });
 
 export const episodeWatRelations = relations(

@@ -15,10 +15,10 @@ import {
 import { db } from "~/server/db";
 import {
   episodeWatchedTable,
+  movieWatchedTable,
   moviesTable,
   seasonWatchedTable,
   userInfoTable,
-  userToMovie,
 } from "~/server/db/schema";
 import {
   type DBErorr,
@@ -55,7 +55,7 @@ export async function addToMovieWatched(
 
   // Try to create the watched record, if already exist throw error
   try {
-    await db.insert(userToMovie).values({
+    await db.insert(movieWatchedTable).values({
       movieId: movie.id.toString(),
       userId: userId,
       duration: movie.runtime,
@@ -75,12 +75,15 @@ export async function addToMovieWatched(
 
     const time_watched = record.timeWatched + 1;
     await db
-      .update(userToMovie)
+      .update(movieWatchedTable)
       .set({
         timeWatched: time_watched,
       })
       .where(
-        and(eq(userToMovie.userId, userId), eq(userToMovie.movieId, movieId)),
+        and(
+          eq(movieWatchedTable.userId, userId),
+          eq(movieWatchedTable.movieId, movieId),
+        ),
       );
   }
 
@@ -121,15 +124,15 @@ export async function removeFromMovieWatched(
   "use server";
   try {
     const deleted = await db
-      .delete(userToMovie)
+      .delete(movieWatchedTable)
       .where(
         and(
-          eq(userToMovie.userId, userId),
-          eq(userToMovie.movieId, movie.id.toString()),
+          eq(movieWatchedTable.userId, userId),
+          eq(movieWatchedTable.movieId, movie.id.toString()),
         ),
       )
       .returning({
-        timeWatched: userToMovie.timeWatched,
+        timeWatched: movieWatchedTable.timeWatched,
       });
 
     if (deleted.length < 1 || deleted[0] === undefined) {
@@ -187,7 +190,7 @@ export async function myWatchedMovie(
     },
     where: (user, { eq }) => eq(user.userId, userId),
 
-    orderBy: desc(userToMovie.dateWatched),
+    orderBy: desc(movieWatchedTable.dateWatched),
     limit: limit,
     offset: offset,
   });
