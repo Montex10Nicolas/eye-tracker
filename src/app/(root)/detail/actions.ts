@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import {
   checkIfSeasonIsCompleted,
   checkIfSerieIsCompleted,
-  createEpisodesWatched,
   createOrDeleteEpisodeWatched,
   getOrCreateFullTVData,
   getOrCreateTVSeriesWatched,
@@ -60,7 +59,7 @@ export async function addToMovieWatched(
       userId: userId,
       duration: movie.runtime,
       timeWatched: 1,
-      dateWatched: new Date(),
+      watchedAt: new Date(),
     });
   } catch (e: unknown) {
     // Add update the watch count and duration
@@ -174,31 +173,6 @@ export async function removeFromMovieWatched(
   }
 }
 
-export async function myWatchedMovie(
-  userId: string,
-  limit = 25,
-  offset: number,
-) {
-  "use server";
-  const results = await db.query.movieWatchedTable.findMany({
-    with: {
-      movie: true,
-      user: {
-        with: {
-          info: true,
-        },
-      },
-    },
-    where: (user, { eq }) => eq(user.userId, userId),
-
-    orderBy: desc(movieWatchedTable.watchedAt),
-    limit: limit,
-    offset: offset,
-  });
-
-  return results;
-}
-
 export interface SeriesAndSeasons {
   serie: SerieWatchedType;
   seasons: SeasonWatchWithEpisodes[];
@@ -265,26 +239,6 @@ export async function getUserWatchedTVAndSeason(
   };
 }
 
-export async function myWatchedTV(userId: string, limit = 25, offset: number) {
-  "use server";
-
-  const results = await db.query.seasonWatchedTable.findMany({
-    where: (sesWat, { eq }) => eq(seasonWatchedTable.userId, userId),
-    with: {
-      season: true,
-    },
-  });
-
-  return results;
-}
-
-export async function myWatchedSeason(userId: string | undefined) {
-  if (userId === undefined) return null;
-  return await db.query.seasonWatchedTable.findMany({
-    where: (_, { eq }) => eq(seasonWatchedTable.userId, userId),
-  });
-}
-
 // Is episodesID = [] = add all episodes
 // Otherwhise only add the
 export async function addSeasonToWatched(
@@ -300,8 +254,8 @@ export async function addSeasonToWatched(
 
   const seasonId = season.id.toString(),
     serieId = serie.id.toString();
-  await updateOrCreateSeasonWatch(seasonId, serieId, userId, "watching");
-  await updateOrCreateSerieWatch(serieId, userId, "watching");
+  await updateOrCreateSeasonWatch(seasonId, serieId, userId, "watching", -1);
+  await updateOrCreateSerieWatch(serieId, userId, "watching", -1);
 
   episodes_db = episodes_db.sort((a, b) => {
     const ep_num_a = a.episodeDate.episode_number;
@@ -318,7 +272,7 @@ export async function addSeasonToWatched(
   for (const value of boolEp) {
     const episode = episodes_db[index++];
     console.log(
-      `Index: ${index} ${episode?.id} ${episode?.episodeDate.episode_number}`,
+      `Index: ${index} ${episode?.id} ${episode?.episodeDate.episode_number} ${value}`,
     );
     if (episode === undefined) continue;
 
@@ -332,18 +286,34 @@ export async function addSeasonToWatched(
 
   await getOrCreateTVSeriesWatched(serieId, userId);
 
-  const isSeasonCompleted = await checkIfSeasonIsCompleted(userId, seasonId);
+  const { isSeasonCompleted, episodeCount } = await checkIfSeasonIsCompleted(
+    userId,
+    seasonId,
+  );
   if (isSeasonCompleted) {
-    await updateOrCreateSeasonWatch(seasonId, serieId, userId, "completed");
+    await updateOrCreateSeasonWatch(
+      seasonId,
+      serieId,
+      userId,
+      "completed",
+      episodeCount,
+    );
   } else {
-    await updateOrCreateSeasonWatch(seasonId, serieId, userId, "watching");
+    await updateOrCreateSeasonWatch(
+      seasonId,
+      serieId,
+      userId,
+      "watching",
+      episodeCount,
+    );
   }
 
-  const isSeriesCompleted = await checkIfSerieIsCompleted(userId, serieId);
+  const { completed: isSeriesCompleted, seasonCount } =
+    await checkIfSerieIsCompleted(userId, serieId);
   if (isSeriesCompleted) {
-    await updateOrCreateSerieWatch(serieId, userId, "completed");
+    await updateOrCreateSerieWatch(serieId, userId, "completed", seasonCount);
   } else {
-    await updateOrCreateSerieWatch(serieId, userId, "watching");
+    await updateOrCreateSerieWatch(serieId, userId, "watching", seasonCount);
   }
 
   await updateInfoWatchComp(userId);

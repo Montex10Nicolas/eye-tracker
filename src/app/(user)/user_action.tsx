@@ -1,4 +1,5 @@
 import { hash, verify } from "@node-rs/argon2";
+import { desc } from "drizzle-orm";
 import { generateIdFromEntropySize } from "lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -6,8 +7,19 @@ import { NextResponse } from "next/server";
 import { cache } from "react";
 import { lucia } from "~/lib/auth";
 import { db } from "~/server/db";
-import { userInfoTable, userTable } from "~/server/db/schema";
-import { type UserInfo } from "~/server/db/types";
+import {
+  episodeWatchedTable,
+  movieWatchedTable,
+  seasonWatchedTable,
+  userInfoTable,
+  userTable,
+  type episodeTable,
+  type seasonTable,
+  type seriesTable,
+  type seriesWatchedTable,
+} from "~/server/db/schema";
+import { type SeasonWatchedType, type UserInfo } from "~/server/db/types";
+import { type MovieDetail } from "~/types/tmdb_detail";
 
 export const PASSWORD_HASH_PAR = {
   memoryCost: 19456,
@@ -166,4 +178,125 @@ export async function myInfo(userId: string) {
   });
 
   return info;
+}
+
+export async function myWatchedSeries(
+  userId: string,
+  limit = 25,
+  offset: number,
+) {
+  "use server";
+
+  const results = await db.query.seriesWatchedTable.findMany({
+    where: (sesWat, { eq, and, ne }) =>
+      and(eq(sesWat.userId, userId), ne(sesWat.status, "not_started")),
+    with: {
+      serie: {
+        with: {
+          seasons: true,
+        },
+      },
+    },
+  });
+
+  type SeriesAndSeasonWatched = typeof seriesWatchedTable.$inferSelect & {
+    season: (typeof seasonWatchedTable.$inferSelect)[];
+    serie: typeof seriesTable.$inferSelect;
+  };
+
+  const series: SeriesAndSeasonWatched[] = [];
+
+  for (const serie of results) {
+    const season_watched: (typeof seasonWatchedTable.$inferSelect)[] = [];
+    for (const season of serie.serie.seasons) {
+      const seasonId = season.id.toString();
+      const seasonWatchRes = await db.query.seasonWatchedTable.findFirst({
+        where: (ses, { eq, and }) =>
+          and(eq(ses.userId, userId), eq(ses.seasonId, seasonId)),
+      });
+
+      if (seasonWatchRes !== undefined) season_watched.push(seasonWatchRes);
+    }
+
+    const a: SeriesAndSeasonWatched = {
+      id: serie.id,
+      seasonCount: serie.seasonCount,
+      serieId: serie.serieId,
+      status: serie.status,
+      userId: serie.userId,
+      season: season_watched,
+      serie: serie.serie,
+    };
+
+    series.push(a);
+  }
+
+  return series;
+}
+
+export async function myWatchedSeason(userId: string | undefined) {
+  if (userId === undefined) return null;
+  return await db.query.seasonWatchedTable.findMany({
+    where: (_, { eq }) => eq(seasonWatchedTable.userId, userId),
+  });
+}
+
+export type LatestWatchedEpisodes = typeof episodeWatchedTable.$inferSelect & {
+  episode: typeof episodeTable.$inferSelect & {
+    season: typeof seasonTable.$inferSelect;
+  };
+};
+
+export async function getLatestWatchedEpisodes(
+  userId: string,
+  LIMIT = 25,
+  OFFSET = 0,
+) {
+  const results: LatestWatchedEpisodes[] =
+    await db.query.episodeWatchedTable.findMany({
+      where: (ep, { eq }) => eq(ep.userId, userId),
+      limit: LIMIT,
+      offset: OFFSET,
+      orderBy: desc(episodeWatchedTable.watchedAt),
+      with: {
+        episode: {
+          with: {
+            season: true,
+          },
+        },
+      },
+    });
+
+  return results;
+}
+
+export interface MyMovieType {
+  userId: string;
+  movieId: string;
+  duration: number;
+  timeWatched: number;
+  watchedAt: Date | null;
+  movie: {
+    id: string;
+    movie_data: MovieDetail;
+  };
+}
+
+export async function myWatchedMovie(
+  userId: string,
+  limit = 25,
+  offset: number,
+) {
+  "use server";
+  const results = await db.query.movieWatchedTable.findMany({
+    with: {
+      movie: true,
+    },
+    where: (user, { eq }) => eq(user.userId, userId),
+
+    limit: limit,
+    offset: offset,
+  });
+
+  return results;
 }

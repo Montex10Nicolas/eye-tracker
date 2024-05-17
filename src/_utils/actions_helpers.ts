@@ -52,8 +52,8 @@ export async function updateInfo(
   movieCountTotal = 0,
   tvDurationTotal = 0,
   tvEpisodeCount = 0,
-  tvSeasonCompleted = 0,
-  tvSeasonWatching = 0,
+  tvSerieCompleted = 0,
+  tvSerieWatching = 0,
 ) {
   const info = await getOrCreateInfo(userId);
 
@@ -65,8 +65,8 @@ export async function updateInfo(
     newDuration = v(info.movieDurationTotal, movieDurationTotal),
     newTVCount = v(info.tvEpisodeCount, tvEpisodeCount),
     newTvDuration = v(info.tvDurationTotal, tvDurationTotal),
-    newTVWatching = v(info.tvSeasonWatching, tvSeasonWatching),
-    newTVCompleted = v(info.tvSeasonCompleted, tvSeasonCompleted);
+    newTVWatching = v(info.tvSerieWatching, tvSerieWatching),
+    newTVCompleted = v(info.tvSerieCompleted, tvSerieCompleted);
   await db
     .update(userInfoTable)
     .set({
@@ -74,8 +74,8 @@ export async function updateInfo(
       movieDurationTotal: newDuration,
       tvDurationTotal: newTvDuration,
       tvEpisodeCount: newTVCount,
-      tvSeasonCompleted: newTVCompleted,
-      tvSeasonWatching: newTVWatching,
+      tvSerieCompleted: newTVCompleted,
+      tvSerieWatching: newTVWatching,
     })
     .where(eq(userInfoTable.userId, userId));
 }
@@ -187,7 +187,7 @@ export async function createTVSeriesWatched(serieId: string, userId: string) {
     })
     .returning();
 
-  return (serie[0] as SeriesWatchedTableType) ?? null;
+  return serie[0] as SeriesWatchedTableType;
 }
 
 async function createTVSeasonsWatched(
@@ -311,7 +311,7 @@ async function getOrCreateEpisodeWatched(
     );
 
     // This is probably bad but it will do for now
-    await updateInfo(userId, 0, 0, episode_duration, 1, 0);
+    await updateInfo(userId, 0, 0, episode_duration, 0, 0);
   }
 
   return episodeWatch;
@@ -333,7 +333,7 @@ export async function createEpisodesWatched(
     }
   }
 
-  await updateInfo(userId, 0, 0, duration, ep_count, 1, -1);
+  await updateInfo(userId, 0, 0, duration, ep_count, 0, 0);
 }
 
 async function deleteSingleEpisodeWatched(
@@ -450,12 +450,14 @@ export async function updateOrCreateSerieWatch(
   serieId: string,
   userId: string,
   status: "watching" | "completed",
+  seasonCount: number,
 ) {
-  await getOrCreateTVSeriesWatched(serieId, userId);
+  const serie = await getOrCreateTVSeriesWatched(serieId, userId);
+  const newEp = seasonCount === -1 ? serie?.seasonCount : seasonCount;
 
   await db
     .update(seriesWatchedTable)
-    .set({ status: status })
+    .set({ status: status, seasonCount: seasonCount })
     .where(
       and(
         eq(seriesWatchedTable.serieId, serieId),
@@ -469,13 +471,16 @@ export async function updateOrCreateSeasonWatch(
   serieId: string,
   userId: string,
   status: "watching" | "completed",
+  episodeCount: number,
 ) {
-  await getOrCreateTVSeasonWatched(userId, serieId, seasonId);
+  const season = await getOrCreateTVSeasonWatched(userId, serieId, seasonId);
+  const newEp = episodeCount === -1 ? season.episodeCount : episodeCount;
 
   await db
     .update(seasonWatchedTable)
     .set({
       status: status,
+      episodeCount: newEp,
     })
     .where(
       and(
@@ -501,7 +506,10 @@ export async function checkIfSeasonIsCompleted(
   });
 
   if (season === undefined) {
-    return false;
+    return {
+      isSeasonCompleted: false,
+      episodeCount: 0,
+    };
   }
 
   const ep_count = season.season.season_data.episode_count;
@@ -514,7 +522,10 @@ export async function checkIfSeasonIsCompleted(
       and(eq(epWa.userId, userId), eq(episodeTable.seasonId, seasonId)),
   });
 
-  return ep_count === episodes.length;
+  return {
+    isSeasonCompleted: ep_count === episodes.length,
+    episodeCount: episodes.length,
+  };
 }
 
 export async function checkIfSerieIsCompleted(userId: string, serieId: string) {
@@ -530,7 +541,10 @@ export async function checkIfSerieIsCompleted(userId: string, serieId: string) {
   });
 
   if (serie === undefined) {
-    return false;
+    return {
+      completed: false,
+      seasonCount: 0,
+    };
   }
 
   const season_count = serie.serie.serie_data.seasons.length;
@@ -544,18 +558,18 @@ export async function checkIfSerieIsCompleted(userId: string, serieId: string) {
       ),
   });
 
-  return season_count === seasons.length;
+  return {
+    completed: season_count === seasons.length,
+    seasonCount: season_count,
+  };
 }
 
 export async function updateInfoWatchComp(userId: string) {
-  const all = await db.query.seasonWatchedTable.findMany({
-    where: (season, { eq, and, or }) =>
+  const all = await db.query.seriesWatchedTable.findMany({
+    where: (serie, { eq, and, or }) =>
       and(
-        eq(seasonWatchedTable.userId, userId),
-        or(
-          eq(seasonWatchedTable.status, "completed"),
-          eq(seasonWatchedTable.status, "watching"),
-        ),
+        eq(serie.userId, userId),
+        or(eq(serie.status, "completed"), eq(serie.status, "watching")),
       ),
   });
 
@@ -569,8 +583,8 @@ export async function updateInfoWatchComp(userId: string) {
   await db
     .update(userInfoTable)
     .set({
-      tvSeasonCompleted: completed,
-      tvSeasonWatching: watching,
+      tvSerieCompleted: completed,
+      tvSerieWatching: watching,
     })
     .where(eq(userInfoTable.userId, userId));
 }

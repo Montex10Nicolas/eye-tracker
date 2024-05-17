@@ -24,6 +24,7 @@ export interface SeriesWatchedTableType {
   serieId: string;
   userId: string;
   status: "not_started" | "watching" | "completed";
+  seasonCount: number;
 }
 
 export interface SeasonType {
@@ -37,6 +38,7 @@ export interface SeasonsWatchedDB {
   userId: string;
   serieId: string;
   status: "not_started" | "watching" | "completed";
+  episodeCount: number;
 }
 
 export interface UserInfo {
@@ -46,8 +48,8 @@ export interface UserInfo {
   movieCountTotal: number;
   tvDurationTotal: number;
   tvEpisodeCount: number;
-  tvSeasonCompleted: number;
-  tvSeasonWatching: number;
+  tvSerieCompleted: number;
+  tvSerieWatching: number;
 }
 
 export interface SerieDBType {
@@ -68,7 +70,6 @@ export interface SeasonWatchedType {
   serieId: string;
   status: "not_started" | "watching" | "completed";
   seasonId: string;
-  episodes: Episode[];
 }
 
 export const CODES_STATUS: number[] = [23505];

@@ -51,8 +51,8 @@ export const userInfoTable = createTable("user_info", {
   movieCountTotal: integer("movie_count_total").notNull().default(0),
   tvDurationTotal: integer("tv_duration_total").notNull().default(0),
   tvEpisodeCount: integer("tv_episode_count").notNull().default(0),
-  tvSeasonCompleted: integer("tv_season_completed").notNull().default(0),
-  tvSeasonWatching: integer("tv_season_Watching").notNull().default(0),
+  tvSerieCompleted: integer("tv_serie_completed").notNull().default(0),
+  tvSerieWatching: integer("tv_serie_Watching").notNull().default(0),
 });
 
 export const sessionTable = createTable("session", {
@@ -142,6 +142,7 @@ export const seriesWatchedTable = createTable("tv-series-watched", {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
+  seasonCount: smallint("season_count").notNull().default(0),
   status: text("status", {
     enum: ["not_started", "watching", "completed"],
   }).notNull(),
@@ -204,6 +205,7 @@ export const seasonWatchedTable = createTable("tv-season-watched", {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
+  episodeCount: smallint("episode_count").notNull().default(0),
   status: text("status", {
     enum: ["not_started", "watching", "completed"],
   }).notNull(),
@@ -265,7 +267,9 @@ export const episodeWatchedTable = createTable("tv-episode-watched", {
       onUpdate: "cascade",
     }),
   duration: smallint("duration").notNull().default(-1),
-  watchedAt: timestamp("watched_at").default(sql`timezone('utc', now())`),
+  watchedAt: timestamp("watched_at")
+    .notNull()
+    .default(sql`timezone('utc', now())`),
 });
 
 export const episodeWatRelations = relations(
