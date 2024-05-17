@@ -72,9 +72,6 @@ async function DisplayInfo(props: {
         <p className="mb-4 mt-auto">
           <span className=" text-slate-300">Overview: </span> {tv.overview}
         </p>
-        <p>
-          <code>{JSON.stringify(serieWatched, null, 2)}</code>
-        </p>
       </div>
 
       <img

@@ -54,7 +54,6 @@ export default function SeasonDrawer(props: {
       </DrawerTrigger>
       <DrawerContent className="w-full bg-slate-900">
         <div className="mx-auto w-[70%]">
-          <code>{JSON.stringify(selected, null, 2)}</code>
           <DrawerHeader>
             <DrawerTitle>Select the season you have watched</DrawerTitle>
           </DrawerHeader>

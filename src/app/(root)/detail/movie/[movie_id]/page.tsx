@@ -38,10 +38,8 @@ async function DisplayInfo(props: { movie: MovieDetail; user: User | null }) {
 
   async function removeMovie() {
     "use server";
-    console.log("he");
 
     if (!user) {
-      console.log("he");
       return "need to be logged in";
     }
     await removeFromMovieWatched(user.id, movie);

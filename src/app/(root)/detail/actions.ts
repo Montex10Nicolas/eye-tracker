@@ -121,7 +121,6 @@ export async function removeFromMovieWatched(
   movie: MovieDetail,
 ) {
   "use server";
-  console.log("remove");
   try {
     const deleted = await db
       .delete(movieWatchedTable)
@@ -265,15 +264,11 @@ export async function addSeasonToWatched(
 
   for (let i = 0; i < episodes_db.length; i++) {
     const ep = episodes_db[i]?.episodeDate;
-    console.log(`${i}: ${episodes_db[i]?.id} ${ep?.id} ${ep?.episode_number}`);
   }
 
   let index = 0;
   for (const value of boolEp) {
     const episode = episodes_db[index++];
-    console.log(
-      `Index: ${index} ${episode?.id} ${episode?.episodeDate.episode_number} ${value}`,
-    );
     if (episode === undefined) continue;
 
     await createOrDeleteEpisodeWatched(
