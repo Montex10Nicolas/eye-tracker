@@ -58,7 +58,7 @@ function DatePicker(props: {
   );
 }
 
-export default function Prova(props: {
+export default function DrawerEpisodes(props: {
   serverEpisodeQuery: (
     serieId: string,
     seasonId: string,
@@ -71,8 +71,24 @@ export default function Prova(props: {
   serieName: string;
 }) {
   const { serverEpisodeQuery, serieId, seasonId, season, serieName } = props;
+
+  const ep_count = season.episode_count;
+
   const [episodes, setEpisodes] = useState<Return[]>([]);
-  const [dates, setDates] = useState<Array<Date | undefined>>([]);
+  const [dates, setDates] = useState<Array<Date | undefined>>(
+    new Array(ep_count).fill(undefined),
+  );
+  const [selected, setSelected] = useState<boolean[]>(
+    new Array(ep_count).fill(false),
+  );
+
+  useEffect(() => {
+    const a: boolean[] = [];
+    for (const date of dates) {
+      a.push(date !== undefined);
+    }
+    setSelected(a);
+  }, [dates]);
 
   function handleCheckbox(e: ChangeEvent<HTMLInputElement>, index: number) {
     const value = e.target.checked;
@@ -116,6 +132,9 @@ export default function Prova(props: {
                 <div>
                   <code>{JSON.stringify(dates, null, 2)}</code>
                 </div>
+                <div>
+                  <code>{JSON.stringify(selected, null, 2)}</code>
+                </div>
               </h1>
             </DrawerHeader>
             <ScrollArea className="h-80">
@@ -125,11 +144,16 @@ export default function Prova(props: {
 
                   return (
                     <div key={episode.id} className="relative">
-                      <input
-                        className="absolute right-4 top-4 h-8 w-8 cursor-pointer rounded-sm"
-                        type="checkbox"
-                        onChange={(e) => handleCheckbox(e, index)}
-                      />
+                      <div className="h-10 w-full bg-black py-2 text-center text-white">
+                        {data.name}
+                      </div>
+                      <div className="absolute right-4 top-12 h-8 w-8 overflow-hidden rounded-md">
+                        <input
+                          className="h-full w-full cursor-pointer"
+                          type="checkbox"
+                          onChange={(e) => handleCheckbox(e, index)}
+                        />
+                      </div>
                       <img
                         className="min-w-80 shrink-0"
                         src={TMDB_IMAGE_URL(data.still_path)}
@@ -150,6 +174,9 @@ export default function Prova(props: {
               <ScrollBar orientation="horizontal" />
             </ScrollArea>
             <DrawerFooter>
+              <button className="w-full rounded-sm bg-green-800 py-2 text-xl font-semibold uppercase text-white">
+                submit
+              </button>
               <DrawerClose>
                 <button className="w-full rounded-sm bg-red-800 py-2 text-xl font-semibold uppercase text-white">
                   Cancel
