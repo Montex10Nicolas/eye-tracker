@@ -243,6 +243,11 @@ export async function getUserWatchedTVAndSeason(
   };
 }
 
+interface SeasonUpdate {
+  date: Date | undefined;
+  update: boolean;
+}
+
 // Is episodesID = [] = add all episodes
 // Otherwhise only add the
 export async function addSeasonToWatched(
@@ -250,6 +255,7 @@ export async function addSeasonToWatched(
   userId: string,
   serie: Serie,
   boolEp: boolean[],
+  ep: SeasonUpdate[],
 ) {
   "use server";
 

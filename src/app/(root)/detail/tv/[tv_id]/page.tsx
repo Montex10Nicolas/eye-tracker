@@ -1,6 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
-import { spec } from "node:test/reporters";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
@@ -21,7 +19,7 @@ import {
   type SeasonWatchWithEpisodes,
   type SeriesAndSeasons,
 } from "../../actions";
-import Prova from "./_components/bho";
+import DrawerEpisodes from "./_components/SeasonEpisodes";
 
 async function DisplayInfo(props: {
   tv: Serie;
@@ -135,7 +133,7 @@ async function DisplaySeason(props: {
                     <button className="flex h-full w-full items-center justify-center bg-sky-600">
                       <AddIcon />
                     </button>
-                    <Prova
+                    <DrawerEpisodes
                       seasonId={season.id.toString()}
                       serieId={tvId}
                       season={season}
