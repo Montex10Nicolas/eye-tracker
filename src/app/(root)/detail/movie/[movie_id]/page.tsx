@@ -5,7 +5,10 @@ import { getUser } from "~/app/(user)/user_action";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { GetMovieDetail, getMovieRecomendation } from "~/server/queries";
+import {
+  queryTMDBMovieDetail,
+  queryTMDBMovieRecomendation,
+} from "~/server/queries";
 import { type MovieDetail, type Serie, type User } from "~/types/tmdb_detail";
 import { DisplayGenres, DisplayMovies } from "../../_components/Display";
 import Provider from "../../_components/Providers";
@@ -168,7 +171,7 @@ async function DisplayCredits(props: { movie: MovieDetail }) {
 async function DisplayReccomendation(props: { movie: MovieDetail }) {
   const { movie } = props;
   const id = movie.id;
-  const reccomendations = await getMovieRecomendation(id, 1);
+  const reccomendations = await queryTMDBMovieRecomendation(id, 1);
   return (
     <section className="my-6 flex-col rounded-md bg-white p-4 text-black">
       <h1 className="text-xl font-semibold">
@@ -195,7 +198,7 @@ async function DisplayReccomendation(props: { movie: MovieDetail }) {
 export default async function Page(props: { params: { movie_id: number } }) {
   const id = props.params.movie_id;
 
-  const movie = await GetMovieDetail(id);
+  const movie = await queryTMDBMovieDetail(id);
   const user = await getUser();
 
   if (Number.isNaN(id)) {

@@ -50,6 +50,8 @@ export default async function RootLayout({
           </div>
         </section>
         {children}
+        <div id="modal-root"></div>
+
         <footer className="bottom-0 mt-auto flex h-20 w-full items-center justify-between bg-slate-800 p-6">
           <div>
             Created by <span>Nicolas Montecchiani</span>
