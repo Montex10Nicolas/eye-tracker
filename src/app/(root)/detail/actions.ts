@@ -5,7 +5,11 @@ import {
   checkIfSeasonIsCompleted,
   checkIfSerieIsCompleted,
   createOrDeleteEpisodeWatched,
+  getOrCreateEpisodes,
   getOrCreateFullTVData,
+  getOrCreateTVSeason,
+  getOrCreateTVSeasonWatched,
+  getOrCreateTVSeries,
   getOrCreateTVSeriesWatched,
   updateInfoWatchComp,
   updateOrCreateSeasonWatch,
@@ -24,6 +28,7 @@ import {
   type SeasonWatchedType,
   type SerieWatchedType,
 } from "~/server/db/types";
+import { queryTMDBSeasonDetail } from "~/server/queries";
 import {
   type Episode,
   type MovieDetail,
@@ -262,9 +267,9 @@ export async function addSeasonToWatched(
     return ep_num_a - ep_num_b;
   });
 
-  for (let i = 0; i < episodes_db.length; i++) {
-    const ep = episodes_db[i]?.episodeDate;
-  }
+  // for (let i = 0; i < episodes_db.length; i++) {
+  //   const ep = episodes_db[i]?.episodeDate;
+  // }
 
   let index = 0;
   for (const value of boolEp) {
@@ -314,4 +319,16 @@ export async function addSeasonToWatched(
   await updateInfoWatchComp(userId);
 
   revalidatePath(`/tv/detail/${serieId}`);
+}
+
+export async function returnEpisodesFromSeason(
+  serieId: string,
+  seasonId: string,
+  season: Season,
+  serieName: string,
+) {
+  await getOrCreateTVSeason(seasonId, season, serieId, serieName);
+
+  const episodes = await getOrCreateEpisodes(serieId, seasonId, season);
+  return episodes;
 }

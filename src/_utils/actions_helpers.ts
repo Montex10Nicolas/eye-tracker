@@ -16,7 +16,7 @@ import {
   type SeriesWatchedTableType,
   type UserInfo,
 } from "~/server/db/types";
-import { getSeasonDetail } from "~/server/queries";
+import { queryTMDBSeasonDetail } from "~/server/queries";
 import {
   type Episode,
   type MovieDetail,
@@ -258,7 +258,7 @@ async function createSingleEpisode(seasonId: string, episode: Episode) {
 async function createMultiEpisode(season: Season, serieId: string) {
   "use server";
   const seasonId = season.id.toString();
-  const seasonDet = await getSeasonDetail(serieId, season.season_number);
+  const seasonDet = await queryTMDBSeasonDetail(serieId, season.season_number);
 
   const episodes: { id: string; seasonId: string; episodeDate: Episode }[] = [];
   for (const episode of seasonDet.episodes) {
@@ -371,7 +371,7 @@ export async function createOrDeleteEpisodeWatched(
   }
 }
 
-async function getOrCreateSeason(
+export async function getOrCreateTVSeason(
   seasonId: string,
   season: Season,
   serieId: string,
@@ -388,7 +388,7 @@ async function getOrCreateSeason(
   return seasonDB;
 }
 
-async function getOrCreateEpisodes(
+export async function getOrCreateEpisodes(
   serieId: string,
   seasonId: string,
   season: Season,
@@ -411,7 +411,7 @@ export async function getOrCreateFullTVData(season: Season, serie: Serie) {
   const seasonId = season.id.toString();
 
   const serie_db = await getOrCreateTVSeries(serieId, serie);
-  const season_db = await getOrCreateSeason(
+  const season_db = await getOrCreateTVSeason(
     seasonId,
     season,
     serieId,

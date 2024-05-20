@@ -21,7 +21,7 @@ export const Headers = {
   },
 };
 
-export async function searchTV(search: string) {
+export async function queryTMDBSearchTV(search: string) {
   "use server";
   const url = new URL("3/search/tv", TMDB_URL);
   url.searchParams.set("query", search);
@@ -39,7 +39,7 @@ export async function searchTV(search: string) {
 }
 
 // This search inclue Movie Series and Persons
-export async function MultiSearch(query: string) {
+export async function queryTMDBMultiSearch(query: string) {
   "use server";
   const url = new URL("3/search/multi", TMDB_URL);
   url.searchParams.set("query", query);
@@ -58,7 +58,7 @@ export async function MultiSearch(query: string) {
   return data as Search<MovieResultType & PersonSearchType & TVResultType>;
 }
 
-export async function GetMovieDetail(id: number) {
+export async function queryTMDBMovieDetail(id: number) {
   "use server";
   const url = new URL(`3/movie/${id}`, TMDB_URL);
   url.searchParams.set("append_to_response", "credits,images,videos");
@@ -77,7 +77,7 @@ export async function GetMovieDetail(id: number) {
   return data;
 }
 
-export async function GetPersonDetail(id: number) {
+export async function queryTMDBPersonDetail(id: number) {
   "use server";
   const url = new URL(`3/person/${id}`, TMDB_URL);
   url.searchParams.set("append_to_response", "movie_credits,tv_credits,images");
@@ -97,7 +97,7 @@ export async function GetPersonDetail(id: number) {
   return data as PersonDetailType;
 }
 
-export async function GetTVDetail(id: string) {
+export async function queryTMDBTVDetail(id: string) {
   "use server";
 
   const url = new URL(`/3/tv/${id}`, TMDB_URL);
@@ -112,7 +112,7 @@ export async function GetTVDetail(id: string) {
   return data;
 }
 
-export async function getTvRecomendation(tvId: number, page: number) {
+export async function queryTMDBTVRecomendation(tvId: number, page: number) {
   "use server";
   const id = tvId.toString();
   const url = new URL(`/3/tv/${id}/recommendations`, TMDB_URL);
@@ -125,7 +125,7 @@ export async function getTvRecomendation(tvId: number, page: number) {
   return data as Search<TVResultType>;
 }
 
-export async function getMovieRecomendation(movId: number, page: number) {
+export async function queryTMDBMovieRecomendation(movId: number, page: number) {
   const id = movId.toString();
   const url = new URL(`/3/movie/${id}/recommendations`, TMDB_URL);
   url.searchParams.set("page", page.toString());
@@ -138,10 +138,15 @@ export async function getMovieRecomendation(movId: number, page: number) {
 }
 
 // Get of a specified season all details including all the episodes
-export async function getSeasonDetail(serieId: string, season_number: number) {
+export async function queryTMDBSeasonDetail(
+  serieId: string,
+  season_number: number,
+) {
   "use server";
   const seasonNum = season_number.toString();
   const url = new URL(`3/tv/${serieId}/season/${seasonNum}`, TMDB_URL);
+
+  console.log(url);
 
   const response = await fetch(url, {
     ...Headers,

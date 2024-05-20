@@ -1,21 +1,27 @@
 import Image from "next/image";
+import Link from "next/link";
+import { spec } from "node:test/reporters";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import {
   type SeasonWatchedType,
   type SerieWatchedType,
 } from "~/server/db/types";
-import { GetTVDetail } from "~/server/queries";
+import { queryTMDBTVDetail } from "~/server/queries";
 import { type Season, type Serie, type User } from "~/types/tmdb_detail";
 import { SeasonButtons } from "../../_components/Buttons";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
+import { AddIcon, EditIcon, TrashIcon } from "../../_components/Icons";
 import Provider from "../../_components/Providers";
 import {
   addSeasonToWatched,
   getUserWatchedTVAndSeason,
+  returnEpisodesFromSeason,
   type SeasonWatchWithEpisodes,
   type SeriesAndSeasons,
 } from "../../actions";
+import Prova from "./_components/bho";
 
 async function DisplayInfo(props: {
   tv: Serie;
@@ -83,6 +89,8 @@ async function DisplayInfo(props: {
   );
 }
 
+// I should get all the episodes of a season on Edit button click
+
 async function DisplaySeason(props: {
   user: User | null;
   tv: Serie;
@@ -90,57 +98,60 @@ async function DisplaySeason(props: {
   seasons: Season[];
   seasonsWatched: SeasonWatchWithEpisodes[] | undefined;
 }) {
-  const { seasons, user, tv, seasonsWatched } = props;
+  const { seasons, user, tv, seasonsWatched, tvId } = props;
   const loggedIn = user !== null;
 
+  // Position specials at the end of the list
+  if (seasons[0]?.name.toLocaleLowerCase() === "specials") {
+    const special = seasons.shift();
+    if (special !== undefined) {
+      seasons.push(special);
+    }
+  }
+
   return (
-    <section className="mt-4 flex flex-col gap-1 rounded-md bg-white p-4 text-black">
-      <h1>Seasons</h1>
-      <hr className="mb-3" />
-      <section className="relative flex flex-row flex-wrap gap-4 rounded-sm">
-        {seasons.map((season) => {
-          const seasonId = season.id.toString();
+    <section className="mt-4 rounded-md bg-white p-4 text-black">
+      <h1 className="text-xl font-semibold">Season</h1>
+      <hr className="h-2 w-full bg-black fill-black" />
 
-          const seasonWatched = seasonsWatched?.find((season) => {
-            return season.seasonId === seasonId ? season : undefined;
-          });
-
-          const episodeNumber = seasonWatched?.episode.length ?? 0;
-
-          return (
-            <div
-              key={seasonId}
-              className="relative w-32 shrink-0 border border-slate-900"
-            >
-              <Image
-                src={TMDB_IMAGE_URL(season.poster_path)}
-                alt={season.name}
-                width={200}
-                height={200}
-                className="h-44"
-              />
-              <div className="flex flex-row flex-wrap justify-between gap-1">
-                <div>{season.name}</div>
-                <div>{season.episode_count} episodes</div>
-                <div>Watched {episodeNumber}</div>
-              </div>
-              <div className="absolute right-0 top-0 w-16 rounded-bl-xl bg-white p-2 text-center font-bold">
-                {season.vote_average}/10
-              </div>
-              {loggedIn ? (
-                <div className="flex w-full flex-col gap-2 p-1">
-                  <SeasonButtons
-                    addAllSeason={addSeasonToWatched}
-                    season={season}
-                    userId={user.id}
-                    serie={tv}
-                    seasonWatched={seasonWatched}
+      <section className="mt-4">
+        <ScrollArea className="h-80 w-full">
+          <div className="flex flex-row flex-wrap justify-around gap-4">
+            {seasons.map((season) => {
+              return (
+                <div
+                  key={season.id}
+                  className="flex flex-col bg-slate-900 text-white"
+                >
+                  <h3 className="py-1 text-center text-xl">{season.name}</h3>
+                  <Image
+                    src={TMDB_IMAGE_URL(season.poster_path)}
+                    width={150}
+                    height={300}
+                    alt={`Poster ${season.name}`}
+                    className="object-fill"
                   />
+                  <div className="mt-auto flex h-12 flex-row justify-around">
+                    <button className="flex h-full w-full items-center justify-center bg-sky-600">
+                      <AddIcon />
+                    </button>
+                    <Prova
+                      seasonId={season.id.toString()}
+                      serieId={tvId}
+                      season={season}
+                      serieName={tv.name}
+                      serverEpisodeQuery={returnEpisodesFromSeason}
+                    />
+                    <button className="flex h-full w-full items-center justify-center bg-red-600">
+                      <TrashIcon />
+                    </button>
+                  </div>
                 </div>
-              ) : null}
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+          <ScrollBar orientation="vertical" />
+        </ScrollArea>
       </section>
     </section>
   );
@@ -149,7 +160,7 @@ async function DisplaySeason(props: {
 export default async function Page(props: { params: { tv_id: string } }) {
   const tv_id = props.params.tv_id;
 
-  const tv = await GetTVDetail(tv_id);
+  const tv = await queryTMDBTVDetail(tv_id);
   const user = await getUser();
 
   const userId = user?.id;
