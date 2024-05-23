@@ -2,24 +2,18 @@ import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
-import {
-  type SeasonWatchedType,
-  type SerieWatchedType,
-} from "~/server/db/types";
+import { type SerieWatchedType } from "~/server/db/types";
 import { queryTMDBTVDetail } from "~/server/queries";
 import { type Season, type Serie, type User } from "~/types/tmdb_detail";
-import { SeasonButtons } from "../../_components/Buttons";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
-import { AddIcon, EditIcon, TrashIcon } from "../../_components/Icons";
+import { AddIcon, TrashIcon } from "../../_components/Icons";
 import Provider from "../../_components/Providers";
 import {
-  addSeasonToWatched,
   getUserWatchedTVAndSeason,
   returnEpisodesFromSeason,
   type SeasonWatchWithEpisodes,
-  type SeriesAndSeasons,
+  type SeriesAndSeasons as SeriesAndSeasonsWatched,
 } from "../../actions";
-import DrawerEpisodes from "./_components/SeasonEpisodes";
 
 async function DisplayInfo(props: {
   tv: Serie;
@@ -47,37 +41,50 @@ async function DisplayInfo(props: {
         </div>
       </div>
 
-      <div className="flex flex-col">
-        <div className="space-x-2">
+      <div className="flex flex-col gap-3">
+        <div className="mb-2 space-x-2">
           <span className="font-bold">{tv.name}</span>
           <span>|</span>
           <span className="italic text-slate-400">{tv.status}</span>
         </div>
 
-        <div className="flex flex-col flex-wrap gap-1">
-          <p>
-            <span className="italic text-slate-300">Language(s): </span>
-            <span>{tv.languages.join("-").toUpperCase()}</span>
+        <div className="flex flex-col flex-wrap gap-3">
+          <p className="flex w-full flex-row flex-wrap justify-start gap-x-4 gap-y-2 md:w-[70%]">
+            <div>
+              <span className="italic text-slate-300">Language(s): </span>
+              <span>{tv.languages.join("-").toUpperCase()}</span>
+            </div>
+            <div>
+              <span className="italic text-slate-300">Runtime: </span>
+              <span>{tv.episode_run_time}</span>m
+            </div>
+            <div>
+              <span className="italic text-slate-300">Episodes: </span>
+              <span>{tv.number_of_episodes}</span>
+            </div>
+            <div>
+              <span className="italic text-slate-300">Seasons: </span>
+              <span>{tv.number_of_seasons}</span>
+            </div>
+            <div>
+              <span className="italic text-slate-300">From: </span>
+              <span>{displayHumanDate(tv.first_air_date)}</span>
+            </div>
+            <div>
+              <span className="italic text-slate-300"> To: </span>
+              <span>{displayHumanDate(tv.last_air_date)}</span>
+            </div>
           </p>
-          <p>
-            <span className="italic text-slate-300">Runtime: </span>
-            <span>{tv.episode_run_time}</span>m
-          </p>
-          <p className="">
-            <span className="italic text-slate-300">From: </span>
-            <span>{displayHumanDate(tv.first_air_date)}</span>
-            <span className="italic text-slate-300"> To: </span>
-            <span>{displayHumanDate(tv.last_air_date)}</span>
-          </p>
-          <div>
-            <DisplayGenres genres={tv.genres} />
-          </div>
         </div>
-        <p className="mb-4 mt-auto">
+        <div>
+          <DisplayGenres genres={tv.genres} />
+        </div>
+        <p className="mb-2 mt-auto">
           <span className=" text-slate-300">Overview: </span> {tv.overview}
         </p>
       </div>
 
+      {/* Backgroun image */}
       <img
         src={TMDB_IMAGE_URL(back_url)}
         alt={tv.name}
@@ -133,13 +140,6 @@ async function DisplaySeason(props: {
                     <button className="flex h-full w-full items-center justify-center bg-sky-600">
                       <AddIcon />
                     </button>
-                    <DrawerEpisodes
-                      seasonId={season.id.toString()}
-                      serieId={tvId}
-                      season={season}
-                      serieName={tv.name}
-                      serverEpisodeQuery={returnEpisodesFromSeason}
-                    />
                     <button className="flex h-full w-full items-center justify-center bg-red-600">
                       <TrashIcon />
                     </button>
@@ -163,7 +163,7 @@ export default async function Page(props: { params: { tv_id: string } }) {
 
   const userId = user?.id;
 
-  const seriesAndSeasonWatched: SeriesAndSeasons | undefined =
+  const seriesAndSeasonWatched: SeriesAndSeasonsWatched | undefined =
     await getUserWatchedTVAndSeason(userId, tv_id);
 
   return (

@@ -12,6 +12,9 @@ import {
   userInfoTable,
 } from "~/server/db/schema";
 import {
+  type DBSeasonWatchedType,
+  type DBSerieType,
+  type DBSerieWatchedType,
   type SerieType,
   type SeriesWatchedTableType,
   type UserInfo,
@@ -150,7 +153,7 @@ export async function getOrCreateTVSeriesWatched(
   serieId: string,
   userId: string,
 ) {
-  let tvSeriesWatched: SeriesWatchedTableType | undefined =
+  let tvSeriesWatched: DBSerieWatchedType | undefined =
     await db.query.seriesWatchedTable.findFirst({
       where: (data, { eq, and }) =>
         and(eq(data.serieId, serieId), eq(data.userId, userId)),
@@ -177,7 +180,7 @@ async function createTVSeries(serieId: string, series: Serie) {
 }
 
 export async function createTVSeriesWatched(serieId: string, userId: string) {
-  const serie = await db
+  const serie: DBSerieWatchedType[] = await db
     .insert(seriesWatchedTable)
     .values({
       serieId: serieId,

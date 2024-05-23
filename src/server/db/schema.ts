@@ -151,7 +151,7 @@ export const seriesWatchedTable = createTable("tv-series-watched", {
 
 export const seriesWatchedRelations = relations(
   seriesWatchedTable,
-  ({ one }) => ({
+  ({ one, many }) => ({
     serie: one(seriesTable, {
       references: [seriesTable.id],
       fields: [seriesWatchedTable.serieId],
@@ -160,6 +160,7 @@ export const seriesWatchedRelations = relations(
       references: [userTable.id],
       fields: [seriesWatchedTable.userId],
     }),
+    seasonWatched: many(seasonWatchedTable),
   }),
 );
 
@@ -206,6 +207,12 @@ export const seasonWatchedTable = createTable("tv-season-watched", {
     .references(() => seriesTable.id, {
       onDelete: "cascade",
       onUpdate: "cascade",
+    }),
+  serieWatch: integer("serie_watch_id")
+    .notNull()
+    .references(() => seriesWatchedTable.id, {
+      onDelete: "no action",
+      onUpdate: "no action",
     }),
   episodeWatched: smallint("episode_watched").notNull().default(0),
   status: text("status", {

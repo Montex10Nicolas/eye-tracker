@@ -20,21 +20,19 @@ export enum Status {
   "completed",
 }
 
-export type SerieType = typeof seriesTable.$inferSelect;
+export type DBSerieType = typeof seriesTable.$inferSelect;
 
-export type SeriesWatchedTableType = typeof seriesWatchedTable.$inferSelect;
+export type DBSeriesWatchedTableType = typeof seriesWatchedTable.$inferSelect;
 
-export type SeasonType = typeof seasonTable.$inferSelect;
+export type DBSeasonType = typeof seasonTable.$inferSelect;
 
-export type SeasonsWatchedDB = typeof seasonWatchedTable.$inferSelect;
+export type DBSeasonsWatchedDB = typeof seasonWatchedTable.$inferSelect;
 
-export type UserInfo = typeof userInfoTable.$inferSelect;
+export type DBUserInfo = typeof userInfoTable.$inferSelect;
 
-export type SerieDBType = typeof seriesTable.$inferSelect;
+export type DBSerieWatchedType = typeof seriesWatchedTable.$inferSelect;
 
-export type SerieWatchedType = typeof seriesWatchedTable.$inferSelect;
-
-export type SeasonWatchedType = typeof seasonWatchedTable.$inferSelect;
+export type DBSeasonWatchedType = typeof seasonWatchedTable.$inferSelect;
 
 export const CODES_STATUS: number[] = [23505];
 
