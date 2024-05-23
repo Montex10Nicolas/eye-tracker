@@ -68,6 +68,9 @@ importers:
       react-dom:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
+      siuwi-tracker:
+        specifier: 'link:'
+        version: 'link:'
       tailwind-merge:
         specifier: ^2.3.0
         version: 2.3.0
