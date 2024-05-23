@@ -21,6 +21,7 @@ import {
   type Episode,
   type MovieDetail,
   type Season,
+  type SeasonDetail,
   type Serie,
 } from "~/types/tmdb_detail";
 
@@ -149,10 +150,11 @@ export async function getOrCreateTVSeriesWatched(
   serieId: string,
   userId: string,
 ) {
-  let tvSeriesWatched = await db.query.seriesWatchedTable.findFirst({
-    where: (data, { eq, and }) =>
-      and(eq(data.serieId, serieId), eq(data.userId, userId)),
-  });
+  let tvSeriesWatched: SeriesWatchedTableType | undefined =
+    await db.query.seriesWatchedTable.findFirst({
+      where: (data, { eq, and }) =>
+        and(eq(data.serieId, serieId), eq(data.userId, userId)),
+    });
 
   if (tvSeriesWatched === undefined) {
     tvSeriesWatched = await createTVSeriesWatched(serieId, userId);
@@ -171,23 +173,20 @@ async function createTVSeries(serieId: string, series: Serie) {
     })
     .returning();
   if (serie[0] === undefined) throw new Error("WTF");
-  return serie[0] as SerieType;
+  return serie[0];
 }
 
 export async function createTVSeriesWatched(serieId: string, userId: string) {
-  const id = generateId(32);
-
   const serie = await db
     .insert(seriesWatchedTable)
     .values({
-      id: id,
       serieId: serieId,
       userId: userId,
       status: "not_started",
     })
     .returning();
 
-  return serie[0] as SeriesWatchedTableType;
+  return serie[0]!;
 }
 
 async function createTVSeasonsWatched(
@@ -196,12 +195,10 @@ async function createTVSeasonsWatched(
   serieId: string,
 ) {
   "use server";
-  const id = generateId(32);
 
   const tvWatched = await db
     .insert(seasonWatchedTable)
     .values({
-      id: id,
       seasonId: seasonId,
       userId: userId,
       status: "watching",
@@ -229,6 +226,7 @@ async function createTVSeason(
       seasonName: season.name,
       serieName: serieName,
       season_data: season,
+      episodeCount: season.episode_count,
     })
     .returning();
 
@@ -258,7 +256,10 @@ async function createSingleEpisode(seasonId: string, episode: Episode) {
 async function createMultiEpisode(season: Season, serieId: string) {
   "use server";
   const seasonId = season.id.toString();
-  const seasonDet = await queryTMDBSeasonDetail(serieId, season.season_number);
+  const seasonDet: SeasonDetail = await queryTMDBSeasonDetail(
+    serieId,
+    season.season_number,
+  );
 
   const episodes: { id: string; seasonId: string; episodeDate: Episode }[] = [];
   for (const episode of seasonDet.episodes) {
@@ -474,13 +475,13 @@ export async function updateOrCreateSeasonWatch(
   episodeCount: number,
 ) {
   const season = await getOrCreateTVSeasonWatched(userId, serieId, seasonId);
-  const newEp = episodeCount === -1 ? season.episodeCount : episodeCount;
+  const newEp = episodeCount === -1 ? season.episodeWatched : episodeCount;
 
   await db
     .update(seasonWatchedTable)
     .set({
       status: status,
-      episodeCount: newEp,
+      episodeWatched: newEp,
     })
     .where(
       and(

@@ -146,8 +146,6 @@ export async function queryTMDBSeasonDetail(
   const seasonNum = season_number.toString();
   const url = new URL(`3/tv/${serieId}/season/${seasonNum}`, TMDB_URL);
 
-  console.log(url);
-
   const response = await fetch(url, {
     ...Headers,
     cache: "no-cache",
