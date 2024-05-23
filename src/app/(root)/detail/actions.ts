@@ -19,7 +19,14 @@ import {
   moviesTable,
   userInfoTable,
 } from "~/server/db/schema";
-import { type DBErorr, type SerieWatchedType } from "~/server/db/types";
+import {
+  type DBErorr,
+  type DBSeasonType,
+  type DBSeasonWatchedType,
+  type DBSerieWatchedType,
+  type SerieType,
+  type SerieWatchedType,
+} from "~/server/db/types";
 import {
   type Episode,
   type MovieDetail,
@@ -170,28 +177,8 @@ export async function removeFromMovieWatched(
 }
 
 export interface SeriesAndSeasons {
-  serie: SerieWatchedType;
-  seasons: SeasonWatchWithEpisodes[];
-}
-
-export interface SeasonWatchWithEpisodes {
-  episode: {
-    id: string;
-    userId: string;
-    duration: number;
-    seasonId: string;
-    episodeId: string;
-    episode: {
-      id: string;
-      seasonId: string;
-      episodeDate: Episode;
-    };
-  }[];
-  id: string;
-  userId: string;
-  serieId: string;
-  status: "not_started" | "watching" | "completed";
-  seasonId: string;
+  serie: DBSerieWatchedType;
+  seasons: DBSeasonWatchedType[];
 }
 
 // Return info about a series and it's season in relation to a user
@@ -203,7 +190,10 @@ export async function getUserWatchedTVAndSeason(
     return undefined;
   }
 
-  const serie = await getOrCreateTVSeriesWatched(serieId, userId);
+  const serie: DBSerieWatchedType = await getOrCreateTVSeriesWatched(
+    serieId,
+    userId,
+  );
 
   const seasons = await db.query.seasonWatchedTable.findMany({
     where: (ses, { and, eq }) =>
@@ -211,7 +201,7 @@ export async function getUserWatchedTVAndSeason(
   });
 
   return {
-    serie,
+    serie: serie,
     seasons: seasons,
   };
 }
