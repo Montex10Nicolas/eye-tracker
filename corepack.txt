@@ -1,0 +1,3 @@
+corepack enable
+corepack prepare pnpm@9.0.4 --activate
+corepack install --global pnpm@9.0.4
