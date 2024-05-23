@@ -1,5 +1,5 @@
 "use server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
   checkIfSeasonIsCompleted,
@@ -8,8 +8,6 @@ import {
   getOrCreateEpisodes,
   getOrCreateFullTVData,
   getOrCreateTVSeason,
-  getOrCreateTVSeasonWatched,
-  getOrCreateTVSeries,
   getOrCreateTVSeriesWatched,
   updateInfoWatchComp,
   updateOrCreateSeasonWatch,
@@ -17,18 +15,11 @@ import {
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
-  episodeWatchedTable,
   movieWatchedTable,
   moviesTable,
-  seasonWatchedTable,
   userInfoTable,
 } from "~/server/db/schema";
-import {
-  type DBErorr,
-  type SeasonWatchedType,
-  type SerieWatchedType,
-} from "~/server/db/types";
-import { queryTMDBSeasonDetail } from "~/server/queries";
+import { type DBErorr, type SerieWatchedType } from "~/server/db/types";
 import {
   type Episode,
   type MovieDetail,
@@ -109,6 +100,7 @@ export async function addToMovieWatched(
       .where(eq(userInfoTable.id, info.id));
   } catch (e: unknown) {
     const err = e as DBErorr;
+    console.log(err);
   }
 }
 
@@ -218,28 +210,9 @@ export async function getUserWatchedTVAndSeason(
       and(eq(ses.userId, userId), eq(ses.serieId, serieId)),
   });
 
-  const seasonWatchWithEpisodes: SeasonWatchWithEpisodes[] = [];
-  for (const season of seasons) {
-    const s_id = season.seasonId.toString();
-
-    const episode_watched = await db.query.episodeWatchedTable.findMany({
-      where: (ep, { and, eq }) =>
-        and(eq(ep.userId, userId), eq(ep.seasonId, s_id)),
-      with: {
-        episode: true,
-      },
-    });
-
-    const a = {
-      ...season,
-      episode: episode_watched,
-    };
-    seasonWatchWithEpisodes.push(a);
-  }
-
   return {
     serie,
-    seasons: seasonWatchWithEpisodes,
+    seasons: seasons,
   };
 }
 

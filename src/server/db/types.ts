@@ -1,4 +1,11 @@
 import { type Episode, type Season, type Serie } from "~/types/tmdb_detail";
+import {
+  type seasonTable,
+  type seasonWatchedTable,
+  type seriesTable,
+  type seriesWatchedTable,
+  type userInfoTable,
+} from "./schema";
 
 export interface DBErorr extends Error {
   severity_local: string;
@@ -13,64 +20,21 @@ export enum Status {
   "completed",
 }
 
-export interface SerieType {
-  id: string;
-  name: string;
-  serie_data: Serie;
-}
+export type SerieType = typeof seriesTable.$inferSelect;
 
-export interface SeriesWatchedTableType {
-  id: string;
-  serieId: string;
-  userId: string;
-  status: "not_started" | "watching" | "completed";
-  seasonCount: number;
-}
+export type SeriesWatchedTableType = typeof seriesWatchedTable.$inferSelect;
 
-export interface SeasonType {
-  id: string;
-  season_data: Season;
-}
+export type SeasonType = typeof seasonTable.$inferSelect;
 
-export interface SeasonsWatchedDB {
-  id: string;
-  seasonId: string;
-  userId: string;
-  serieId: string;
-  status: "not_started" | "watching" | "completed";
-  episodeCount: number;
-}
+export type SeasonsWatchedDB = typeof seasonWatchedTable.$inferSelect;
 
-export interface UserInfo {
-  id: string;
-  userId: string;
-  movieDurationTotal: number;
-  movieCountTotal: number;
-  tvDurationTotal: number;
-  tvEpisodeCount: number;
-  tvSerieCompleted: number;
-  tvSerieWatching: number;
-}
+export type UserInfo = typeof userInfoTable.$inferSelect;
 
-export interface SerieDBType {
-  id: string;
-  serie_data: Serie;
-}
+export type SerieDBType = typeof seriesTable.$inferSelect;
 
-export interface SerieWatchedType {
-  id: string;
-  userId: string;
-  serieId: string;
-  status: "not_started" | "watching" | "completed";
-}
+export type SerieWatchedType = typeof seriesWatchedTable.$inferSelect;
 
-export interface SeasonWatchedType {
-  id: string;
-  userId: string;
-  serieId: string;
-  status: "not_started" | "watching" | "completed";
-  seasonId: string;
-}
+export type SeasonWatchedType = typeof seasonWatchedTable.$inferSelect;
 
 export const CODES_STATUS: number[] = [23505];
 
