@@ -3,13 +3,12 @@ import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
   queryTMDBMovieDetail,
   queryTMDBMovieRecomendation,
 } from "~/server/queries";
-import { type MovieDetail, type Serie, type User } from "~/types/tmdb_detail";
+import { type MovieDetail, type User } from "~/types/tmdb_detail";
 import { DisplayGenres, DisplayMovies } from "../../_components/Display";
 import Provider from "../../_components/Providers";
 import { DisplayCastCrew } from "../../_components/Summary";
@@ -35,7 +34,7 @@ async function DisplayInfo(props: { movie: MovieDetail; user: User | null }) {
     if (!user) {
       return "need to be logged in";
     }
-    await addToMovieWatched(user.id, movie, false);
+    await addToMovieWatched(user.id, movie);
     revalidatePath(`/detail/movie${movie.id}`);
   }
 
