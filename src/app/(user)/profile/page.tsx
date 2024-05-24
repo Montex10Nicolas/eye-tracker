@@ -8,7 +8,7 @@ import {
   type LatestWatchedEpisodes,
 } from "~/app/(user)/user_action";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
-import { type UserInfo } from "~/server/db/types";
+import { type DBUserInfoType } from "~/server/db/types";
 import { type User } from "~/types/tmdb_detail";
 import { myWatchedMovie } from "../user_action";
 
@@ -36,7 +36,7 @@ function handleVisualizationMinute(start: number) {
   );
 }
 
-function Summary(props: { user: User; info: UserInfo }) {
+function Summary(props: { user: User; info: DBUserInfoType }) {
   const { user, info } = props;
   return (
     <section className="mx-4  rounded-md bg-white p-4 text-slate-950">
@@ -186,9 +186,7 @@ async function DisplayEpisodes(props: { user: User }) {
 
 export default async function Page() {
   const user = await getUser();
-  let info: UserInfo;
-  const LIMIT = 25;
-  const offset = 0;
+  let info: DBUserInfoType;
 
   if (user === null) {
     return (

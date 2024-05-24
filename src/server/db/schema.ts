@@ -222,7 +222,7 @@ export const seasonWatchedTable = createTable("tv-season-watched", {
 
 export const seasonWatchedRelations = relations(
   seasonWatchedTable,
-  ({ one, many }) => ({
+  ({ one }) => ({
     season: one(seasonTable, {
       references: [seasonTable.id],
       fields: [seasonWatchedTable.seasonId],

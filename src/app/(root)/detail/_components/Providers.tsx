@@ -60,8 +60,9 @@ export default async function Provider(props: {
     <>
       {final.map((provider) => {
         return (
-          <div key={provider.provider_id} className="border border-slate-700">
+          <div key={provider.provider_id}>
             <img
+              className="border border-slate-800"
               src={TMDB_IMAGE_URL(provider.logo_path)}
               alt={provider.provider_name}
             />

@@ -14,17 +14,15 @@ import Provider from "../../_components/Providers";
 import {
   addEpisodeToSeasonWatched,
   getUserWatchedTVAndSeason,
-  returnEpisodesFromSeason,
   type SeriesAndSeasonsWatched,
 } from "../../actions";
 import { EditSeason } from "./_components/EditSeason";
-import { SeasonForm } from "./_components/SeasonForm";
 
 async function DisplayInfo(props: {
   tv: Serie;
   serieWatched: DBSerieWatchedType | undefined;
 }) {
-  const { tv, serieWatched } = props;
+  const { tv } = props;
   const back_url = tv.backdrop_path;
   const poster_url = tv.poster_path;
 
@@ -104,11 +102,10 @@ async function DisplayInfo(props: {
 async function DisplaySeason(props: {
   user: User | null;
   tv: Serie;
-  tvId: string;
   seasons: Season[];
   seasonsWatched: DBSeasonWatchedType[] | undefined;
 }) {
-  const { seasons, user, tv, seasonsWatched, tvId } = props;
+  const { seasons, user, tv, seasonsWatched } = props;
   const loggedIn = user !== null;
 
   // Position specials at the end of the list
@@ -239,7 +236,6 @@ export default async function Page(props: { params: { tv_id: string } }) {
       <DisplaySeason
         user={user}
         tv={tv}
-        tvId={tv_id}
         seasons={tv.seasons}
         seasonsWatched={seriesAndSeasonWatched?.seasons}
       />

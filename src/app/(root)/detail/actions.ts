@@ -2,19 +2,12 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
-  checkIfSeasonIsCompleted,
-  checkIfSerieIsCompleted,
-  createOrDeleteEpisodeWatched,
   getOrCreateEpisodes,
-  getOrCreateFullTVData,
   getOrCreateTVSeason,
-  getOrCreateTVSeasonWatched,
   getOrCreateTVSeriesWatched,
   updateInfo,
   updateInfoWatchComp,
   updateOrCreateSeasonWatch,
-  updateOrCreateSerieWatch,
-  updateSeasonWatch,
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
@@ -24,19 +17,11 @@ import {
 } from "~/server/db/schema";
 import {
   type DBErorr,
-  type DBSeasonType,
   type DBSeasonWatchedType,
   type DBSerieWatchedType,
-  type SerieType,
-  type SerieWatchedType,
   type StatusWatchedType,
 } from "~/server/db/types";
-import {
-  type Episode,
-  type MovieDetail,
-  type Season,
-  type Serie,
-} from "~/types/tmdb_detail";
+import { type MovieDetail, type Season, type Serie } from "~/types/tmdb_detail";
 
 export async function addMovie(movie: MovieDetail) {
   await db.insert(moviesTable).values({
@@ -45,11 +30,7 @@ export async function addMovie(movie: MovieDetail) {
   });
 }
 
-export async function addToMovieWatched(
-  userId: string,
-  movie: MovieDetail,
-  again: boolean,
-) {
+export async function addToMovieWatched(userId: string, movie: MovieDetail) {
   const search_movie = await db.query.moviesTable.findFirst({
     where: (mov, { eq }) => eq(mov.id, movie.id.toString()),
   });
@@ -210,11 +191,6 @@ export async function getUserWatchedTVAndSeason(
   };
 }
 
-interface SeasonUpdate {
-  date: Date | undefined;
-  update: boolean;
-}
-
 export interface UpdateSeasonWatchData {
   episodeCount: number;
   status: StatusWatchedType;
@@ -255,96 +231,11 @@ export async function addEpisodeToSeasonWatched(
   const runtime =
     ep_runtime === undefined ? DEFAULT_RUNTIME : ep_runtime * ep_diff;
 
-  await updateInfo(
-    userId,
-    0,
-    0,
-    runtime,
-    ep_diff,
-    0,
-    0,
-  );
+  await updateInfo(userId, 0, 0, runtime, ep_diff, 0, 0);
 
   await updateInfoWatchComp(userId);
 
   revalidatePath(`/detail/tv/${serie.id}`);
-}
-
-export async function addSeasonToWatched(
-  season: Season,
-  userId: string,
-  serie: Serie,
-  boolEp: boolean[],
-  ep: SeasonUpdate[],
-) {
-  "use server";
-
-  const data = await getOrCreateFullTVData(season, serie);
-  let episodes_db = data.episodes;
-
-  const seasonId = season.id.toString(),
-    serieId = serie.id.toString();
-  await updateOrCreateSeasonWatch(seasonId, serieId, userId, "watching", -1);
-  await updateOrCreateSerieWatch(serieId, userId, "watching", -1);
-
-  episodes_db = episodes_db.sort((a, b) => {
-    const ep_num_a = a.episodeDate.episode_number;
-    const ep_num_b = b.episodeDate.episode_number;
-    return ep_num_a - ep_num_b;
-  });
-
-  // for (let i = 0; i < episodes_db.length; i++) {
-  //   const ep = episodes_db[i]?.episodeDate;
-  // }
-
-  let index = 0;
-  for (const value of boolEp) {
-    const episode = episodes_db[index++];
-    if (episode === undefined) continue;
-
-    await createOrDeleteEpisodeWatched(
-      userId,
-      seasonId,
-      episode.episodeDate,
-      value,
-    );
-  }
-
-  await getOrCreateTVSeriesWatched(serieId, userId);
-
-  const { isSeasonCompleted, episodeCount } = await checkIfSeasonIsCompleted(
-    userId,
-    seasonId,
-  );
-  if (isSeasonCompleted) {
-    await updateOrCreateSeasonWatch(
-      seasonId,
-      serieId,
-      userId,
-      "completed",
-      episodeCount,
-    );
-  } else {
-    await updateOrCreateSeasonWatch(
-      seasonId,
-      serieId,
-      userId,
-      "watching",
-      episodeCount,
-    );
-  }
-
-  const { completed: isSeriesCompleted, seasonCount } =
-    await checkIfSerieIsCompleted(userId, serieId);
-  if (isSeriesCompleted) {
-    await updateOrCreateSerieWatch(serieId, userId, "completed", seasonCount);
-  } else {
-    await updateOrCreateSerieWatch(serieId, userId, "watching", seasonCount);
-  }
-
-  await updateInfoWatchComp(userId);
-
-  revalidatePath(`/tv/detail/${serieId}`);
 }
 
 export async function returnEpisodesFromSeason(
