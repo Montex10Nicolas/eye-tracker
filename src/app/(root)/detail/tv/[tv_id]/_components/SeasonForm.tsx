@@ -5,7 +5,7 @@ import { useEffect, useState, type ChangeEvent } from "react";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
 import { type DBSeasonWatchedType } from "~/server/db/types";
 import { type Season, type Serie } from "~/types/tmdb_detail";
-import { type addEpisodeToSeasonWatched } from "../actions";
+import { type addEpisodeToSeasonWatched } from "../../../actions";
 
 type StatusForm = "PLANNING" | "WATCHING" | "COMPLETED" | "DROPPED";
 
@@ -65,9 +65,9 @@ export function SeasonForm(props: {
   }
 
   return (
-    <section className="left-0 top-0 z-10 h-[70%] w-[70%] cursor-default rounded-md bg-white text-black">
+    <section className="left-0 top-0 z-40 h-[70%] w-[70%] cursor-default rounded-md bg-white text-black">
       <div className="grid h-full w-full grid-cols-3">
-        <div className="flex h-full w-full flex-col items-center justify-center">
+        <div className="col-span-1 flex h-full w-full flex-col items-center justify-center">
           <div>
             <p>{serie.name}</p>
             <p>{season.name}</p>
@@ -89,7 +89,7 @@ export function SeasonForm(props: {
             <select
               name="episodes"
               value={episodeCount}
-              className="w-[50%] cursor-pointer rounded-sm border border-gray-950 px-4 py-2 text-right"
+              className="w-[50%] cursor-pointer rounded-sm border border-gray-950 px-4 py-2 text-center"
               onChange={handleEpisodes}
             >
               <option value="0">_</option>

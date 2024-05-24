@@ -10,6 +10,7 @@ import {
   getOrCreateTVSeason,
   getOrCreateTVSeasonWatched,
   getOrCreateTVSeriesWatched,
+  updateInfo,
   updateInfoWatchComp,
   updateOrCreateSeasonWatch,
   updateOrCreateSerieWatch,
@@ -223,18 +224,48 @@ export async function addEpisodeToSeasonWatched(
   userId: string,
   serie: Serie,
   season: Season,
-  updateInfo: UpdateSeasonWatchData,
+  newInfo: UpdateSeasonWatchData,
 ) {
   const serieId = serie.id.toString(),
     seasonId = season.id.toString();
 
-  console.log(serieId, seasonId, updateInfo);
+  console.log(serieId, seasonId, newInfo);
 
   await getOrCreateTVSeriesWatched(serieId, userId);
   await getOrCreateTVSeason(seasonId, season, serieId, serie.name);
-  await updateOrCreateSeasonWatch(seasonId, serieId, userId, updateInfo);
+  const [pre, post] = await updateOrCreateSeasonWatch(
+    seasonId,
+    serieId,
+    userId,
+    newInfo,
+  );
+
+  if (pre === undefined || post === undefined) {
+    throw new Error("I can this two be undefined");
+  }
+
+  console.log(pre, post);
 
   // UPDATE INFO AND SERIE WATCH
+  const ep_diff = post.episodeWatched - pre.episodeWatched;
+
+  // RUNTIME
+  const ep_runtime = serie.episode_run_time[0];
+  const DEFAULT_RUNTIME = 40;
+  const runtime =
+    ep_runtime === undefined ? DEFAULT_RUNTIME : ep_runtime * ep_diff;
+
+  await updateInfo(
+    userId,
+    0,
+    0,
+    runtime,
+    ep_diff,
+    0,
+    0,
+  );
+
+  await updateInfoWatchComp(userId);
 
   revalidatePath(`/detail/tv/${serie.id}`);
 }

@@ -113,8 +113,9 @@ export function DisplayCredits(props: { credits: Credits }) {
     hasCrew = crew.length > 0;
   return (
     <section className="mt-4 flex flex-col rounded-md bg-white p-4 text-black">
-      <h1 className="">Credits</h1>
-      <hr className="mb-4" />
+      <h1 className="text-xl font-semibold">Credits:</h1>
+      <hr className="h-2 w-full bg-black fill-black" />
+
       <Tabs defaultValue="cast" className="relative mt-6 w-full">
         <TabsList className="flex w-full flex-row bg-black">
           <TabsTrigger value="cast" className="w-full">
@@ -124,7 +125,7 @@ export function DisplayCredits(props: { credits: Credits }) {
             Crew
           </TabsTrigger>
         </TabsList>
-        <ScrollArea className="h-[500] w-full">
+        <ScrollArea className="h-[500px] w-full">
           <TabsContent value="cast" className="mt-6">
             {hasCast ? (
               <DisplayCastCrew persons={cast} cast={true} />

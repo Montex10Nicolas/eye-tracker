@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { type DBSeasonWatchedType } from "~/server/db/types";
 import { type Season, type Serie } from "~/types/tmdb_detail";
 import { EditIcon } from "../../../_components/Icons";
-import { SeasonForm } from "../../../_components/SeasonForm";
-import {
-  type SeriesAndSeasonsWatched,
-  type addEpisodeToSeasonWatched,
-} from "../../../actions";
+import { type addEpisodeToSeasonWatched } from "../../../actions";
+import { SeasonForm } from "./SeasonForm";
 
 export function EditSeason(props: {
   serie: Serie;
@@ -31,26 +29,30 @@ export function EditSeason(props: {
   }
 
   function closeDialog() {
-    console.log("Close dialog");
     setVisible(false);
   }
 
   return (
-    <div className="z-5 fixed left-0 top-0 flex h-screen w-screen items-center justify-center overflow-hidden bg-slate-900 bg-opacity-95">
-      <div
-        onClick={() => {
-          setVisible(false);
-        }}
-        className="absolute left-0 top-0 min-h-full min-w-full cursor-crosshair bg-transparent"
-      ></div>
-      <SeasonForm
-        userId={userId}
-        serie={serie}
-        season={season}
-        addEpisode={addEpisode}
-        seasonWatch={season_w}
-        close={closeDialog}
-      />
+    <div className="">
+      {createPortal(
+        <div className="fixed left-0 top-0 flex h-screen w-screen items-center justify-center overflow-hidden bg-slate-900 bg-opacity-95">
+          <div
+            onClick={() => {
+              setVisible(false);
+            }}
+            className="absolute left-0 top-0 min-h-full min-w-full cursor-crosshair bg-transparent"
+          ></div>
+          <SeasonForm
+            userId={userId}
+            serie={serie}
+            season={season}
+            addEpisode={addEpisode}
+            seasonWatch={season_w}
+            close={closeDialog}
+          />
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }
