@@ -6,7 +6,7 @@ import {
   ageCalculator,
   displayHumanDate,
 } from "~/_utils/utils";
-import { GetPersonDetail } from "~/server/queries";
+import { queryTMDBPersonDetail } from "~/server/queries";
 import {
   type MovieCredits,
   type PersonsCast,
@@ -53,7 +53,7 @@ function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
 export default async function PersonDetail(props: {
   params: { person_id: number };
 }) {
-  const person = await GetPersonDetail(props.params.person_id);
+  const person = await queryTMDBPersonDetail(props.params.person_id);
   const credits = mergeCredits(person.movie_credits, person.tv_credits);
 
   return (

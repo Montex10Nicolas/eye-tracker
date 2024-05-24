@@ -1,27 +1,28 @@
 import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import {
-  type SeasonWatchedType,
-  type SerieWatchedType,
+  type DBSeasonWatchedType,
+  type DBSerieWatchedType,
 } from "~/server/db/types";
-import { GetTVDetail } from "~/server/queries";
+import { queryTMDBTVDetail } from "~/server/queries";
 import { type Season, type Serie, type User } from "~/types/tmdb_detail";
-import { SeasonButtons } from "../../_components/Buttons";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
+import { AddIcon, TrashIcon } from "../../_components/Icons";
 import Provider from "../../_components/Providers";
 import {
-  addSeasonToWatched,
+  addEpisodeToSeasonWatched,
   getUserWatchedTVAndSeason,
-  type SeasonWatchWithEpisodes,
-  type SeriesAndSeasons,
+  type SeriesAndSeasonsWatched,
 } from "../../actions";
+import { EditSeason } from "./_components/EditSeason";
 
 async function DisplayInfo(props: {
   tv: Serie;
-  serieWatched: SerieWatchedType | undefined;
+  serieWatched: DBSerieWatchedType | undefined;
 }) {
-  const { tv, serieWatched } = props;
+  const { tv } = props;
   const back_url = tv.backdrop_path;
   const poster_url = tv.poster_path;
 
@@ -43,37 +44,52 @@ async function DisplayInfo(props: {
         </div>
       </div>
 
-      <div className="flex flex-col">
-        <div className="space-x-2">
+      <div className="flex flex-col gap-3">
+        <div className="mb-2 space-x-2">
           <span className="font-bold">{tv.name}</span>
           <span>|</span>
           <span className="italic text-slate-400">{tv.status}</span>
         </div>
 
-        <div className="flex flex-col flex-wrap gap-1">
-          <p>
-            <span className="italic text-slate-300">Language(s): </span>
-            <span>{tv.languages.join("-").toUpperCase()}</span>
+        <div className="flex flex-col flex-wrap gap-3">
+          <p className="flex w-full flex-row flex-wrap justify-start gap-x-4 gap-y-2 md:w-[70%]">
+            <p>
+              <span className="italic text-slate-300">Language(s): </span>
+              <span>{tv.languages.join("-").toUpperCase()}</span>
+            </p>
+            <p>
+              <span className="italic text-slate-300">Runtime: </span>
+              <span>{tv.episode_run_time}</span>m
+            </p>
+            <p>
+              <span className="italic text-slate-300">Episodes: </span>
+              <span>{tv.number_of_episodes}</span>
+            </p>
+            <p>
+              <span className="italic text-slate-300">Seasons: </span>
+              <span>{tv.number_of_seasons}</span>
+            </p>
+            <p>
+              <span className="italic text-slate-300">From: </span>
+              <span>{displayHumanDate(tv.first_air_date)}</span>
+            </p>
+            <p>
+              <span className="italic text-slate-300"> To: </span>
+              <span>{displayHumanDate(tv.last_air_date)}</span>
+            </p>
           </p>
-          <p>
-            <span className="italic text-slate-300">Runtime: </span>
-            <span>{tv.episode_run_time}</span>m
-          </p>
-          <p className="">
-            <span className="italic text-slate-300">From: </span>
-            <span>{displayHumanDate(tv.first_air_date)}</span>
-            <span className="italic text-slate-300"> To: </span>
-            <span>{displayHumanDate(tv.last_air_date)}</span>
-          </p>
-          <div>
-            <DisplayGenres genres={tv.genres} />
-          </div>
         </div>
-        <p className="mb-4 mt-auto">
+
+        <div>
+          <DisplayGenres genres={tv.genres} />
+        </div>
+
+        <p className="mb-2 mt-auto">
           <span className=" text-slate-300">Overview: </span> {tv.overview}
         </p>
       </div>
 
+      {/* Backgroun image */}
       <img
         src={TMDB_IMAGE_URL(back_url)}
         alt={tv.name}
@@ -86,61 +102,118 @@ async function DisplayInfo(props: {
 async function DisplaySeason(props: {
   user: User | null;
   tv: Serie;
-  tvId: string;
   seasons: Season[];
-  seasonsWatched: SeasonWatchWithEpisodes[] | undefined;
+  seasonsWatched: DBSeasonWatchedType[] | undefined;
 }) {
   const { seasons, user, tv, seasonsWatched } = props;
   const loggedIn = user !== null;
 
+  // Position specials at the end of the list
+  if (seasons[0]?.name.toLocaleLowerCase() === "specials") {
+    const special = seasons.shift();
+    if (special !== undefined) {
+      seasons.push(special);
+    }
+  }
+
   return (
-    <section className="mt-4 flex flex-col gap-1 rounded-md bg-white p-4 text-black">
-      <h1>Seasons</h1>
-      <hr className="mb-3" />
-      <section className="relative flex flex-row flex-wrap gap-4 rounded-sm">
-        {seasons.map((season) => {
-          const seasonId = season.id.toString();
+    <section className="mt-4 rounded-md bg-white p-4 text-black">
+      <h1 className="text-xl font-semibold">Season</h1>
+      <hr className="h-2 w-full bg-black fill-black" />
 
-          const seasonWatched = seasonsWatched?.find((season) => {
-            return season.seasonId === seasonId ? season : undefined;
-          });
+      <section className="mt-4">
+        <ScrollArea className="h-[630px]">
+          <div className="flex flex-row flex-wrap justify-around gap-4">
+            {seasons.map((season) => {
+              const watchedS = seasonsWatched?.find(
+                (s) => s.seasonId === season.id.toString(),
+              );
+              const userId = user?.id.toString();
 
-          const episodeNumber = seasonWatched?.episode.length ?? 0;
+              async function addAll() {
+                "use server";
+                if (userId === undefined) return;
+                await addEpisodeToSeasonWatched(userId, tv, season, {
+                  episodeCount: season.episode_count,
+                  status: "COMPLETED",
+                });
+              }
 
-          return (
-            <div
-              key={seasonId}
-              className="relative w-32 shrink-0 border border-slate-900"
-            >
-              <Image
-                src={TMDB_IMAGE_URL(season.poster_path)}
-                alt={season.name}
-                width={200}
-                height={200}
-                className="h-44"
-              />
-              <div className="flex flex-row flex-wrap justify-between gap-1">
-                <div>{season.name}</div>
-                <div>{season.episode_count} episodes</div>
-                <div>Watched {episodeNumber}</div>
-              </div>
-              <div className="absolute right-0 top-0 w-16 rounded-bl-xl bg-white p-2 text-center font-bold">
-                {season.vote_average}/10
-              </div>
-              {loggedIn ? (
-                <div className="flex w-full flex-col gap-2 p-1">
-                  <SeasonButtons
-                    addAllSeason={addSeasonToWatched}
-                    season={season}
-                    userId={user.id}
-                    serie={tv}
-                    seasonWatched={seasonWatched}
-                  />
+              async function removeAll() {
+                "use server";
+                if (userId === undefined) return;
+                await addEpisodeToSeasonWatched(userId, tv, season, {
+                  episodeCount: 0,
+                  status: null,
+                });
+              }
+
+              return (
+                <div
+                  key={season.id}
+                  className="flex flex-col bg-slate-900 text-white"
+                >
+                  <h3 className="py-1 text-center text-xl">{season.name}</h3>
+                  <div className="sticky">
+                    <Image
+                      src={TMDB_IMAGE_URL(season.poster_path)}
+                      width={150}
+                      height={300}
+                      alt={`Poster ${season.name}`}
+                      className="object-fill"
+                    />
+                    <p className="absolute right-1 top-1 flex w-fit flex-col rounded-sm bg-white p-1 text-xs font-bold text-black">
+                      <p>{watchedS?.status}</p>
+                      <p className="ml-auto">
+                        {watchedS?.status === "WATCHING" ? (
+                          <>
+                            <span>{watchedS?.episodeWatched}</span> /
+                            <span>{season.episode_count}</span>
+                          </>
+                        ) : null}
+                      </p>
+                    </p>
+                  </div>
+                  {loggedIn ? (
+                    <div className="mt-auto flex h-12 flex-row justify-around">
+                      {watchedS?.status != "COMPLETED" ? (
+                        <form
+                          className="flex h-full w-full items-center justify-center bg-green-600"
+                          action={addAll}
+                        >
+                          <button className="flex h-full w-full items-center justify-center bg-green-600">
+                            <AddIcon />
+                          </button>
+                        </form>
+                      ) : null}
+
+                      <button className="flex h-full w-full items-center justify-center bg-sky-600">
+                        <EditSeason
+                          addEpisode={addEpisodeToSeasonWatched}
+                          serie={tv}
+                          season={season}
+                          userId={user.id.toString()}
+                          season_w={watchedS}
+                        />
+                      </button>
+                      {watchedS?.status != null && watchedS != undefined ? (
+                        <form
+                          className="flex h-full w-full items-center justify-center bg-red-600"
+                          action={removeAll}
+                        >
+                          <button className="flex h-full w-full items-center justify-center bg-red-600">
+                            <TrashIcon />
+                          </button>
+                        </form>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+          <ScrollBar orientation="vertical" />
+        </ScrollArea>
       </section>
     </section>
   );
@@ -149,12 +222,12 @@ async function DisplaySeason(props: {
 export default async function Page(props: { params: { tv_id: string } }) {
   const tv_id = props.params.tv_id;
 
-  const tv = await GetTVDetail(tv_id);
+  const tv = await queryTMDBTVDetail(tv_id);
   const user = await getUser();
 
   const userId = user?.id;
 
-  const seriesAndSeasonWatched: SeriesAndSeasons | undefined =
+  const seriesAndSeasonWatched: SeriesAndSeasonsWatched | undefined =
     await getUserWatchedTVAndSeason(userId, tv_id);
 
   return (
@@ -163,7 +236,6 @@ export default async function Page(props: { params: { tv_id: string } }) {
       <DisplaySeason
         user={user}
         tv={tv}
-        tvId={tv_id}
         seasons={tv.seasons}
         seasonsWatched={seriesAndSeasonWatched?.seasons}
       />

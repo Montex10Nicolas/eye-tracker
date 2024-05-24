@@ -1,5 +1,5 @@
 import { NOT_FOUND_POSTER } from "~/_utils/utils";
-import { MultiSearch } from "~/server/queries";
+import { queryTMDBMultiSearch } from "~/server/queries";
 import {
   type MovieResultType,
   type PersonSearchType,
@@ -29,7 +29,7 @@ function sortByPopularity(
 // Gets a string as a parameter and search with the multi query(person, movie and series)
 // Need to add a filter
 export default async function SearchPage(props: { params: { query: string } }) {
-  const results = await MultiSearch(props.params.query);
+  const results = await queryTMDBMultiSearch(props.params.query);
   results.results = sortByPopularity(results);
 
   return (

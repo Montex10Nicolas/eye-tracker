@@ -7,6 +7,7 @@ import {
   json,
   pgTableCreator,
   primaryKey,
+  serial as serial_without_erros,
   smallint,
   text,
   timestamp,
@@ -129,7 +130,7 @@ export const seriesRelations = relations(seriesTable, ({ many }) => ({
 }));
 
 export const seriesWatchedTable = createTable("tv-series-watched", {
-  id: varchar("id", { length: 256 }).primaryKey(),
+  id: serial_without_erros("id").primaryKey(),
   serieId: varchar("serie_id", { length: 256 })
     .notNull()
     .references(() => seriesTable.id, {
@@ -144,13 +145,13 @@ export const seriesWatchedTable = createTable("tv-series-watched", {
     }),
   seasonCount: smallint("season_count").notNull().default(0),
   status: text("status", {
-    enum: ["not_started", "watching", "completed"],
-  }).notNull(),
+    enum: ["PLANNING", "WATCHING", "COMPLETED", "DROPPED"],
+  }),
 });
 
 export const seriesWatchedRelations = relations(
   seriesWatchedTable,
-  ({ one }) => ({
+  ({ one, many }) => ({
     serie: one(seriesTable, {
       references: [seriesTable.id],
       fields: [seriesWatchedTable.serieId],
@@ -159,6 +160,7 @@ export const seriesWatchedRelations = relations(
       references: [userTable.id],
       fields: [seriesWatchedTable.userId],
     }),
+    seasonWatched: many(seasonWatchedTable),
   }),
 );
 
@@ -175,6 +177,7 @@ export const seasonTable = createTable("tv-season", {
     length: 256,
   }).notNull(),
   seasonName: varchar("name", { length: 256 }).notNull(),
+  episodeCount: integer("episode_count").notNull(),
 });
 
 export const seasonRelations = relations(seasonTable, ({ one, many }) => ({
@@ -186,7 +189,7 @@ export const seasonRelations = relations(seasonTable, ({ one, many }) => ({
 }));
 
 export const seasonWatchedTable = createTable("tv-season-watched", {
-  id: varchar("id", { length: 256 }).primaryKey(),
+  id: serial_without_erros("id").primaryKey(),
   seasonId: varchar("season_id")
     .references(() => seasonTable.id, {
       onDelete: "cascade",
@@ -205,15 +208,21 @@ export const seasonWatchedTable = createTable("tv-season-watched", {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
-  episodeCount: smallint("episode_count").notNull().default(0),
+  serieWatch: integer("serie_watch_id")
+    .notNull()
+    .references(() => seriesWatchedTable.id, {
+      onDelete: "no action",
+      onUpdate: "no action",
+    }),
+  episodeWatched: smallint("episode_watched").notNull().default(0),
   status: text("status", {
-    enum: ["not_started", "watching", "completed"],
-  }).notNull(),
+    enum: ["PLANNING", "WATCHING", "COMPLETED", "DROPPED"],
+  }),
 });
 
 export const seasonWatchedRelations = relations(
   seasonWatchedTable,
-  ({ one, many }) => ({
+  ({ one }) => ({
     season: one(seasonTable, {
       references: [seasonTable.id],
       fields: [seasonWatchedTable.seasonId],
@@ -221,6 +230,10 @@ export const seasonWatchedRelations = relations(
     user: one(userTable, {
       references: [userTable.id],
       fields: [seasonWatchedTable.userId],
+    }),
+    serieWatch: one(seriesWatchedTable, {
+      references: [seriesWatchedTable.id],
+      fields: [seasonWatchedTable.serieWatch],
     }),
   }),
 );

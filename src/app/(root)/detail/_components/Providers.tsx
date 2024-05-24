@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
 import { Headers, TMDB_URL } from "~/server/queries";
 import { type FlatRentBuy, type WatchProvider } from "~/types/tmdb_detail";
@@ -61,8 +60,9 @@ export default async function Provider(props: {
     <>
       {final.map((provider) => {
         return (
-          <div key={provider.provider_id} className="border border-slate-700">
+          <div key={provider.provider_id}>
             <img
+              className="border border-slate-800"
               src={TMDB_IMAGE_URL(provider.logo_path)}
               alt={provider.provider_name}
             />

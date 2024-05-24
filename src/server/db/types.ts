@@ -1,4 +1,11 @@
-import { type Episode, type Season, type Serie } from "~/types/tmdb_detail";
+import {
+  type seasonTable,
+  type seasonWatchedTable,
+  type seriesTable,
+  type seriesWatchedTable,
+  type userInfoTable,
+  type userTable,
+} from "./schema";
 
 export interface DBErorr extends Error {
   severity_local: string;
@@ -7,70 +14,28 @@ export interface DBErorr extends Error {
   routing: string;
 }
 
-export enum Status {
-  "not_started",
-  "watching",
-  "completed",
-}
+export type StatusWatchedType =
+  | "PLANNING"
+  | "WATCHING"
+  | "COMPLETED"
+  | "DROPPED"
+  | null;
 
-export interface SerieType {
-  id: string;
-  name: string;
-  serie_data: Serie;
-}
+export type DBUserType = typeof userTable.$inferSelect;
 
-export interface SeriesWatchedTableType {
-  id: string;
-  serieId: string;
-  userId: string;
-  status: "not_started" | "watching" | "completed";
-  seasonCount: number;
-}
+export type DBUserInfoType = typeof userInfoTable.$inferSelect;
 
-export interface SeasonType {
-  id: string;
-  season_data: Season;
-}
+export type DBSerieType = typeof seriesTable.$inferSelect;
 
-export interface SeasonsWatchedDB {
-  id: string;
-  seasonId: string;
-  userId: string;
-  serieId: string;
-  status: "not_started" | "watching" | "completed";
-  episodeCount: number;
-}
+export type DBSeriesWatchedTableType = typeof seriesWatchedTable.$inferSelect;
 
-export interface UserInfo {
-  id: string;
-  userId: string;
-  movieDurationTotal: number;
-  movieCountTotal: number;
-  tvDurationTotal: number;
-  tvEpisodeCount: number;
-  tvSerieCompleted: number;
-  tvSerieWatching: number;
-}
+export type DBSeasonType = typeof seasonTable.$inferSelect;
 
-export interface SerieDBType {
-  id: string;
-  serie_data: Serie;
-}
+export type DBSeasonsWatchedDB = typeof seasonWatchedTable.$inferSelect;
 
-export interface SerieWatchedType {
-  id: string;
-  userId: string;
-  serieId: string;
-  status: "not_started" | "watching" | "completed";
-}
+export type DBSerieWatchedType = typeof seriesWatchedTable.$inferSelect;
 
-export interface SeasonWatchedType {
-  id: string;
-  userId: string;
-  serieId: string;
-  status: "not_started" | "watching" | "completed";
-  seasonId: string;
-}
+export type DBSeasonWatchedType = typeof seasonWatchedTable.$inferSelect;
 
 export const CODES_STATUS: number[] = [23505];
 
