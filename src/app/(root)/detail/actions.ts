@@ -236,15 +236,3 @@ export async function addEpisodeToSeasonWatched(
 
   revalidatePath(`/detail/tv/${serie.id}`);
 }
-
-export async function returnEpisodesFromSeason(
-  serieId: string,
-  seasonId: string,
-  season: Season,
-  serieName: string,
-) {
-  await getOrCreateTVSeason(seasonId, season, serieId, serieName);
-
-  const episodes = await getOrCreateEpisodes(serieId, seasonId, season);
-  return episodes;
-}
