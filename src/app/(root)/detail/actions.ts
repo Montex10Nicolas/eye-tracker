@@ -8,10 +8,12 @@ import {
   getOrCreateEpisodes,
   getOrCreateFullTVData,
   getOrCreateTVSeason,
+  getOrCreateTVSeasonWatched,
   getOrCreateTVSeriesWatched,
   updateInfoWatchComp,
   updateOrCreateSeasonWatch,
   updateOrCreateSerieWatch,
+  updateSeasonWatch,
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
@@ -26,6 +28,7 @@ import {
   type DBSerieWatchedType,
   type SerieType,
   type SerieWatchedType,
+  type StatusWatchedType,
 } from "~/server/db/types";
 import {
   type Episode,
@@ -176,7 +179,7 @@ export async function removeFromMovieWatched(
   }
 }
 
-export interface SeriesAndSeasons {
+export interface SeriesAndSeasonsWatched {
   serie: DBSerieWatchedType;
   seasons: DBSeasonWatchedType[];
 }
@@ -211,8 +214,31 @@ interface SeasonUpdate {
   update: boolean;
 }
 
-// Is episodesID = [] = add all episodes
-// Otherwhise only add the
+export interface UpdateSeasonWatchData {
+  episodeCount: number;
+  status: StatusWatchedType;
+}
+
+export async function addEpisodeToSeasonWatched(
+  userId: string,
+  serie: Serie,
+  season: Season,
+  updateInfo: UpdateSeasonWatchData,
+) {
+  const serieId = serie.id.toString(),
+    seasonId = season.id.toString();
+
+  console.log(serieId, seasonId, updateInfo);
+
+  await getOrCreateTVSeriesWatched(serieId, userId);
+  await getOrCreateTVSeason(seasonId, season, serieId, serie.name);
+  await updateOrCreateSeasonWatch(seasonId, serieId, userId, updateInfo);
+
+  // UPDATE INFO AND SERIE WATCH
+
+  revalidatePath(`/detail/tv/${serie.id}`);
+}
+
 export async function addSeasonToWatched(
   season: Season,
   userId: string,

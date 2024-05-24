@@ -2,22 +2,27 @@ import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
-import { type SerieWatchedType } from "~/server/db/types";
+import {
+  type DBSeasonWatchedType,
+  type DBSerieWatchedType,
+} from "~/server/db/types";
 import { queryTMDBTVDetail } from "~/server/queries";
 import { type Season, type Serie, type User } from "~/types/tmdb_detail";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
 import { AddIcon, TrashIcon } from "../../_components/Icons";
 import Provider from "../../_components/Providers";
+import { SeasonForm } from "../../_components/SeasonForm";
 import {
+  addEpisodeToSeasonWatched,
   getUserWatchedTVAndSeason,
   returnEpisodesFromSeason,
-  type SeasonWatchWithEpisodes,
-  type SeriesAndSeasons as SeriesAndSeasonsWatched,
+  type SeriesAndSeasonsWatched,
 } from "../../actions";
+import { EditSeason } from "./_components/EditSeason";
 
 async function DisplayInfo(props: {
   tv: Serie;
-  serieWatched: SerieWatchedType | undefined;
+  serieWatched: DBSerieWatchedType | undefined;
 }) {
   const { tv, serieWatched } = props;
   const back_url = tv.backdrop_path;
@@ -50,35 +55,37 @@ async function DisplayInfo(props: {
 
         <div className="flex flex-col flex-wrap gap-3">
           <p className="flex w-full flex-row flex-wrap justify-start gap-x-4 gap-y-2 md:w-[70%]">
-            <div>
+            <p>
               <span className="italic text-slate-300">Language(s): </span>
               <span>{tv.languages.join("-").toUpperCase()}</span>
-            </div>
-            <div>
+            </p>
+            <p>
               <span className="italic text-slate-300">Runtime: </span>
               <span>{tv.episode_run_time}</span>m
-            </div>
-            <div>
+            </p>
+            <p>
               <span className="italic text-slate-300">Episodes: </span>
               <span>{tv.number_of_episodes}</span>
-            </div>
-            <div>
+            </p>
+            <p>
               <span className="italic text-slate-300">Seasons: </span>
               <span>{tv.number_of_seasons}</span>
-            </div>
-            <div>
+            </p>
+            <p>
               <span className="italic text-slate-300">From: </span>
               <span>{displayHumanDate(tv.first_air_date)}</span>
-            </div>
-            <div>
+            </p>
+            <p>
               <span className="italic text-slate-300"> To: </span>
               <span>{displayHumanDate(tv.last_air_date)}</span>
-            </div>
+            </p>
           </p>
         </div>
+
         <div>
           <DisplayGenres genres={tv.genres} />
         </div>
+
         <p className="mb-2 mt-auto">
           <span className=" text-slate-300">Overview: </span> {tv.overview}
         </p>
@@ -94,14 +101,12 @@ async function DisplayInfo(props: {
   );
 }
 
-// I should get all the episodes of a season on Edit button click
-
 async function DisplaySeason(props: {
   user: User | null;
   tv: Serie;
   tvId: string;
   seasons: Season[];
-  seasonsWatched: SeasonWatchWithEpisodes[] | undefined;
+  seasonsWatched: DBSeasonWatchedType[] | undefined;
 }) {
   const { seasons, user, tv, seasonsWatched, tvId } = props;
   const loggedIn = user !== null;
@@ -120,9 +125,23 @@ async function DisplaySeason(props: {
       <hr className="h-2 w-full bg-black fill-black" />
 
       <section className="mt-4">
-        <ScrollArea className="h-80 w-full">
+        <ScrollArea className="-z-1 static h-80 w-full">
           <div className="flex flex-row flex-wrap justify-around gap-4">
             {seasons.map((season) => {
+              const watchedS = seasonsWatched?.find(
+                (s) => s.seasonId === season.id.toString(),
+              );
+              const userId = user?.id.toString();
+
+              async function handleForm() {
+                "use server";
+                if (userId === undefined) return;
+                await addEpisodeToSeasonWatched(userId, tv, season, {
+                  episodeCount: season.episode_count,
+                  status: "COMPLETED",
+                });
+              }
+
               return (
                 <div
                   key={season.id}
@@ -136,14 +155,32 @@ async function DisplaySeason(props: {
                     alt={`Poster ${season.name}`}
                     className="object-fill"
                   />
-                  <div className="mt-auto flex h-12 flex-row justify-around">
-                    <button className="flex h-full w-full items-center justify-center bg-sky-600">
-                      <AddIcon />
-                    </button>
-                    <button className="flex h-full w-full items-center justify-center bg-red-600">
-                      <TrashIcon />
-                    </button>
-                  </div>
+                  {loggedIn ? (
+                    <div className="mt-auto flex h-12 flex-row justify-around">
+                      {watchedS?.status != "COMPLETED" ? (
+                        <form action={handleForm}>
+                          <button className="flex h-full w-full items-center justify-center bg-green-600">
+                            <AddIcon />
+                          </button>
+                        </form>
+                      ) : null}
+
+                      <button className="flex h-full w-full items-center justify-center bg-sky-600">
+                        <EditSeason
+                          addEpisode={addEpisodeToSeasonWatched}
+                          serie={tv}
+                          season={season}
+                          userId={user.id.toString()}
+                          season_w={watchedS}
+                        />
+                      </button>
+                      {watchedS?.status != null && watchedS != undefined ? (
+                        <button className="flex h-full w-full items-center justify-center bg-red-600">
+                          <TrashIcon />
+                        </button>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
               );
             })}
