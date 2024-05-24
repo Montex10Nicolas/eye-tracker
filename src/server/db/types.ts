@@ -33,8 +33,6 @@ export type DBSeasonType = typeof seasonTable.$inferSelect;
 
 export type DBSeasonsWatchedDB = typeof seasonWatchedTable.$inferSelect;
 
-export type DBUserInfo = typeof userInfoTable.$inferSelect;
-
 export type DBSerieWatchedType = typeof seriesWatchedTable.$inferSelect;
 
 export type DBSeasonWatchedType = typeof seasonWatchedTable.$inferSelect;

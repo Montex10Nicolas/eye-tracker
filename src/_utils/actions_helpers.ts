@@ -14,13 +14,9 @@ import {
 } from "~/server/db/schema";
 import {
   type DBSeasonWatchedType,
-  type DBSerieType,
   type DBSerieWatchedType,
   type DBUserInfoType,
-  type SerieType,
-  type SeriesWatchedTableType,
   type StatusWatchedType,
-  type UserInfo,
 } from "~/server/db/types";
 import { queryTMDBSeasonDetail } from "~/server/queries";
 import {

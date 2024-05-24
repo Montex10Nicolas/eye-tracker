@@ -3,11 +3,12 @@
 import Image from "next/image";
 import { useEffect, useState, type ChangeEvent } from "react";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
-import { type DBSeasonWatchedType } from "~/server/db/types";
+import {
+  type DBSeasonWatchedType,
+  type StatusWatchedType,
+} from "~/server/db/types";
 import { type Season, type Serie } from "~/types/tmdb_detail";
 import { type addEpisodeToSeasonWatched } from "../../../actions";
-
-type StatusForm = "PLANNING" | "WATCHING" | "COMPLETED" | "DROPPED";
 
 export function SeasonForm(props: {
   serie: Serie;
@@ -21,11 +22,11 @@ export function SeasonForm(props: {
   const episode_count = season.episode_count;
   const ep_arr = new Array(episode_count).fill(null);
 
-  const [status, setStatus] = useState<StatusForm>("WATCHING");
+  const [status, setStatus] = useState<StatusWatchedType>("WATCHING");
   const [episodeCount, setEpisode] = useState(0);
 
   function handleStatus(event: ChangeEvent<HTMLSelectElement>) {
-    const value = event.target.value.toUpperCase() as StatusForm;
+    const value = event.target.value.toUpperCase() as StatusWatchedType;
     setStatus(value);
   }
 
@@ -37,7 +38,7 @@ export function SeasonForm(props: {
   useEffect(() => {
     if (seasonWatch === undefined) return;
     setEpisode(seasonWatch.episodeWatched);
-    setStatus(seasonWatch.status!);
+    setStatus(seasonWatch.status);
   }, [seasonWatch]);
 
   useEffect(() => {
@@ -113,7 +114,7 @@ export function SeasonForm(props: {
               id=""
               className="w-[50%] cursor-pointer rounded-md border border-gray-900 px-4 py-2 text-center"
               onChange={handleStatus}
-              value={status.toLowerCase()}
+              value={status?.toLowerCase()}
             >
               <option value="planning">Planning</option>
               <option value="watching">Watching</option>

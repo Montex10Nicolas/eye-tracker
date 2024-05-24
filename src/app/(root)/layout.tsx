@@ -10,15 +10,12 @@ export const metadata = {
 
 export default function AppRootLayout({
   children,
-  season,
 }: {
   children: React.ReactNode;
-  season: React.ReactNode;
 }) {
   return (
     <section>
       <DisplaySearchMultiple />
-      {season}
       {children}
     </section>
   );
