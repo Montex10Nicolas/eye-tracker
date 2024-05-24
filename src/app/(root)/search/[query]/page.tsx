@@ -28,7 +28,7 @@ function sortByPopularity(
 
 // Gets a string as a parameter and search with the multi query(person, movie and series)
 // Need to add a filter
-export default async function SearchPage(props: { params: { query: string } }) {
+export default async function Page(props: { params: { query: string } }) {
   const results = await queryTMDBMultiSearch(props.params.query);
   results.results = sortByPopularity(results);
 
