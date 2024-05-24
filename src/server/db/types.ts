@@ -1,4 +1,3 @@
-import { type Episode, type Season, type Serie } from "~/types/tmdb_detail";
 import {
   type seasonTable,
   type seasonWatchedTable,
@@ -14,11 +13,11 @@ export interface DBErorr extends Error {
   routing: string;
 }
 
-export enum Status {
-  "not_started",
-  "watching",
-  "completed",
-}
+export type StatusWatchedType =
+  | "PLANNING"
+  | "WATCHING"
+  | "COMPLETED"
+  | "DROPPED";
 
 export type DBSerieType = typeof seriesTable.$inferSelect;
 

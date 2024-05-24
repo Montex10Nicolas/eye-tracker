@@ -1,5 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { generateId } from "lucia";
+import { type UpdateSeasonWatchData } from "~/app/(root)/detail/actions";
 import { db } from "~/server/db";
 import {
   episodeTable,
@@ -17,6 +18,7 @@ import {
   type DBSerieWatchedType,
   type SerieType,
   type SeriesWatchedTableType,
+  type StatusWatchedType,
   type UserInfo,
 } from "~/server/db/types";
 import { queryTMDBSeasonDetail } from "~/server/queries";
@@ -153,14 +155,15 @@ export async function getOrCreateTVSeriesWatched(
   serieId: string,
   userId: string,
 ) {
-  let tvSeriesWatched: DBSerieWatchedType | undefined =
+  const tvSeriesWatched: DBSerieWatchedType | undefined =
     await db.query.seriesWatchedTable.findFirst({
       where: (data, { eq, and }) =>
         and(eq(data.serieId, serieId), eq(data.userId, userId)),
     });
 
   if (tvSeriesWatched === undefined) {
-    tvSeriesWatched = await createTVSeriesWatched(serieId, userId);
+    const newTVSW = await createTVSeriesWatched(serieId, userId);
+    return newTVSW;
   }
 
   return tvSeriesWatched;
@@ -185,7 +188,6 @@ export async function createTVSeriesWatched(serieId: string, userId: string) {
     .values({
       serieId: serieId,
       userId: userId,
-      status: "not_started",
     })
     .returning();
 
@@ -196,18 +198,37 @@ async function createTVSeasonsWatched(
   seasonId: string,
   userId: string,
   serieId: string,
+  serieWatchId: number,
 ) {
   "use server";
+
+  console.log("C_TVSW", seasonId, userId, serieId, serieWatchId);
+
+  const query = db
+    .insert(seasonWatchedTable)
+    .values({
+      userId: userId,
+      serieWatch: serieWatchId,
+      serieId: serieId,
+      seasonId: seasonId,
+      episodeWatched: 0,
+    })
+    .toSQL();
+
+  console.log(query);
 
   const tvWatched = await db
     .insert(seasonWatchedTable)
     .values({
-      seasonId: seasonId,
       userId: userId,
-      status: "watching",
+      serieWatch: serieWatchId,
       serieId: serieId,
+      seasonId: seasonId,
+      episodeWatched: 0,
     })
     .returning();
+
+  console.log("C_TVSW", seasonId, userId, serieId, serieWatchId);
 
   if (tvWatched[0] === undefined) {
     throw new Error("wtf tv season should exist");
@@ -444,7 +465,18 @@ export async function getOrCreateTVSeasonWatched(
   });
 
   if (seasonWatched === undefined) {
-    seasonWatched = await createTVSeasonsWatched(seasonId, userId, serieId);
+    const serieWatch = await getOrCreateTVSeriesWatched(serieId, userId);
+    if (serieWatch === undefined) {
+      throw new Error("How can it be undeinfed");
+    }
+    const serieWatchId = serieWatch.id;
+
+    seasonWatched = await createTVSeasonsWatched(
+      seasonId,
+      userId,
+      serieId,
+      serieWatchId,
+    );
   }
 
   return seasonWatched;
@@ -470,28 +502,38 @@ export async function updateOrCreateSerieWatch(
     );
 }
 
+// This is probably useless
+export async function updateSeasonWatch(
+  seasonWatchId: number,
+  updateInfo: UpdateSeasonWatchData,
+) {
+  const { episodeCount, status } = updateInfo;
+  await db
+    .update(seasonWatchedTable)
+    .set({
+      status: status,
+      episodeWatched: episodeCount,
+    })
+    .where(eq(seasonWatchedTable.id, seasonWatchId));
+}
+
 export async function updateOrCreateSeasonWatch(
   seasonId: string,
   serieId: string,
   userId: string,
-  status: "watching" | "completed",
-  episodeCount: number,
+  updateInfo: UpdateSeasonWatchData,
 ) {
   const season = await getOrCreateTVSeasonWatched(userId, serieId, seasonId);
-  const newEp = episodeCount === -1 ? season.episodeWatched : episodeCount;
+
+  const { episodeCount, status } = updateInfo;
 
   await db
     .update(seasonWatchedTable)
     .set({
       status: status,
-      episodeWatched: newEp,
+      episodeWatched: episodeCount,
     })
-    .where(
-      and(
-        eq(seasonWatchedTable.seasonId, seasonId),
-        eq(seasonWatchedTable.userId, userId),
-      ),
-    );
+    .where(eq(seasonWatchedTable.id, season.id));
 }
 
 export async function checkIfSeasonIsCompleted(

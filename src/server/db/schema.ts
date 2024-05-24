@@ -145,8 +145,8 @@ export const seriesWatchedTable = createTable("tv-series-watched", {
     }),
   seasonCount: smallint("season_count").notNull().default(0),
   status: text("status", {
-    enum: ["not_started", "watching", "completed"],
-  }).notNull(),
+    enum: ["PLANNING", "WATCHING", "COMPLETED", "DROPPED"],
+  }),
 });
 
 export const seriesWatchedRelations = relations(
@@ -216,8 +216,8 @@ export const seasonWatchedTable = createTable("tv-season-watched", {
     }),
   episodeWatched: smallint("episode_watched").notNull().default(0),
   status: text("status", {
-    enum: ["not_started", "watching", "completed"],
-  }).notNull(),
+    enum: ["PLANNING", "WATCHING", "COMPLETED", "DROPPED"],
+  }),
 });
 
 export const seasonWatchedRelations = relations(
@@ -230,6 +230,10 @@ export const seasonWatchedRelations = relations(
     user: one(userTable, {
       references: [userTable.id],
       fields: [seasonWatchedTable.userId],
+    }),
+    serieWatch: one(seriesWatchedTable, {
+      references: [seriesWatchedTable.id],
+      fields: [seasonWatchedTable.serieWatch],
     }),
   }),
 );
