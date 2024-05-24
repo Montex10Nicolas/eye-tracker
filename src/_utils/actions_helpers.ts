@@ -488,21 +488,15 @@ export async function getOrCreateTVSeasonWatched(
 export async function updateOrCreateSerieWatch(
   serieId: string,
   userId: string,
-  status: "watching" | "completed",
+  status: StatusWatchedType,
   seasonCount: number,
 ) {
   const serie = await getOrCreateTVSeriesWatched(serieId, userId);
-  const newEp = seasonCount === -1 ? serie?.seasonCount : seasonCount;
 
   await db
     .update(seriesWatchedTable)
     .set({ status: status, seasonCount: seasonCount })
-    .where(
-      and(
-        eq(seriesWatchedTable.serieId, serieId),
-        eq(seriesWatchedTable.userId, userId),
-      ),
-    );
+    .where(eq(seriesWatchedTable.id, serie.id));
 }
 
 // This is probably useless
@@ -609,7 +603,7 @@ export async function checkIfSerieIsCompleted(userId: string, serieId: string) {
       and(
         eq(seasonWatchedTable.userId, userId),
         eq(seasonWatchedTable.serieId, serieId),
-        eq(seasonWatchedTable.status, "completed"),
+        eq(seasonWatchedTable.status, "COMPLETED"),
       ),
   });
 
