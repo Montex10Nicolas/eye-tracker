@@ -11,7 +11,6 @@ import { type Season, type Serie, type User } from "~/types/tmdb_detail";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
 import { AddIcon, TrashIcon } from "../../_components/Icons";
 import Provider from "../../_components/Providers";
-import { SeasonForm } from "../../_components/SeasonForm";
 import {
   addEpisodeToSeasonWatched,
   getUserWatchedTVAndSeason,
@@ -19,6 +18,7 @@ import {
   type SeriesAndSeasonsWatched,
 } from "../../actions";
 import { EditSeason } from "./_components/EditSeason";
+import { SeasonForm } from "./_components/SeasonForm";
 
 async function DisplayInfo(props: {
   tv: Serie;
@@ -125,7 +125,7 @@ async function DisplaySeason(props: {
       <hr className="h-2 w-full bg-black fill-black" />
 
       <section className="mt-4">
-        <ScrollArea className="-z-1 static h-80 w-full">
+        <ScrollArea className="h-[630px]">
           <div className="flex flex-row flex-wrap justify-around gap-4">
             {seasons.map((season) => {
               const watchedS = seasonsWatched?.find(
@@ -133,12 +133,21 @@ async function DisplaySeason(props: {
               );
               const userId = user?.id.toString();
 
-              async function handleForm() {
+              async function addAll() {
                 "use server";
                 if (userId === undefined) return;
                 await addEpisodeToSeasonWatched(userId, tv, season, {
                   episodeCount: season.episode_count,
                   status: "COMPLETED",
+                });
+              }
+
+              async function removeAll() {
+                "use server";
+                if (userId === undefined) return;
+                await addEpisodeToSeasonWatched(userId, tv, season, {
+                  episodeCount: 0,
+                  status: null,
                 });
               }
 
@@ -148,17 +157,33 @@ async function DisplaySeason(props: {
                   className="flex flex-col bg-slate-900 text-white"
                 >
                   <h3 className="py-1 text-center text-xl">{season.name}</h3>
-                  <Image
-                    src={TMDB_IMAGE_URL(season.poster_path)}
-                    width={150}
-                    height={300}
-                    alt={`Poster ${season.name}`}
-                    className="object-fill"
-                  />
+                  <div className="sticky">
+                    <Image
+                      src={TMDB_IMAGE_URL(season.poster_path)}
+                      width={150}
+                      height={300}
+                      alt={`Poster ${season.name}`}
+                      className="object-fill"
+                    />
+                    <p className="absolute right-1 top-1 flex w-fit flex-col rounded-sm bg-white p-1 text-xs font-bold text-black">
+                      <p>{watchedS?.status}</p>
+                      <p className="ml-auto">
+                        {watchedS?.status === "WATCHING" ? (
+                          <>
+                            <span>{watchedS?.episodeWatched}</span> /
+                            <span>{season.episode_count}</span>
+                          </>
+                        ) : null}
+                      </p>
+                    </p>
+                  </div>
                   {loggedIn ? (
                     <div className="mt-auto flex h-12 flex-row justify-around">
                       {watchedS?.status != "COMPLETED" ? (
-                        <form action={handleForm}>
+                        <form
+                          className="flex h-full w-full items-center justify-center bg-green-600"
+                          action={addAll}
+                        >
                           <button className="flex h-full w-full items-center justify-center bg-green-600">
                             <AddIcon />
                           </button>
@@ -175,9 +200,14 @@ async function DisplaySeason(props: {
                         />
                       </button>
                       {watchedS?.status != null && watchedS != undefined ? (
-                        <button className="flex h-full w-full items-center justify-center bg-red-600">
-                          <TrashIcon />
-                        </button>
+                        <form
+                          className="flex h-full w-full items-center justify-center bg-red-600"
+                          action={removeAll}
+                        >
+                          <button className="flex h-full w-full items-center justify-center bg-red-600">
+                            <TrashIcon />
+                          </button>
+                        </form>
                       ) : null}
                     </div>
                   ) : null}

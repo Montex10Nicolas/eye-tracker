@@ -4,6 +4,7 @@ import {
   type seriesTable,
   type seriesWatchedTable,
   type userInfoTable,
+  type userTable,
 } from "./schema";
 
 export interface DBErorr extends Error {
@@ -17,7 +18,12 @@ export type StatusWatchedType =
   | "PLANNING"
   | "WATCHING"
   | "COMPLETED"
-  | "DROPPED";
+  | "DROPPED"
+  | null;
+
+export type DBUserType = typeof userTable.$inferSelect;
+
+export type DBUserInfoType = typeof userInfoTable.$inferSelect;
 
 export type DBSerieType = typeof seriesTable.$inferSelect;
 

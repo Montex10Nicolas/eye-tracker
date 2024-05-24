@@ -16,6 +16,7 @@ import {
   type DBSeasonWatchedType,
   type DBSerieType,
   type DBSerieWatchedType,
+  type DBUserInfoType,
   type SerieType,
   type SeriesWatchedTableType,
   type StatusWatchedType,
@@ -31,9 +32,11 @@ import {
 } from "~/types/tmdb_detail";
 
 export async function getOrCreateInfo(userId: string) {
-  let info: UserInfo | undefined = await db.query.userInfoTable.findFirst({
-    where: (user, { eq }) => eq(userInfoTable.userId, userId),
-  });
+  let info: DBUserInfoType | undefined = await db.query.userInfoTable.findFirst(
+    {
+      where: (user, { eq }) => eq(userInfoTable.userId, userId),
+    },
+  );
 
   if (info === undefined) {
     const temp = await db
@@ -522,18 +525,24 @@ export async function updateOrCreateSeasonWatch(
   serieId: string,
   userId: string,
   updateInfo: UpdateSeasonWatchData,
-) {
+): Promise<[DBSeasonWatchedType, DBSeasonWatchedType]> {
   const season = await getOrCreateTVSeasonWatched(userId, serieId, seasonId);
 
   const { episodeCount, status } = updateInfo;
 
-  await db
+  const newData = await db
     .update(seasonWatchedTable)
     .set({
       status: status,
       episodeWatched: episodeCount,
     })
-    .where(eq(seasonWatchedTable.id, season.id));
+    .where(eq(seasonWatchedTable.id, season.id))
+    .returning();
+  if (newData[0] === undefined) throw new Error("I can newData be undefined");
+
+  const post = newData[0];
+
+  return [season, post];
 }
 
 export async function checkIfSeasonIsCompleted(
@@ -615,15 +624,15 @@ export async function updateInfoWatchComp(userId: string) {
     where: (serie, { eq, and, or }) =>
       and(
         eq(serie.userId, userId),
-        or(eq(serie.status, "completed"), eq(serie.status, "watching")),
+        or(eq(serie.status, "COMPLETED"), eq(serie.status, "WATCHING")),
       ),
   });
 
   let watching = 0,
     completed = 0;
   for (const res of all) {
-    if (res.status === "watching") watching++;
-    if (res.status === "completed") completed++;
+    if (res.status === "WATCHING") watching++;
+    if (res.status === "COMPLETED") completed++;
   }
 
   await db
