@@ -8,12 +8,9 @@ import { cache } from "react";
 import { lucia } from "~/lib/auth";
 import { db } from "~/server/db";
 import {
-  episodeWatchedTable,
   seasonWatchedTable,
   userInfoTable,
   userTable,
-  type episodeTable,
-  type seasonTable,
   type seriesTable,
   type seriesWatchedTable,
 } from "~/server/db/schema";
@@ -234,35 +231,6 @@ export async function myWatchedSeason(userId: string | undefined) {
   return await db.query.seasonWatchedTable.findMany({
     where: (_, { eq }) => eq(seasonWatchedTable.userId, userId),
   });
-}
-
-export type LatestWatchedEpisodes = typeof episodeWatchedTable.$inferSelect & {
-  episode: typeof episodeTable.$inferSelect & {
-    season: typeof seasonTable.$inferSelect;
-  };
-};
-
-export async function getLatestWatchedEpisodes(
-  userId: string,
-  LIMIT = 25,
-  OFFSET = 0,
-) {
-  const results: LatestWatchedEpisodes[] =
-    await db.query.episodeWatchedTable.findMany({
-      where: (ep, { eq }) => eq(ep.userId, userId),
-      limit: LIMIT,
-      offset: OFFSET,
-      orderBy: desc(episodeWatchedTable.watchedAt),
-      with: {
-        episode: {
-          with: {
-            season: true,
-          },
-        },
-      },
-    });
-
-  return results;
 }
 
 export interface MyMovieType {

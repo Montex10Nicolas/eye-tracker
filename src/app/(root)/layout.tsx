@@ -8,7 +8,7 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export function AppRootLayout({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <section>
       <DisplaySearchMultiple />
