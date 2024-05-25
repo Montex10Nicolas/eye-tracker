@@ -156,7 +156,7 @@ export async function queryTMDBSeasonDetail(
   return data as SeasonDetail;
 }
 
-export async function queryTMDBTVProvider(type: "tv" | "movie", id: number) {
+export async function queryTMDBProvider(type: "tv" | "movie", id: number) {
   const url = new URL(`3/${type}/${id}/watch/providers`, TMDB_URL);
   const response = await fetch(url, {
     ...Headers,

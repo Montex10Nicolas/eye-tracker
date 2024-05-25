@@ -6,7 +6,7 @@ import {
   type DBSeasonWatchedType,
   type DBSerieWatchedType,
 } from "~/server/db/types";
-import { queryTMDBTVDetail, queryTMDBTVProvider } from "~/server/queries";
+import { queryTMDBProvider, queryTMDBTVDetail } from "~/server/queries";
 import { type Season, type Serie, type User } from "~/types/tmdb_detail";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
 import { AddIcon, TrashIcon } from "../../_components/Icons";
@@ -27,7 +27,7 @@ async function DisplayInfo(props: {
   const poster_url = tv.poster_path;
   const tvId = tv.id;
 
-  const providers = await queryTMDBTVProvider("tv", tvId);
+  const providers = await queryTMDBProvider("tv", tvId);
 
   return (
     <section className="relative flex flex-row gap-4 overflow-hidden rounded-md border border-white bg-transparent p-4 text-white">

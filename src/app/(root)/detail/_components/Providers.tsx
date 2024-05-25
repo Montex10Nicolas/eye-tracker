@@ -52,7 +52,7 @@ function DisplayProvider(props: {
   if (colLen > 4) colLen = 4;
 
   return (
-    <div className={`grid  grid-cols-${colLen} justify-center gap-2`}>
+    <div className={`grid grid-cols-${colLen} gap-2`}>
       {final.map((prov) => {
         return (
           <div key={prov.provider_id}>
