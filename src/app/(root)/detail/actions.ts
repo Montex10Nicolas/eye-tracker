@@ -2,10 +2,6 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
-<<<<<<< HEAD
-  getOrCreateEpisodes,
-=======
->>>>>>> main
   getOrCreateTVSeason,
   getOrCreateTVSeriesWatched,
   updateInfo,
@@ -239,19 +235,4 @@ export async function addEpisodeToSeasonWatched(
   await updateInfoWatchComp(userId);
 
   revalidatePath(`/detail/tv/${serie.id}`);
-<<<<<<< HEAD
-}
-
-export async function returnEpisodesFromSeason(
-  serieId: string,
-  seasonId: string,
-  season: Season,
-  serieName: string,
-) {
-  await getOrCreateTVSeason(seasonId, season, serieId, serieName);
-
-  const episodes = await getOrCreateEpisodes(serieId, seasonId, season);
-  return episodes;
-=======
->>>>>>> main
 }
