@@ -6,7 +6,7 @@ import {
   type DBSeasonWatchedType,
   type DBSerieWatchedType,
 } from "~/server/db/types";
-import { queryTMDBTVDetail } from "~/server/queries";
+import { queryTMDBTVDetail, queryTMDBTVProvider } from "~/server/queries";
 import { type Season, type Serie, type User } from "~/types/tmdb_detail";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
 import { AddIcon, TrashIcon } from "../../_components/Icons";
@@ -25,6 +25,9 @@ async function DisplayInfo(props: {
   const { tv } = props;
   const back_url = tv.backdrop_path;
   const poster_url = tv.poster_path;
+  const tvId = tv.id;
+
+  const providers = await queryTMDBTVProvider("tv", tvId);
 
   return (
     <section className="relative flex flex-row gap-4 overflow-hidden rounded-md border border-white bg-transparent p-4 text-white">
@@ -38,8 +41,8 @@ async function DisplayInfo(props: {
             priority
             className="w-full object-cover"
           />
-          <div className="grid w-full grid-flow-col gap-5 p-1 [&>*]:overflow-hidden [&>*]:rounded-md">
-            <Provider id={tv.id} type="tv" />
+          <div className="mt-2">
+            <Provider providers={providers.results} />
           </div>
         </div>
       </div>
@@ -123,7 +126,7 @@ async function DisplaySeason(props: {
 
       <section className="mt-4">
         <ScrollArea className="h-[630px]">
-          <div className="flex flex-row flex-wrap justify-around gap-4">
+          <div className="flex flex-row flex-wrap justify-start gap-4">
             {seasons.map((season) => {
               const watchedS = seasonsWatched?.find(
                 (s) => s.seasonId === season.id.toString(),

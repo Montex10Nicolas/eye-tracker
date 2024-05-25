@@ -8,6 +8,7 @@ import {
   type SeasonDetail,
   type Serie,
   type TVResultType,
+  type WatchProvider,
 } from "~/types/tmdb_detail";
 
 export const TMDB_URL = "https://api.themoviedb.org";
@@ -153,4 +154,13 @@ export async function queryTMDBSeasonDetail(
 
   const data: unknown = await response.json();
   return data as SeasonDetail;
+}
+
+export async function queryTMDBTVProvider(type: "tv" | "movie", id: number) {
+  const url = new URL(`3/${type}/${id}/watch/providers`, TMDB_URL);
+  const response = await fetch(url, {
+    ...Headers,
+  });
+
+  return (await response.json()) as WatchProvider;
 }
