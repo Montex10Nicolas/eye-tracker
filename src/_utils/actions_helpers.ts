@@ -1,10 +1,7 @@
 import { and, eq } from "drizzle-orm";
-import { generateId } from "lucia";
 import { type UpdateSeasonWatchData } from "~/app/(root)/detail/actions";
 import { db } from "~/server/db";
 import {
-  episodeTable,
-  episodeWatchedTable,
   moviesTable,
   seasonTable,
   seasonWatchedTable,
@@ -18,14 +15,7 @@ import {
   type DBUserInfoType,
   type StatusWatchedType,
 } from "~/server/db/types";
-import { queryTMDBSeasonDetail } from "~/server/queries";
-import {
-  type Episode,
-  type MovieDetail,
-  type Season,
-  type SeasonDetail,
-  type Serie,
-} from "~/types/tmdb_detail";
+import { type MovieDetail, type Season, type Serie } from "~/types/tmdb_detail";
 
 export async function getOrCreateInfo(userId: string) {
   let info: DBUserInfoType | undefined = await db.query.userInfoTable.findFirst(
@@ -259,142 +249,6 @@ async function createTVSeason(
   return season_db[0];
 }
 
-async function createSingleEpisode(seasonId: string, episode: Episode) {
-  const ep_id = episode.id.toString();
-
-  const res = await db
-    .insert(episodeTable)
-    .values({
-      id: ep_id,
-      seasonId: seasonId,
-      episodeDate: episode,
-    })
-    .returning();
-  if (res[0] === undefined) {
-    throw new Error("episode should not be undefined");
-  }
-  return res[0];
-}
-
-async function createMultiEpisode(season: Season, serieId: string) {
-  "use server";
-  const seasonId = season.id.toString();
-  const seasonDet: SeasonDetail = await queryTMDBSeasonDetail(
-    serieId,
-    season.season_number,
-  );
-
-  const episodes: { id: string; seasonId: string; episodeDate: Episode }[] = [];
-  for (const episode of seasonDet.episodes) {
-    const ep_db = await createSingleEpisode(seasonId, episode);
-    episodes.push(ep_db);
-  }
-
-  return episodes;
-}
-
-async function createEpisodeWatched(
-  userId: string,
-  episodeId: string,
-  seasonId: string,
-  duration: number,
-) {
-  const ep_watched = await db
-    .insert(episodeWatchedTable)
-    .values({
-      id: generateId(32),
-      duration: duration,
-      episodeId: episodeId,
-      userId: userId,
-      seasonId: seasonId,
-    })
-    .returning();
-
-  if (ep_watched[0] !== undefined) return ep_watched[0];
-}
-
-async function getOrCreateEpisodeWatched(
-  userId: string,
-  seasonId: string,
-  episode: Episode,
-) {
-  const epId = episode.id.toString();
-
-  let episodeWatch = await db.query.episodeWatchedTable.findFirst({
-    where: (ses, { and, eq }) =>
-      and(eq(ses.userId, userId), eq(ses.episodeId, epId)),
-  });
-
-  if (episodeWatch === undefined) {
-    const episode_duration = episode.runtime ?? 0;
-    episodeWatch = await createEpisodeWatched(
-      userId,
-      epId,
-      seasonId,
-      episode_duration,
-    );
-
-    // This is probably bad but it will do for now
-    await updateInfo(userId, 0, 0, episode_duration, 0, 0);
-  }
-
-  return episodeWatch;
-}
-
-export async function createEpisodesWatched(
-  userId: string,
-  seasonId: string,
-  episodes: Episode[],
-) {
-  let ep_count = 0,
-    duration = 0;
-  for (const episode of episodes) {
-    const added = await getOrCreateEpisodeWatched(userId, seasonId, episode);
-
-    if (added) {
-      ep_count++;
-      duration += episode.runtime ?? 0;
-    }
-  }
-
-  await updateInfo(userId, 0, 0, duration, ep_count, 0, 0);
-}
-
-async function deleteSingleEpisodeWatched(
-  userId: string,
-  seasonId: string,
-  episode: Episode,
-) {
-  const episodeId = episode.id.toString();
-  const episodeWatched = await db.query.episodeWatchedTable.findFirst({
-    where: (ep) => and(eq(ep.episodeId, episodeId), eq(ep.userId, userId)),
-  });
-
-  if (episodeWatched === undefined) return;
-  const deleteRecord = await db
-    .delete(episodeWatchedTable)
-    .where(eq(episodeWatchedTable.id, episodeWatched.id))
-    .returning();
-  if (deleteRecord[0] === undefined) return;
-  const episodeDeleted = deleteRecord[0];
-  const duration = -episodeDeleted.duration;
-
-  await updateInfo(userId, 0, 0, duration, -1, 0, 0);
-}
-
-export async function createOrDeleteEpisodeWatched(
-  userId: string,
-  seasonId: string,
-  episode: Episode,
-  add: boolean,
-) {
-  if (add) {
-    await getOrCreateEpisodeWatched(userId, seasonId, episode);
-  } else {
-    await deleteSingleEpisodeWatched(userId, seasonId, episode);
-  }
-}
-
 export async function getOrCreateTVSeason(
   seasonId: string,
   season: Season,
@@ -412,22 +266,6 @@ export async function getOrCreateTVSeason(
   return seasonDB;
 }
 
-export async function getOrCreateEpisodes(
-  serieId: string,
-  seasonId: string,
-  season: Season,
-) {
-  let episode_db = await db.query.episodeTable.findMany({
-    where: (ep, { eq }) => eq(ep.seasonId, seasonId),
-  });
-
-  if (episode_db === undefined || episode_db.length === 0) {
-    episode_db = await createMultiEpisode(season, serieId);
-  }
-
-  return episode_db;
-}
-
 // Create series, season and episode data if they don't exist
 export async function getOrCreateFullTVData(season: Season, serie: Serie) {
   "use server";
@@ -441,12 +279,10 @@ export async function getOrCreateFullTVData(season: Season, serie: Serie) {
     serieId,
     serie.name,
   );
-  const episodes = await getOrCreateEpisodes(serieId, seasonId, season);
 
   return {
     serie: serie_db,
     season: season_db,
-    episodes: episodes,
   };
 }
 
@@ -559,18 +395,7 @@ export async function checkIfSeasonIsCompleted(
 
   const ep_count = season.season.season_data.episode_count;
 
-  const episodes = await db.query.episodeWatchedTable.findMany({
-    with: {
-      episode: true,
-    },
-    where: (epWa, { and, eq }) =>
-      and(eq(epWa.userId, userId), eq(episodeTable.seasonId, seasonId)),
-  });
-
-  return {
-    isSeasonCompleted: ep_count === episodes.length,
-    episodeCount: episodes.length,
-  };
+  return ep_count === season.episodeWatched;
 }
 
 export async function checkIfSerieIsCompleted(userId: string, serieId: string) {

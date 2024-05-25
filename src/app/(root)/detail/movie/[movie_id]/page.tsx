@@ -3,15 +3,20 @@ import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { Separator } from "~/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
   queryTMDBMovieDetail,
   queryTMDBMovieRecomendation,
+<<<<<<< HEAD
 } from "~/server/queries";
 import { type MovieDetail, type Serie, type User } from "~/types/tmdb_detail";
+=======
+  queryTMDBProvider,
+} from "~/server/queries";
+import { type MovieDetail, type User } from "~/types/tmdb_detail";
+>>>>>>> main
 import { DisplayGenres, DisplayMovies } from "../../_components/Display";
-import Provider from "../../_components/Providers";
+import { default as Provider } from "../../_components/Providers";
 import { DisplayCastCrew } from "../../_components/Summary";
 import {
   addToMovieWatched,
@@ -19,35 +24,55 @@ import {
   removeFromMovieWatched,
 } from "../../actions";
 
+async function addMovie(user: User | null, movie: MovieDetail) {
+  "use server";
+
+  if (user === null) {
+    return;
+  }
+  const userId = user.id;
+  const movieId = movie.id;
+
+  await addToMovieWatched(userId, movie);
+  revalidatePath(`/detail/movie${movieId}`);
+}
+
+async function removeMovie(user: User | null, movie: MovieDetail) {
+  "use server";
+
+  if (user === null) {
+    throw new Error("hello user not logged in");
+  }
+
+  const userId = user.id;
+  const movieId = movie.id;
+  await removeFromMovieWatched(userId, movie);
+  revalidatePath(`/detail/movie${movieId}`);
+}
+
 async function DisplayInfo(props: { movie: MovieDetail; user: User | null }) {
   const { movie, user } = props;
-  const background_url = movie.backdrop_path;
   const isLogged = user !== null;
+
+  const background_url = movie.backdrop_path;
 
   let watched = false;
   if (isLogged) {
     watched = await checkMovieWatched(user.id, movie.id.toString());
   }
 
-  async function addMovie() {
-    "use server";
+  const providers = await queryTMDBProvider("movie", movie.id);
 
-    if (!user) {
-      return "need to be logged in";
-    }
-    await addToMovieWatched(user.id, movie, false);
-    revalidatePath(`/detail/movie${movie.id}`);
+  async function add() {
+    "use server";
+    await addMovie(user, movie);
   }
 
-  async function removeMovie() {
+  async function remove() {
     "use server";
-
-    if (!user) {
-      return "need to be logged in";
-    }
-    await removeFromMovieWatched(user.id, movie);
-    revalidatePath(`/detail/movie${movie.id}`);
+    await removeMovie(user, movie);
   }
+
   return (
     <section className="relative flex flex-row gap-4 overflow-hidden rounded-md border border-white bg-transparent p-4 text-white">
       <div className="flex max-w-40 shrink-0 flex-col gap-2">
@@ -60,8 +85,8 @@ async function DisplayInfo(props: { movie: MovieDetail; user: User | null }) {
             priority
             className="w-full object-cover"
           />
-          <div className="flex  gap-2 p-1 [&>*]:overflow-hidden">
-            <Provider id={movie.id} type="movie" />
+          <div className="mt-2">
+            <Provider providers={providers.results} />
           </div>
         </div>
       </div>
@@ -102,34 +127,36 @@ async function DisplayInfo(props: { movie: MovieDetail; user: User | null }) {
         <p className="mb-4 mt-auto">
           <span className=" text-slate-300">Overview: </span> {movie.overview}
         </p>
-        <form className="flex flex-row items-center justify-around gap-4">
-          {!watched ? (
-            <button
-              className="uppser w-full rounded-sm bg-green-700 px-4 py-2
-          font-semibold uppercase"
-              formAction={addMovie}
-            >
-              Add
-            </button>
-          ) : (
-            <>
+        {isLogged ? (
+          <form className="flex flex-row items-center justify-around gap-4">
+            {!watched ? (
               <button
                 className="uppser w-full rounded-sm bg-green-700 px-4 py-2
           font-semibold uppercase"
-                formAction={addMovie}
+                formAction={add}
               >
-                rewatch
+                Add
               </button>
-              <button
-                className="uppser w-full rounded-sm bg-red-700 px-4 py-2
+            ) : (
+              <>
+                <button
+                  className="uppser w-full rounded-sm bg-green-700 px-4 py-2
           font-semibold uppercase"
-                formAction={removeMovie}
-              >
-                remove
-              </button>
-            </>
-          )}
-        </form>
+                  formAction={add}
+                >
+                  rewatch
+                </button>
+                <button
+                  className="uppser w-full rounded-sm bg-red-700 px-4 py-2
+          font-semibold uppercase"
+                  formAction={remove}
+                >
+                  remove
+                </button>
+              </>
+            )}
+          </form>
+        ) : null}
       </div>
 
       <img

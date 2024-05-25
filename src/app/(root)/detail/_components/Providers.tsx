@@ -1,6 +1,7 @@
+"use client";
+import { useState, type ChangeEvent } from "react";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
-import { Headers, TMDB_URL } from "~/server/queries";
-import { type FlatRentBuy, type WatchProvider } from "~/types/tmdb_detail";
+import { type FlatRentBuy, type ProviderResult } from "~/types/tmdb_detail";
 
 function fixProvider(
   flatrate: FlatRentBuy[] | undefined,
@@ -28,47 +29,64 @@ function fixProvider(
   return final;
 }
 
-async function getProvider(type: "tv" | "movie", id: number) {
-  const url = new URL(`3/${type}/${id}/watch/providers`, TMDB_URL);
-  const response = await fetch(url, {
-    ...Headers,
-  });
+function DisplayProvider(props: { provider: ProviderResult | undefined }) {
+  const { provider } = props;
 
-  return (await response.json()) as WatchProvider;
-}
+  if (provider === undefined) return <div>Not available in your country</div>;
 
-export default async function Provider(props: {
-  id: number;
-  type: "tv" | "movie";
-}) {
-  const { id, type } = props;
-
-  const providers = await getProvider(type, id);
-  const {
-    results: { IT },
-  } = providers;
-
-  if (IT === undefined) {
-    return <div>Not available in your country</div>;
-  }
-
-  const { flatrate, buy, rent } = IT;
+  const { flatrate, buy, rent } = provider;
   const final = fixProvider(flatrate, buy, rent);
 
-  // Empty element so I can apply style on parten div wrapper
+  let colLen = final.length;
+  if (colLen > 4) colLen = 4;
+
   return (
-    <>
-      {final.map((provider) => {
+    <div className={`grid grid-cols-${colLen} gap-2`}>
+      {final.map((prov) => {
         return (
-          <div key={provider.provider_id}>
+          <div key={prov.provider_id}>
             <img
-              className="border border-slate-800"
-              src={TMDB_IMAGE_URL(provider.logo_path)}
-              alt={provider.provider_name}
+              className="rounded-sm border border-slate-800 object-fill"
+              src={TMDB_IMAGE_URL(prov.logo_path)}
+              alt={prov.provider_name}
             />
           </div>
         );
       })}
-    </>
+    </div>
+  );
+}
+
+export default function Provider(props: {
+  providers: Record<string, ProviderResult>;
+}) {
+  const { providers } = props;
+
+  const [country, setCountry] = useState<string>("IT");
+  const providerData = providers[country];
+
+  function handleChange(event: ChangeEvent<HTMLSelectElement>) {
+    const value = event.target.value;
+    setCountry(value.toUpperCase());
+  }
+
+  const keys = Object.keys(providers);
+
+  return (
+    <div className="flex flex-col gap-2">
+      <select
+        onChange={handleChange}
+        value={country}
+        className="cursor-pointer rounded-sm bg-white px-4 py-2 text-center text-black"
+      >
+        {keys.map((key) => {
+          const provider = providers[key];
+          if (provider === undefined)
+            return <div key={key}>{key} undefined</div>;
+          return <option key={key}>{key}</option>;
+        })}
+      </select>
+      <DisplayProvider provider={providerData} />
+    </div>
   );
 }

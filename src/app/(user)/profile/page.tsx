@@ -1,12 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
-import {
-  getLatestWatchedEpisodes,
-  getUser,
-  myInfo,
-  type LatestWatchedEpisodes,
-} from "~/app/(user)/user_action";
+import { getUser, myInfo } from "~/app/(user)/user_action";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { type DBUserInfoType } from "~/server/db/types";
 import { type User } from "~/types/tmdb_detail";
@@ -121,69 +116,6 @@ async function DisplayMovie(props: { user: User }) {
   );
 }
 
-async function DisplayEpisode(props: { latest: LatestWatchedEpisodes }) {
-  const { latest } = props;
-
-  const { episode } = latest;
-  const { season } = episode;
-
-  return (
-    <div className="w-40">
-      <div>
-        <Image
-          src={TMDB_IMAGE_URL(episode.episodeDate.still_path)}
-          width={250}
-          height={250}
-          alt={`${episode.episodeDate.name}`}
-          className="aspect-video"
-        />
-      </div>
-
-      <div className="">
-        <span>{season.serieName}</span>
-        <div className="space-x-2">
-          <span className="ml-auto">{season.seasonName}</span>
-          <span className="ml-auto">
-            Episode: {episode.episodeDate.episode_number}
-          </span>
-        </div>
-      </div>
-
-      <div>{latest.watchedAt.toDateString()}</div>
-    </div>
-  );
-}
-
-async function DisplayEpisodes(props: { user: User }) {
-  const { user } = props;
-  const LIMIT = 25,
-    offset = 0;
-  const episodes = await getLatestWatchedEpisodes(user.id, LIMIT, offset);
-  const hasTv = episodes.length !== 0;
-
-  if (!hasTv) {
-    return (
-      <section>
-        <div>You have no episode watched</div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="mx-4 rounded-md bg-white p-4 text-black">
-      <h1 className="text-xl font-semibold">Latest watched episode:</h1>
-      <ScrollArea>
-        <div className="mt-2 flex h-60 gap-4">
-          {episodes.map((episode) => (
-            <DisplayEpisode key={episode.id} latest={episode} />
-          ))}
-        </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-    </section>
-  );
-}
-
 export default async function Page() {
   const user = await getUser();
   let info: DBUserInfoType;
@@ -213,7 +145,6 @@ export default async function Page() {
     <main className="flex flex-col">
       <Summary user={user} info={info} />
       <DisplayMovie user={user} />
-      <DisplayEpisodes user={user} />
     </main>
   );
 }

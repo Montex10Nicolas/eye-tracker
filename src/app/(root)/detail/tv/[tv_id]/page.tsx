@@ -6,7 +6,7 @@ import {
   type DBSeasonWatchedType,
   type DBSerieWatchedType,
 } from "~/server/db/types";
-import { queryTMDBTVDetail } from "~/server/queries";
+import { queryTMDBProvider, queryTMDBTVDetail } from "~/server/queries";
 import { type Season, type Serie, type User } from "~/types/tmdb_detail";
 import { DisplayCredits, DisplayGenres } from "../../_components/Display";
 import { AddIcon, TrashIcon } from "../../_components/Icons";
@@ -25,6 +25,9 @@ async function DisplayInfo(props: {
   const { tv } = props;
   const back_url = tv.backdrop_path;
   const poster_url = tv.poster_path;
+  const tvId = tv.id;
+
+  const providers = await queryTMDBProvider("tv", tvId);
 
   return (
     <section className="relative flex flex-row gap-4 overflow-hidden rounded-md border border-white bg-transparent p-4 text-white">
@@ -38,8 +41,8 @@ async function DisplayInfo(props: {
             priority
             className="w-full object-cover"
           />
-          <div className="grid w-full grid-flow-col gap-5 p-1 [&>*]:overflow-hidden [&>*]:rounded-md">
-            <Provider id={tv.id} type="tv" />
+          <div className="mt-2">
+            <Provider providers={providers.results} />
           </div>
         </div>
       </div>
@@ -52,7 +55,7 @@ async function DisplayInfo(props: {
         </div>
 
         <div className="flex flex-col flex-wrap gap-3">
-          <p className="flex w-full flex-row flex-wrap justify-start gap-x-4 gap-y-2 md:w-[70%]">
+          <div className="flex w-full flex-row flex-wrap justify-start gap-x-4 gap-y-2 md:w-[70%]">
             <p>
               <span className="italic text-slate-300">Language(s): </span>
               <span>{tv.languages.join("-").toUpperCase()}</span>
@@ -77,7 +80,7 @@ async function DisplayInfo(props: {
               <span className="italic text-slate-300"> To: </span>
               <span>{displayHumanDate(tv.last_air_date)}</span>
             </p>
-          </p>
+          </div>
         </div>
 
         <div>
@@ -123,7 +126,7 @@ async function DisplaySeason(props: {
 
       <section className="mt-4">
         <ScrollArea className="h-[630px]">
-          <div className="flex flex-row flex-wrap justify-around gap-4">
+          <div className="flex flex-row flex-wrap justify-start gap-4">
             {seasons.map((season) => {
               const watchedS = seasonsWatched?.find(
                 (s) => s.seasonId === season.id.toString(),
@@ -239,7 +242,6 @@ export default async function Page(props: { params: { tv_id: string } }) {
         seasons={tv.seasons}
         seasonsWatched={seriesAndSeasonWatched?.seasons}
       />
-
       <DisplayCredits credits={tv.credits} />
     </div>
   );

@@ -14,12 +14,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { generateId } from "lucia";
-import {
-  type Episode,
-  type MovieDetail,
-  type Season,
-  type Serie,
-} from "~/types/tmdb_detail";
+import { type MovieDetail, type Season, type Serie } from "~/types/tmdb_detail";
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -180,8 +175,7 @@ export const seasonTable = createTable("tv-season", {
   episodeCount: integer("episode_count").notNull(),
 });
 
-export const seasonRelations = relations(seasonTable, ({ one, many }) => ({
-  episodes: many(episodeTable),
+export const seasonRelations = relations(seasonTable, ({ one }) => ({
   series: one(seriesTable, {
     references: [seriesTable.id],
     fields: [seasonTable.seriesId],
@@ -234,67 +228,6 @@ export const seasonWatchedRelations = relations(
     serieWatch: one(seriesWatchedTable, {
       references: [seriesWatchedTable.id],
       fields: [seasonWatchedTable.serieWatch],
-    }),
-  }),
-);
-
-export const episodeTable = createTable("tv-episode", {
-  id: varchar("id", {
-    length: 256,
-  }).primaryKey(),
-  seasonId: varchar("season_id", { length: 256 })
-    .notNull()
-    .references(() => seasonTable.id, {
-      onUpdate: "cascade",
-      onDelete: "cascade",
-    }),
-  episodeDate: json("episode_date").$type<Episode>().notNull(),
-});
-
-export const episodeRelations = relations(episodeTable, ({ many, one }) => ({
-  watchedBy: many(episodeWatchedTable),
-  season: one(seasonTable, {
-    fields: [episodeTable.seasonId],
-    references: [seasonTable.id],
-  }),
-}));
-
-export const episodeWatchedTable = createTable("tv-episode-watched", {
-  id: varchar("id").primaryKey(),
-  userId: varchar("user_id", { length: 256 })
-    .notNull()
-    .references(() => userTable.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  seasonId: varchar("season_id", { length: 256 })
-    .notNull()
-    .references(() => seasonTable.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  episodeId: varchar("episode_id", { length: 256 })
-    .notNull()
-    .references(() => episodeTable.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  duration: smallint("duration").notNull().default(-1),
-  watchedAt: timestamp("watched_at")
-    .notNull()
-    .default(sql`timezone('utc', now())`),
-});
-
-export const episodeWatRelations = relations(
-  episodeWatchedTable,
-  ({ one }) => ({
-    user: one(userTable, {
-      fields: [episodeWatchedTable.userId],
-      references: [userTable.id],
-    }),
-    episode: one(episodeTable, {
-      fields: [episodeWatchedTable.episodeId],
-      references: [episodeTable.id],
     }),
   }),
 );

@@ -402,7 +402,7 @@ export interface SpokenLanguage {
 // WatchProviders
 export interface WatchProvider {
   id: number;
-  results: Record<"US" | "IT", ProviderResult>;
+  results: Record<string, ProviderResult>;
 }
 
 export interface ProviderResult {
