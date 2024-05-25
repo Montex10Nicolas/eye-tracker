@@ -1,15 +1,7 @@
 "use client";
-import { count } from "console";
-import Image from "next/image";
-import { useEffect, useState, type ChangeEvent } from "react";
-import Flags from "react-country-flag";
+import { useState, type ChangeEvent } from "react";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
-import { Headers, TMDB_URL } from "~/server/queries";
-import {
-  type FlatRentBuy,
-  type ProviderResult,
-  type WatchProvider,
-} from "~/types/tmdb_detail";
+import { type FlatRentBuy, type ProviderResult } from "~/types/tmdb_detail";
 
 function fixProvider(
   flatrate: FlatRentBuy[] | undefined,
@@ -37,11 +29,8 @@ function fixProvider(
   return final;
 }
 
-function DisplayProvider(props: {
-  country: string;
-  provider: ProviderResult | undefined;
-}) {
-  const { country: key, provider } = props;
+function DisplayProvider(props: { provider: ProviderResult | undefined }) {
+  const { provider } = props;
 
   if (provider === undefined) return <div>Not available in your country</div>;
 
@@ -88,7 +77,7 @@ export default function Provider(props: {
       <select
         onChange={handleChange}
         value={country}
-        className="cursor-pointer rounded-sm bg-white text-black"
+        className="cursor-pointer rounded-sm bg-white px-4 py-2 text-center text-black"
       >
         {keys.map((key) => {
           const provider = providers[key];
@@ -97,7 +86,7 @@ export default function Provider(props: {
           return <option key={key}>{key}</option>;
         })}
       </select>
-      <DisplayProvider country={country} provider={providerData} />
+      <DisplayProvider provider={providerData} />
     </div>
   );
 }
