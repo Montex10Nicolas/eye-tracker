@@ -55,7 +55,7 @@ async function DisplayInfo(props: {
         </div>
 
         <div className="flex flex-col flex-wrap gap-3">
-          <p className="flex w-full flex-row flex-wrap justify-start gap-x-4 gap-y-2 md:w-[70%]">
+          <div className="flex w-full flex-row flex-wrap justify-start gap-x-4 gap-y-2 md:w-[70%]">
             <p>
               <span className="italic text-slate-300">Language(s): </span>
               <span>{tv.languages.join("-").toUpperCase()}</span>
@@ -80,7 +80,7 @@ async function DisplayInfo(props: {
               <span className="italic text-slate-300"> To: </span>
               <span>{displayHumanDate(tv.last_air_date)}</span>
             </p>
-          </p>
+          </div>
         </div>
 
         <div>
@@ -242,7 +242,6 @@ export default async function Page(props: { params: { tv_id: string } }) {
         seasons={tv.seasons}
         seasonsWatched={seriesAndSeasonWatched?.seasons}
       />
-
       <DisplayCredits credits={tv.credits} />
     </div>
   );
