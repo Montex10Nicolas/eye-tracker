@@ -68,7 +68,7 @@ export async function updateInfo(
   await db
     .update(userInfoTable)
     .set({
-      movieCountTotal: newCount,
+      movieWatched: newCount,
       movieDurationTotal: newDuration,
       tvDurationTotal: newTvDuration,
       tvEpisodeCount: newTVCount,

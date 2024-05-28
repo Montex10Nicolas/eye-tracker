@@ -45,11 +45,24 @@ export const userInfoTable = createTable("user_info", {
     .notNull()
     .references(() => userTable.id, { onDelete: "cascade" }),
   movieDurationTotal: integer("movie_duration_total").notNull().default(0),
-  movieCountTotal: integer("movie_count_total").notNull().default(0),
+
+  movieWatched: integer("movie_watched").notNull().default(0),
+  moviePlanned: integer("movie_planned").notNull().default(0),
+
   tvDurationTotal: integer("tv_duration_total").notNull().default(0),
   tvEpisodeCount: integer("tv_episode_count").notNull().default(0),
+
   tvSerieCompleted: integer("tv_serie_completed").notNull().default(0),
-  tvSerieWatching: integer("tv_serie_Watching").notNull().default(0),
+  tvSerieWatching: integer("tv_serie_watching").notNull().default(0),
+  tvSeriePlanned: integer("tv_serie_planned").notNull().default(0),
+  tvSerieDropped: integer("tv_serie_dropped").notNull().default(0),
+  tvSeriePaused: integer("tv_serie_paused").notNull().default(0),
+
+  tvSeasonCompleted: integer("tv_serie_completed").notNull().default(0),
+  tvSeaonWatching: integer("tv_serie_watching").notNull().default(0),
+  tvSeasonPlanned: integer("tv_serie_planned").notNull().default(0),
+  tvSeasonDropped: integer("tv_serie_dropped").notNull().default(0),
+  tvSeasonPaused: integer("tv_serie_paused").notNull().default(0),
 });
 
 export const sessionTable = createTable("session", {
@@ -132,7 +145,6 @@ const SeasonStatusEnum: readonly [string, ...string[]] = [
   "DROPPED",
   "PAUSED",
 ];
-
 export const seriesWatchedTable = createTable("tv-series-watched", {
   id: serial_without_erros("id").primaryKey(),
   serieId: varchar("serie_id", { length: 256 })

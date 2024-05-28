@@ -91,7 +91,7 @@ export async function addToMovieWatched(userId: string, movie: MovieDetail) {
 
     await db
       .update(userInfoTable)
-      .set({ movieCountTotal: count, movieDurationTotal: duration })
+      .set({ movieWatched: count, movieDurationTotal: duration })
       .where(eq(userInfoTable.id, info.id));
   } catch (e: unknown) {
     const err = e as DBErorr;
@@ -155,7 +155,7 @@ export async function removeFromMovieWatched(
     await db
       .update(userInfoTable)
       .set({
-        movieCountTotal: runtime,
+        movieWatched: runtime,
         movieDurationTotal: time,
       })
       .where(eq(userInfoTable.userId, userId));
