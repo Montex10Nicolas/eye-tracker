@@ -102,6 +102,16 @@ export function SeasonForm(props: {
     close();
   }
 
+  async function handleRemove() {
+    await addEpisode(userId, serie, season, {
+      episodeCount: -1,
+      status: null,
+      started: null,
+      ended: null,
+    });
+    close();
+  }
+
   document.body.style.overflowY = "hidden";
 
   return (
@@ -132,7 +142,9 @@ export function SeasonForm(props: {
               className="w-[50%] cursor-pointer rounded-sm border border-gray-950 px-4 py-2 text-center"
               onChange={handleEpisodes}
             >
-              <option value="0">_</option>
+              <option value="0" disabled={true}>
+                0
+              </option>
               {ep_arr.map((_, index) => (
                 <option
                   className="cursor-pointer"
@@ -218,6 +230,12 @@ export function SeasonForm(props: {
               className="h-10 w-full rounded-sm bg-sky-500 font-bold uppercase text-white"
             >
               Save
+            </button>
+            <button
+              onClick={handleRemove}
+              className="h-10 w-full rounded-sm bg-red-800 font-bold uppercase text-white"
+            >
+              Remove
             </button>
             <button
               onClick={close}

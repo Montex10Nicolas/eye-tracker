@@ -1,4 +1,5 @@
 import { hash, verify } from "@node-rs/argon2";
+import { asc, desc } from "drizzle-orm";
 import { generateIdFromEntropySize } from "lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -7,12 +8,12 @@ import { cache } from "react";
 import { lucia } from "~/lib/auth";
 import { db } from "~/server/db";
 import {
+  seasonTable,
   seasonWatchedTable,
+  seriesWatchedTable,
   userInfoTable,
   userTable,
-  type seasonTable,
   type seriesTable,
-  type seriesWatchedTable,
 } from "~/server/db/schema";
 import {
   type DBSeasonType,
@@ -203,6 +204,7 @@ export async function myWatchedSeries(userId: string) {
         },
       },
     },
+    orderBy: asc(seriesWatchedTable.createdAt),
   });
   const series: SeriesAndSeasonWatched[] = [];
 
@@ -220,11 +222,8 @@ export async function myWatchedSeries(userId: string) {
         });
       if (seasonWatchRes === undefined) continue;
 
-      console.log(seasonWatchRes);
       season_watched.push(seasonWatchRes);
     }
-
-    console.log("watched: \n\n", season_watched);
 
     const a: SeriesAndSeasonWatched = {
       id: serie.id,

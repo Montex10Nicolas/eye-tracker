@@ -1,5 +1,5 @@
 import { and, desc, eq, sql } from "drizzle-orm";
-import { ADLaM_Display } from "next/font/google";
+import { ADLaM_Display, Seaweed_Script } from "next/font/google";
 import { type UpdateSeasonWatchData } from "~/app/(root)/detail/actions";
 import { db } from "~/server/db";
 import {
@@ -339,6 +339,34 @@ export async function updateSeasonWatch(
     .where(eq(seasonWatchedTable.id, seasonWatchId));
 }
 
+// DB the ID of the record not the seasonId
+export async function updateSeasonCompletition(DBSeasonID: number) {
+  const seasonWatch = await db.query.seasonWatchedTable.findFirst({
+    where: (ses, { eq }) => eq(ses.id, DBSeasonID),
+    with: {
+      season: true,
+    },
+  });
+  if (seasonWatch === undefined) {
+    throw new Error("How is undefined");
+  }
+
+  const status: StatusWatchedType =
+    seasonWatch.episodeWatched === 0
+      ? "PLANNING"
+      : seasonWatch.episodeWatched === seasonWatch.season.episodeCount
+        ? "COMPLETED"
+        : "WATCHING";
+
+  await db
+    .update(seasonWatchedTable)
+    .set({
+      status: status,
+      ended: null,
+    })
+    .where(eq(seasonWatchedTable.id, DBSeasonID));
+}
+
 export async function updateOrCreateOrDeleteSeasonWatch(
   seasonId: string,
   serieId: string,
@@ -350,7 +378,8 @@ export async function updateOrCreateOrDeleteSeasonWatch(
   const { episodeCount, status, started, ended } = updateInfo;
 
   // This means the user wants to delete the season record
-  if (episodeCount === 0) {
+  // This was also (episodeCount === 0) see if anything is broken
+  if (episodeCount === -1) {
     const deletedRecord = await db
       .delete(seasonWatchedTable)
       .where(

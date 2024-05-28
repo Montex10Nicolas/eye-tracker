@@ -147,7 +147,7 @@ async function DisplaySeason(props: {
                 "use server";
                 if (userId === undefined) return;
                 await addEpisodeToSeasonWatched(userId, tv, season, {
-                  episodeCount: 0,
+                  episodeCount: -1,
                   status: null,
                   started: null,
                   ended: null,

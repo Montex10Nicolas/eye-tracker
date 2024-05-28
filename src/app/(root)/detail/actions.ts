@@ -1,5 +1,5 @@
 "use server";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql, type SQL } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
   getOrCreateTVSeason,
@@ -8,17 +8,20 @@ import {
   updateInfo,
   updateInfoWatchComp,
   updateOrCreateOrDeleteSeasonWatch,
+  updateSeasonCompletition,
   updateSerieCompletition,
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
   movieWatchedTable,
   moviesTable,
+  seasonWatchedTable,
   userInfoTable,
 } from "~/server/db/schema";
 import {
   type DBErorr,
   type DBSeasonWatchedType,
+  type DBSerieType,
   type DBSerieWatchedType,
   type StatusWatchedType,
 } from "~/server/db/types";
@@ -201,6 +204,35 @@ export interface UpdateSeasonWatchData {
   status: StatusWatchedType;
   started?: Date | null;
   ended?: Date | null;
+}
+
+export async function addOrRemoveOneEpisode(
+  userId: string,
+  dbSeasonId: number,
+  serie: Serie,
+  episodeCount: 1 | -1,
+) {
+  await db
+    .update(seasonWatchedTable)
+    .set({
+      episodeWatched:
+        sql`${seasonWatchedTable.episodeWatched} + ${episodeCount}` as
+          | number
+          | SQL<unknown>,
+    })
+    .where(eq(seasonWatchedTable.id, dbSeasonId));
+
+  const serieId = serie.id.toString();
+
+  const ep_runtime = serie.episode_run_time[0];
+  const DEFAULT_RUNTIME = 40;
+  const runtime =
+    ep_runtime === undefined ? DEFAULT_RUNTIME : ep_runtime * episodeCount;
+
+  await updateSeasonCompletition(dbSeasonId);
+  await updateSerieCompletition(userId, serieId);
+  await updateInfo(userId, 0, 0, runtime, episodeCount, 0, 0);
+  await updateInfoWatchComp(userId);
 }
 
 export async function addEpisodeToSeasonWatched(

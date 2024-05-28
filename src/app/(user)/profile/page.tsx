@@ -1,11 +1,15 @@
+import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
-import { getOrCreateTVSeasonWatched } from "~/_utils/actions_helpers";
 import { TMDB_IMAGE_URL, addZero } from "~/_utils/utils";
+import {
+  addEpisodeToSeasonWatched,
+  addOrRemoveOneEpisode,
+} from "~/app/(root)/detail/actions";
+import { EditSeason } from "~/app/(root)/detail/tv/[tv_id]/_components/EditSeason";
 import {
   getUser,
   myInfo,
-  myWatchedSeason,
   myWatchedSeries,
   type seasonWatchWithSeason,
 } from "~/app/(user)/user_action";
@@ -15,18 +19,18 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/accordion";
+import { Progress } from "~/components/ui/progress";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
 import { type DBUserInfoType } from "~/server/db/types";
-import { type User } from "~/types/tmdb_detail";
+import { type Serie, type User } from "~/types/tmdb_detail";
 import { myWatchedMovie } from "../user_action";
 
 function generic(n: number, divident: number): [number, number] {
@@ -148,8 +152,12 @@ async function DispalyAllSeries(props: { user: User }) {
   const userId = user.id.toString();
   const seriesWatched = await myWatchedSeries(userId);
 
-  function DisplaySeason(props: { season: seasonWatchWithSeason[] }) {
-    const { season } = props;
+  function DisplaySeason(props: {
+    serie: Serie;
+    season: seasonWatchWithSeason[];
+  }) {
+    const { serie, season } = props;
+
     return (
       <>
         <Table>
@@ -160,6 +168,7 @@ async function DispalyAllSeries(props: { user: User }) {
               <TableHead>Started</TableHead>
               <TableHead>Ended</TableHead>
               <TableHead>Progress</TableHead>
+              <TableHead>Edit</TableHead>
               <TableHead>Link</TableHead>
             </TableRow>
           </TableHeader>
@@ -168,11 +177,27 @@ async function DispalyAllSeries(props: { user: User }) {
               const started =
                 ses.started === null
                   ? "not set"
-                  : new Date(ses.started).toDateString();
+                  : new Date(ses.started).toLocaleDateString();
+              ("default");
               const ended =
                 ses.ended === null
                   ? "not set"
-                  : new Date(ses.ended).toDateString();
+                  : new Date(ses.ended).toLocaleDateString();
+              ("default");
+
+              async function addOne() {
+                "use server";
+                const seasonID = ses.id;
+                await addOrRemoveOneEpisode(userId, seasonID, serie, 1);
+                revalidatePath("/profile");
+              }
+              async function removeOne() {
+                "use server";
+                const seasonID = ses.id;
+                await addOrRemoveOneEpisode(userId, seasonID, serie, -1);
+                revalidatePath("/profile");
+              }
+
               return (
                 <TableRow key={ses.id}>
                   <TableCell>
@@ -181,7 +206,7 @@ async function DispalyAllSeries(props: { user: User }) {
                       <Image
                         src={TMDB_IMAGE_URL(ses.season.season_data.poster_path)}
                         height={150}
-                        width={50}
+                        width={100}
                         alt={ses.season.season_data.name}
                       />
                     </div>
@@ -190,12 +215,54 @@ async function DispalyAllSeries(props: { user: User }) {
                   <TableCell>{started}</TableCell>
                   <TableCell>{ended}</TableCell>
                   <TableCell>
-                    <div>
-                      {ses.episodeWatched}/{ses.season.episodeCount}
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="flex w-full justify-between px-1">
+                        <form>
+                          <button
+                            formAction={removeOne}
+                            disabled={ses.episodeWatched === 0}
+                            className="h-8 w-8 rounded-full bg-gray-600/20 p-1 hover:bg-gray-600/60"
+                          >
+                            -
+                          </button>
+                        </form>
+                        {ses.episodeWatched}/{ses.season.episodeCount}
+                        <form>
+                          <button
+                            formAction={addOne}
+                            disabled={ses.status === "COMPLETED"}
+                            className="h-8 w-8 rounded-full bg-gray-600/20 p-1 hover:bg-gray-600/60 disabled:bg-red-400/90"
+                          >
+                            +
+                          </button>
+                        </form>
+                      </div>
+                      <Progress
+                        className="h-3 bg-blue-600"
+                        value={
+                          (ses.season.episodeCount * 100) / ses.episodeWatched
+                        }
+                      />
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Link href={`/detail/tv/${ses.serieId}`}>Detail</Link>
+                    <div className="flex h-full w-full items-center justify-center bg-sky-600">
+                      <EditSeason
+                        addEpisode={addEpisodeToSeasonWatched}
+                        serie={serie}
+                        season={ses.season.season_data}
+                        userId={user.id.toString()}
+                        season_w={ses}
+                      />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Link
+                      className="font-semibold text-blue-600 hover:underline"
+                      href={`/detail/tv/${ses.serieId}`}
+                    >
+                      Detail
+                    </Link>
                   </TableCell>
                 </TableRow>
               );
@@ -213,6 +280,15 @@ async function DispalyAllSeries(props: { user: User }) {
           const serieData = serieWatch.serie.serie_data;
           const seasonsWatched = serieWatch.seasonsWatched;
 
+          const started =
+            serieWatch.started === null
+              ? undefined
+              : new Date(serieWatch.started).toLocaleDateString();
+          const ended =
+            serieWatch.ended === null
+              ? undefined
+              : new Date(serieWatch.ended).toLocaleDateString();
+
           return (
             <Accordion type="single" collapsible key={serieData.id}>
               <AccordionItem value={`serie-${index}`}>
@@ -220,18 +296,18 @@ async function DispalyAllSeries(props: { user: User }) {
                   <div className="flex items-center gap-4">
                     <Image
                       src={TMDB_IMAGE_URL(serieData.poster_path)}
-                      width={50}
-                      height={150}
+                      width={100}
+                      height={250}
                       alt={serieData.name}
                     />
                     <div>{serieData.name}</div>
                     <div>{serieWatch.status}</div>
-                    <div>{serieWatch.started}</div>
-                    <div>{serieWatch.started}</div>
+                    <div>{started !== undefined && `Started: ${started}`}</div>
+                    <div>{ended !== undefined && `Ended: ${ended}`}</div>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <DisplaySeason season={seasonsWatched} />
+                  <DisplaySeason serie={serieData} season={seasonsWatched} />
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -243,9 +319,8 @@ async function DispalyAllSeries(props: { user: User }) {
 
   return (
     <section className="mx-4 mt-3 rounded-md bg-white p-4 text-black">
-      <div>
-        <DisplaySeries />
-      </div>
+      <h1 className="text-xl font-semibold">Serie:</h1>
+      <DisplaySeries />
     </section>
   );
 }
