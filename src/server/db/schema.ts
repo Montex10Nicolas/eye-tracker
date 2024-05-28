@@ -58,11 +58,11 @@ export const userInfoTable = createTable("user_info", {
   tvSerieDropped: integer("tv_serie_dropped").notNull().default(0),
   tvSeriePaused: integer("tv_serie_paused").notNull().default(0),
 
-  tvSeasonCompleted: integer("tv_serie_completed").notNull().default(0),
-  tvSeaonWatching: integer("tv_serie_watching").notNull().default(0),
-  tvSeasonPlanned: integer("tv_serie_planned").notNull().default(0),
-  tvSeasonDropped: integer("tv_serie_dropped").notNull().default(0),
-  tvSeasonPaused: integer("tv_serie_paused").notNull().default(0),
+  tvSeasonCompleted: integer("tv_season_completed").notNull().default(0),
+  tvSeasonWatching: integer("tv_season_watching").notNull().default(0),
+  tvSeasonPlanned: integer("tv_season_planned").notNull().default(0),
+  tvSeasonDropped: integer("tv_season_dropped").notNull().default(0),
+  tvSeasonPaused: integer("tv_season_paused").notNull().default(0),
 });
 
 export const sessionTable = createTable("session", {

@@ -37,29 +37,23 @@ export function SummaryGraph(props: { info: DBUserInfoType }) {
     tvEpisodeCount,
     tvSerieCompleted,
     tvSerieWatching,
+    tvSeasonCompleted,
+    moviePlanned,
+    tvSeasonDropped,
+    tvSeasonPaused,
+    tvSeasonPlanned,
+    tvSeasonWatching,
+    tvSerieDropped,
+    tvSeriePaused,
+    tvSeriePlanned,
   } = info;
 
   const data = {
-    labels: ["movie", "serie"],
+    labels: ["movie", "serie", "season"],
     datasets: [
       {
-        label: "Count",
-        data: [movieWatched, tvEpisodeCount],
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-      },
-      {
-        label: "Runtime",
-        data: [movieDurationTotal, tvDurationTotal],
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-      },
-      {
-        label: "Completed",
-        data: [0, tvSerieCompleted],
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-      },
-      {
-        label: "Watching",
-        data: [0, tvSerieWatching],
+        label: "Watched/Completed",
+        data: [movieWatched, tvSerieCompleted, tvSeasonCompleted],
         backgroundColor: "rgba(255, 99, 132, 0.2)",
       },
     ],

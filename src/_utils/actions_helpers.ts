@@ -1,5 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
-import { ADLaM_Display, Seaweed_Script } from "next/font/google";
+import { and, count, eq } from "drizzle-orm";
 import { type UpdateSeasonWatchData } from "~/app/(root)/detail/actions";
 import { db } from "~/server/db";
 import {
@@ -604,26 +603,64 @@ export async function updateSerieStatusWatch(userId: string, serieId: string) {
 }
 
 export async function updateInfoWatchComp(userId: string) {
-  const all = await db.query.seriesWatchedTable.findMany({
-    where: (serie, { eq, and, or }) =>
-      and(
-        eq(serie.userId, userId),
-        or(eq(serie.status, "COMPLETED"), eq(serie.status, "WATCHING")),
-      ),
-  });
+  const seriesStatus = await db
+    .select({
+      count: count(seriesWatchedTable.status),
+      status: seriesWatchedTable.status,
+    })
+    .from(seriesWatchedTable)
+    .where(eq(seriesWatchedTable.userId, userId))
+    .groupBy(seriesWatchedTable.status);
 
-  let watching = 0,
-    completed = 0;
-  for (const res of all) {
-    if (res.status === "WATCHING") watching++;
-    if (res.status === "COMPLETED") completed++;
+  const seasonsStatus = await db
+    .select({
+      count: count(seasonWatchedTable.status),
+      status: seasonWatchedTable.status,
+    })
+    .from(seasonWatchedTable)
+    .where(eq(seasonWatchedTable.userId, userId))
+    .groupBy(seasonWatchedTable.status);
+
+  function returnAllStatus(all: typeof seasonsStatus) {
+    const planning = all.find((c) => c.status === "PLANNING")?.count;
+    const watching = all.find((c) => c.status === "WATCHING")?.count;
+    const completed = all.find((c) => c.status === "COMPLETED")?.count;
+    const dropped = all.find((c) => c.status === "DROPPED")?.count;
+    const paused = all.find((c) => c.status === "PAUSED")?.count;
+
+    return [planning, watching, completed, dropped, paused];
   }
+
+  const [
+    seasonPlanning,
+    seasonWatching,
+    seasonCompleted,
+    seasonDropped,
+    seasonPaused,
+  ] = returnAllStatus(seasonsStatus);
+
+  const [
+    seriePlannig,
+    serieWatching,
+    serieCompleted,
+    serieDropped,
+    seriePaused,
+  ] = returnAllStatus(seriesStatus);
 
   await db
     .update(userInfoTable)
     .set({
-      tvSerieCompleted: completed,
-      tvSerieWatching: watching,
+      tvSeasonPlanned: seasonPlanning,
+      tvSeasonWatching: seasonWatching,
+      tvSeasonCompleted: seasonCompleted,
+      tvSeasonDropped: seasonDropped,
+      tvSeasonPaused: seasonPaused,
+
+      tvSeriePlanned: seriePlannig,
+      tvSerieCompleted: serieCompleted,
+      tvSerieWatching: serieWatching,
+      tvSerieDropped: serieDropped,
+      tvSeriePaused: seriePaused,
     })
     .where(eq(userInfoTable.userId, userId));
 }
