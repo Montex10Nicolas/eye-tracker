@@ -42,6 +42,7 @@ function generic(n: number, divident: number): [number, number] {
   return [whole, left];
 }
 
+// Convert minutes into Days/Hours/Minutes
 function handleVisualizationMinute(start: number) {
   const [toHours, minutes] = generic(start, 60);
   const [toDays, hours] = generic(toHours, 24);
@@ -228,7 +229,7 @@ async function DispalyAllSeries(props: { user: User }) {
                       <Progress
                         className="h-3 bg-blue-600"
                         value={
-                          (ses.season.episodeCount * 100) / ses.episodeWatched
+                          (ses.episodeWatched * 100) / ses.season.episodeCount
                         }
                       />
                     </div>

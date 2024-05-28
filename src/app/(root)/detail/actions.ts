@@ -8,8 +8,9 @@ import {
   updateInfo,
   updateInfoWatchComp,
   updateOrCreateOrDeleteSeasonWatch,
-  updateSeasonCompletition,
-  updateSerieCompletition,
+  updateSeasonCompletitionByID,
+  updateSeasonCompletitionByUser,
+  updateSerieStatusWatch,
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
@@ -86,7 +87,7 @@ export async function addToMovieWatched(userId: string, movie: MovieDetail) {
       throw new Error("Info is undefined");
     }
 
-    const count = info.movieCountTotal + 1;
+    const count = info.movieWatched + 1;
     const duration = info.movieDurationTotal + movie.runtime;
 
     await db
@@ -150,7 +151,7 @@ export async function removeFromMovieWatched(
 
     const runtime_to_remove = movie.runtime * timeWatched;
     const runtime = info.movieDurationTotal - runtime_to_remove;
-    const time = info.movieCountTotal - timeWatched;
+    const time = info.movieWatched - timeWatched;
 
     await db
       .update(userInfoTable)
@@ -228,8 +229,8 @@ export async function addOrRemoveOneEpisode(
   const runtime =
     ep_runtime === undefined ? DEFAULT_RUNTIME : ep_runtime * episodeCount;
 
-  await updateSeasonCompletition(dbSeasonId);
-  await updateSerieCompletition(userId, serieId);
+  await updateSeasonCompletitionByID(dbSeasonId);
+  await updateSerieStatusWatch(userId, serieId);
   await updateInfo(userId, 0, 0, runtime, episodeCount, 0, 0);
   await updateInfoWatchComp(userId);
 }
@@ -265,7 +266,8 @@ export async function addEpisodeToSeasonWatched(
   const runtime =
     ep_runtime === undefined ? DEFAULT_RUNTIME : ep_runtime * ep_diff;
 
-  await updateSerieCompletition(userId, serieId);
+  await updateSeasonCompletitionByUser(userId, serieId);
+  await updateSerieStatusWatch(userId, serieId);
   await updateInfo(userId, 0, 0, runtime, ep_diff, 0, 0);
   await updateInfoWatchComp(userId);
 

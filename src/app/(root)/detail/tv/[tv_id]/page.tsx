@@ -171,7 +171,8 @@ async function DisplaySeason(props: {
                     <div className="absolute right-1 top-1 flex w-fit flex-col rounded-sm bg-white p-1 text-xs font-bold text-black">
                       <p>{watchedS?.status}</p>
                       <p className="ml-auto">
-                        {watchedS?.status === "WATCHING" ? (
+                        {watchedS?.status !== "PLANNING" &&
+                        watchedS?.status !== "COMPLETED" ? (
                           <>
                             <span>{watchedS?.episodeWatched}</span> /
                             <span>{season.episode_count}</span>

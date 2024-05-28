@@ -67,7 +67,7 @@ export function SeasonForm(props: {
   useEffect(() => {
     if (seasonWatch === undefined) return;
     setEpisode(seasonWatch.episodeWatched);
-    setStatus(seasonWatch.status);
+    setStatus(seasonWatch.status as StatusWatchedType);
 
     const started = seasonWatch.started as Date | null;
     const ended = seasonWatch.ended as Date | null;
@@ -85,12 +85,14 @@ export function SeasonForm(props: {
   }, [status, episode_count]);
 
   useEffect(() => {
-    if (episodeCount < episode_count) {
-      setStatus("WATCHING");
-    } else if (episodeCount === episode_count) {
+    if (episodeCount === episode_count && status !== "COMPLETED") {
       setStatus("COMPLETED");
     }
-  }, [episodeCount, episode_count]);
+
+    if (status === "COMPLETED" && episodeCount < episode_count) {
+      setStatus("WATCHING");
+    }
+  }, [episodeCount, episode_count, status]);
 
   async function handleSubmit() {
     await addEpisode(userId, serie, season, {
@@ -120,14 +122,16 @@ export function SeasonForm(props: {
       <div className="grid h-full w-full grid-cols-3">
         <div className="col-span-1 flex h-full w-full flex-col items-center justify-center">
           <div>
-            <p>{serie.name}</p>
-            <p>{season.name}</p>
+            <div className="mb-2 flex flex-col items-center text-xl font-bold">
+              <h1>{serie.name}</h1>
+              <h1>{season.name}</h1>
+            </div>
             <Image
               src={TMDB_IMAGE_URL(season.poster_path)}
               height={300}
               width={300}
               alt={`Poster season ${season.name}`}
-              className="mx-auto my-auto"
+              className="mx-auto my-auto p-4"
             />
           </div>
         </div>
@@ -155,7 +159,6 @@ export function SeasonForm(props: {
                 </option>
               ))}
             </select>
-            <p>Value: {episodeCount}</p>
           </div>
 
           {/* Status */}
@@ -171,9 +174,9 @@ export function SeasonForm(props: {
               <option value="planning">Planning</option>
               <option value="watching">Watching</option>
               <option value="completed">Completed</option>
+              <option value="paused">Paused</option>
               <option value="dropped">Dropped</option>
             </select>
-            <p>Current: {status}</p>
           </div>
 
           {/* Date */}

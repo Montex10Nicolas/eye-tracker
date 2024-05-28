@@ -31,7 +31,7 @@ ChartJS.register(
 export function SummaryGraph(props: { info: DBUserInfoType }) {
   const { info } = props;
   const {
-    movieCountTotal,
+    movieWatched,
     movieDurationTotal,
     tvDurationTotal,
     tvEpisodeCount,
@@ -44,7 +44,7 @@ export function SummaryGraph(props: { info: DBUserInfoType }) {
     datasets: [
       {
         label: "Count",
-        data: [movieCountTotal, tvEpisodeCount],
+        data: [movieWatched, tvEpisodeCount],
         backgroundColor: "rgba(255, 99, 132, 0.2)",
       },
       {

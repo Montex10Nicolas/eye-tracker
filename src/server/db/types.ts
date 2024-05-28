@@ -19,6 +19,7 @@ export type StatusWatchedType =
   | "WATCHING"
   | "COMPLETED"
   | "DROPPED"
+  | "PAUSED"
   | null;
 
 export type DBUserType = typeof userTable.$inferSelect;

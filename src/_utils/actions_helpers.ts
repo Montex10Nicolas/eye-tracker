@@ -59,7 +59,7 @@ export async function updateInfo(
     return start + finish;
   }
 
-  const newCount = mySum(info.movieCountTotal, movieCountTotal),
+  const newCount = mySum(info.movieWatched, movieCountTotal),
     newDuration = mySum(info.movieDurationTotal, movieDurationTotal),
     newTVCount = mySum(info.tvEpisodeCount, tvEpisodeCount),
     newTvDuration = mySum(info.tvDurationTotal, tvDurationTotal),
@@ -340,7 +340,37 @@ export async function updateSeasonWatch(
 }
 
 // DB the ID of the record not the seasonId
-export async function updateSeasonCompletition(DBSeasonID: number) {
+export async function updateSeasonCompletitionByUser(
+  userId: string,
+  serieId: string,
+) {
+  const seasons = await db.query.seasonWatchedTable.findMany({
+    where: (ses, { and, eq }) =>
+      and(eq(ses.userId, userId), eq(ses.serieId, serieId)),
+    with: {
+      season: true,
+    },
+  });
+
+  for (const seasonWatch of seasons) {
+    const status: StatusWatchedType | null =
+      seasonWatch.episodeWatched === 0
+        ? "PLANNING"
+        : seasonWatch.episodeWatched === seasonWatch.season.episodeCount
+          ? "COMPLETED"
+          : (seasonWatch.status as StatusWatchedType | null);
+
+    await db
+      .update(seasonWatchedTable)
+      .set({
+        status: status,
+        ended: null,
+      })
+      .where(eq(seasonWatchedTable.id, seasonWatch.id));
+  }
+}
+
+export async function updateSeasonCompletitionByID(DBSeasonID: number) {
   const seasonWatch = await db.query.seasonWatchedTable.findFirst({
     where: (ses, { eq }) => eq(ses.id, DBSeasonID),
     with: {
@@ -490,7 +520,7 @@ export async function checkIfSerieIsCompleted(userId: string, serieId: string) {
   };
 }
 
-export async function updateSerieCompletition(userId: string, serieId: string) {
+export async function updateSerieStatusWatch(userId: string, serieId: string) {
   const query = await db.query.seriesWatchedTable.findFirst({
     where: (serieWatch, { eq, and }) =>
       and(eq(serieWatch.userId, userId), eq(serieWatch.serieId, serieId)),
@@ -511,7 +541,7 @@ export async function updateSerieCompletition(userId: string, serieId: string) {
     seasonWatched,
   } = query;
 
-  // I think I cannot do this
+  // I think I can do this
   if (seasonWatched.length === 0) {
     await db
       .delete(seriesWatchedTable)
@@ -520,11 +550,13 @@ export async function updateSerieCompletition(userId: string, serieId: string) {
   }
 
   let isCompleted = true;
+  let lastStatus: StatusWatchedType | null = null;
 
   if (serie.seasons.length === seasonWatched.length) {
     for (const seasonWatch of seasonWatched) {
       if (seasonWatch.status !== "COMPLETED") {
         isCompleted = false;
+        lastStatus = seasonWatch.status as StatusWatchedType;
         break;
       }
     }
@@ -535,7 +567,7 @@ export async function updateSerieCompletition(userId: string, serieId: string) {
   const allStartDate = seasonWatched.map((el) => el.started);
   const allEndDate = seasonWatched.map((el) => el.ended);
 
-  function getStartOrEndDate(all: (string | null)[], start: boolean) {
+  function getStartOrEndDate(all: (string | null)[], started: boolean) {
     let now: string | null = null;
 
     for (const start of all) {
@@ -543,9 +575,9 @@ export async function updateSerieCompletition(userId: string, serieId: string) {
       if (now === null) now = start;
       const compare = new Date(start);
       const oldest = new Date(now);
-      if (start && compare < oldest) {
+      if (started && compare < oldest) {
         now = start;
-      } else if (!start && compare > oldest) {
+      } else if (!started && compare > oldest) {
         now = start;
       }
     }
@@ -559,7 +591,7 @@ export async function updateSerieCompletition(userId: string, serieId: string) {
   await db
     .update(seriesWatchedTable)
     .set({
-      status: isCompleted ? "COMPLETED" : "WATCHING",
+      status: isCompleted ? "COMPLETED" : lastStatus,
       started: starter,
       ended: ender,
     })
