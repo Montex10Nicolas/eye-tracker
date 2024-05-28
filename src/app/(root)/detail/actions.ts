@@ -181,8 +181,6 @@ export async function getUserWatchedTVAndSeason(
     serieId,
   );
 
-  console.log("Serie", serie);
-
   if (serie === undefined) {
     return undefined;
   }

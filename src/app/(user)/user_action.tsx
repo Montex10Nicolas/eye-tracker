@@ -10,10 +10,16 @@ import {
   seasonWatchedTable,
   userInfoTable,
   userTable,
+  type seasonTable,
   type seriesTable,
   type seriesWatchedTable,
 } from "~/server/db/schema";
-import { type DBUserInfoType } from "~/server/db/types";
+import {
+  type DBSeasonType,
+  type DBSeasonWatchedType,
+  type DBSerieType,
+  type DBUserInfoType,
+} from "~/server/db/types";
 import { type MovieDetail } from "~/types/tmdb_detail";
 
 export const PASSWORD_HASH_PAR = {
@@ -176,6 +182,15 @@ export async function myInfo(userId: string) {
   return info;
 }
 
+export type seasonWatchWithSeason = {
+  season: DBSeasonType;
+} & DBSeasonWatchedType;
+
+export type SeriesAndSeasonWatched = typeof seriesWatchedTable.$inferSelect & {
+  seasonsWatched: seasonWatchWithSeason[];
+  serie: DBSerieType;
+};
+
 export async function myWatchedSeries(userId: string) {
   "use server";
 
@@ -189,25 +204,27 @@ export async function myWatchedSeries(userId: string) {
       },
     },
   });
-
-  type SeriesAndSeasonWatched = typeof seriesWatchedTable.$inferSelect & {
-    season: (typeof seasonWatchedTable.$inferSelect)[];
-    serie: typeof seriesTable.$inferSelect;
-  };
-
   const series: SeriesAndSeasonWatched[] = [];
 
   for (const serie of results) {
-    const season_watched: (typeof seasonWatchedTable.$inferSelect)[] = [];
+    const season_watched: seasonWatchWithSeason[] = [];
     for (const season of serie.serie.seasons) {
       const seasonId = season.id.toString();
-      const seasonWatchRes = await db.query.seasonWatchedTable.findFirst({
-        where: (ses, { eq, and }) =>
-          and(eq(ses.userId, userId), eq(ses.seasonId, seasonId)),
-      });
+      const seasonWatchRes: seasonWatchWithSeason | undefined =
+        await db.query.seasonWatchedTable.findFirst({
+          where: (ses, { eq, and }) =>
+            and(eq(ses.userId, userId), eq(ses.seasonId, seasonId)),
+          with: {
+            season: true,
+          },
+        });
+      if (seasonWatchRes === undefined) continue;
 
-      if (seasonWatchRes !== undefined) season_watched.push(seasonWatchRes);
+      console.log(seasonWatchRes);
+      season_watched.push(seasonWatchRes);
     }
+
+    console.log("watched: \n\n", season_watched);
 
     const a: SeriesAndSeasonWatched = {
       id: serie.id,
@@ -215,8 +232,11 @@ export async function myWatchedSeries(userId: string) {
       serieId: serie.serieId,
       status: serie.status,
       userId: serie.userId,
-      season: season_watched,
       serie: serie.serie,
+      started: serie.started,
+      ended: serie.ended,
+      seasonsWatched: season_watched,
+      createdAt: null,
     };
 
     series.push(a);
