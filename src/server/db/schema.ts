@@ -3,6 +3,7 @@
 
 import { relations, sql } from "drizzle-orm";
 import {
+  date,
   integer,
   json,
   pgTableCreator,
@@ -138,9 +139,14 @@ export const seriesWatchedTable = createTable("tv-series-watched", {
       onDelete: "cascade",
       onUpdate: "cascade",
     }),
+  started: date("started"),
+  ended: date("ended"),
   seasonCount: smallint("season_count").notNull().default(0),
   status: text("status", {
     enum: ["PLANNING", "WATCHING", "COMPLETED", "DROPPED"],
+  }),
+  createdAt: date("created_at").$defaultFn(() => {
+    return new Date().toString();
   }),
 });
 
@@ -209,6 +215,8 @@ export const seasonWatchedTable = createTable("tv-season-watched", {
       onUpdate: "no action",
     }),
   episodeWatched: smallint("episode_watched").notNull().default(0),
+  started: date("started"),
+  ended: date("ended"),
   status: text("status", {
     enum: ["PLANNING", "WATCHING", "COMPLETED", "DROPPED"],
   }),

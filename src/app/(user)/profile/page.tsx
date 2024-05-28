@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { TMDB_IMAGE_URL } from "~/_utils/utils";
+import { TMDB_IMAGE_URL, addZero } from "~/_utils/utils";
 import { getUser, myInfo } from "~/app/(user)/user_action";
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import { type DBUserInfoType } from "~/server/db/types";
@@ -11,10 +11,6 @@ function generic(n: number, divident: number): [number, number] {
   const whole = Math.floor(n / divident);
   const left = n % divident;
   return [whole, left];
-}
-
-function addZero(n: number) {
-  return n > 10 ? n.toString() : "0" + n;
 }
 
 function handleVisualizationMinute(start: number) {

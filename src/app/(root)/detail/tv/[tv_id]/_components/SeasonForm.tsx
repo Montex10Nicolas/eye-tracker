@@ -2,13 +2,22 @@
 
 import Image from "next/image";
 import { useEffect, useState, type ChangeEvent } from "react";
-import { TMDB_IMAGE_URL } from "~/_utils/utils";
+import { TMDB_IMAGE_URL, addZero } from "~/_utils/utils";
 import {
   type DBSeasonWatchedType,
   type StatusWatchedType,
 } from "~/server/db/types";
 import { type Season, type Serie } from "~/types/tmdb_detail";
 import { type addEpisodeToSeasonWatched } from "../../../actions";
+
+function changeDateInvoValue(date: Date | null) {
+  if (date === null) return;
+  const day = date.getDate(),
+    month = date.getMonth() + 1,
+    year = date.getFullYear();
+
+  return `${year}-${addZero(month)}-${addZero(day)}`;
+}
 
 export function SeasonForm(props: {
   serie: Serie;
@@ -21,9 +30,13 @@ export function SeasonForm(props: {
   const { serie, season, addEpisode, userId, seasonWatch, close } = props;
   const episode_count = season.episode_count;
   const ep_arr = new Array(episode_count).fill(null);
+  const today = new Date();
 
+  // Data for the form
   const [status, setStatus] = useState<StatusWatchedType>("WATCHING");
   const [episodeCount, setEpisode] = useState(0);
+  const [started, setStarted] = useState<Date | null>(null);
+  const [ended, setEnded] = useState<Date | null>(null);
 
   function handleStatus(event: ChangeEvent<HTMLSelectElement>) {
     const value = event.target.value.toUpperCase() as StatusWatchedType;
@@ -33,6 +46,17 @@ export function SeasonForm(props: {
   function handleEpisodes(event: ChangeEvent<HTMLSelectElement>) {
     const value = parseInt(event.target.value);
     setEpisode(value);
+  }
+
+  function handleStarted(event: ChangeEvent<HTMLDataElement>) {
+    const value = event.target.value;
+    const date = new Date(value);
+    setStarted(date);
+  }
+  function handleEnded(event: ChangeEvent<HTMLDataElement>) {
+    const value = event.target.value;
+    const date = new Date(value);
+    setEnded(date);
   }
 
   useEffect(() => {
@@ -123,6 +147,38 @@ export function SeasonForm(props: {
             </select>
             <p>Current: {status}</p>
           </div>
+
+          {/* Date */}
+          <div className="flex flex-col">
+            <div>
+              <label htmlFor="started">Start Date: </label>
+              <input
+                type="date"
+                name="started"
+                max={
+                  ended
+                    ? changeDateInvoValue(ended)
+                    : changeDateInvoValue(today)
+                }
+                value={changeDateInvoValue(started)}
+                onChange={handleStarted}
+              />
+              <button onClick={() => setStarted(today)}>Today</button>
+            </div>
+            <div>
+              <label htmlFor="ended">Ended Date: </label>
+              <input
+                type="date"
+                name="ended"
+                min={changeDateInvoValue(started)}
+                max={changeDateInvoValue(today)}
+                value={changeDateInvoValue(ended)}
+                onChange={handleEnded}
+              />
+              <button onClick={() => setEnded(today)}>Today</button>
+            </div>
+          </div>
+
           <div className="mx-4 mt-auto w-full space-y-3 p-2">
             <button
               onClick={handleSubmit}
