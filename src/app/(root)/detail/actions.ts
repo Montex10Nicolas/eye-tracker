@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import {
   getOrCreateTVSeason,
   getOrCreateTVSeriesWatched,
+  getTVSeriesWatched,
   updateInfo,
   updateInfoWatchComp,
-  updateOrCreateSeasonWatch,
+  updateOrCreateOrDeleteSeasonWatch,
   updateSerieCompletition,
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
@@ -175,10 +176,16 @@ export async function getUserWatchedTVAndSeason(
     return undefined;
   }
 
-  const serie: DBSerieWatchedType = await getOrCreateTVSeriesWatched(
-    serieId,
+  const serie: DBSerieWatchedType | undefined = await getTVSeriesWatched(
     userId,
+    serieId,
   );
+
+  console.log("Serie", serie);
+
+  if (serie === undefined) {
+    return undefined;
+  }
 
   const seasons = await db.query.seasonWatchedTable.findMany({
     where: (ses, { and, eq }) =>
@@ -209,7 +216,7 @@ export async function addEpisodeToSeasonWatched(
 
   await getOrCreateTVSeriesWatched(serieId, userId);
   await getOrCreateTVSeason(seasonId, season, serieId, serie.name);
-  const [pre, post] = await updateOrCreateSeasonWatch(
+  const [pre, post] = await updateOrCreateOrDeleteSeasonWatch(
     seasonId,
     serieId,
     userId,
@@ -221,7 +228,7 @@ export async function addEpisodeToSeasonWatched(
   }
 
   // UPDATE INFO AND SERIE WATCH
-  const ep_diff = post.episodeWatched - pre.episodeWatched;
+  const ep_diff = post !== null ? post.episodeWatched : 0 - pre.episodeWatched;
 
   // RUNTIME
   const ep_runtime = serie.episode_run_time[0];
@@ -230,7 +237,6 @@ export async function addEpisodeToSeasonWatched(
     ep_runtime === undefined ? DEFAULT_RUNTIME : ep_runtime * ep_diff;
 
   await updateSerieCompletition(userId, serieId);
-
   await updateInfo(userId, 0, 0, runtime, ep_diff, 0, 0);
   await updateInfoWatchComp(userId);
 

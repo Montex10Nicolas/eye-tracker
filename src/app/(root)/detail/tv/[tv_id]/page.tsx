@@ -193,7 +193,7 @@ async function DisplaySeason(props: {
                         </form>
                       ) : null}
 
-                      <button className="flex h-full w-full items-center justify-center bg-sky-600">
+                      <div className="flex h-full w-full items-center justify-center bg-sky-600">
                         <EditSeason
                           addEpisode={addEpisodeToSeasonWatched}
                           serie={tv}
@@ -201,7 +201,7 @@ async function DisplaySeason(props: {
                           userId={user.id.toString()}
                           season_w={watchedS}
                         />
-                      </button>
+                      </div>
                       {watchedS?.status != null && watchedS != undefined ? (
                         <form
                           className="flex h-full w-full items-center justify-center bg-red-600"
