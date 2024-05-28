@@ -168,7 +168,7 @@ async function DisplaySeason(props: {
                       alt={`Poster ${season.name}`}
                       className="object-fill"
                     />
-                    <p className="absolute right-1 top-1 flex w-fit flex-col rounded-sm bg-white p-1 text-xs font-bold text-black">
+                    <div className="absolute right-1 top-1 flex w-fit flex-col rounded-sm bg-white p-1 text-xs font-bold text-black">
                       <p>{watchedS?.status}</p>
                       <p className="ml-auto">
                         {watchedS?.status === "WATCHING" ? (
@@ -178,7 +178,7 @@ async function DisplaySeason(props: {
                           </>
                         ) : null}
                       </p>
-                    </p>
+                    </div>
                   </div>
                   {loggedIn ? (
                     <div className="mt-auto flex h-12 flex-row justify-around">

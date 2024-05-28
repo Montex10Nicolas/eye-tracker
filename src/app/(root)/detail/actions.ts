@@ -7,6 +7,7 @@ import {
   updateInfo,
   updateInfoWatchComp,
   updateOrCreateSeasonWatch,
+  updateSerieCompletition,
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
@@ -228,8 +229,9 @@ export async function addEpisodeToSeasonWatched(
   const runtime =
     ep_runtime === undefined ? DEFAULT_RUNTIME : ep_runtime * ep_diff;
 
-  await updateInfo(userId, 0, 0, runtime, ep_diff, 0, 0);
+  await updateSerieCompletition(userId, serieId);
 
+  await updateInfo(userId, 0, 0, runtime, ep_diff, 0, 0);
   await updateInfoWatchComp(userId);
 
   revalidatePath(`/detail/tv/${serie.id}`);

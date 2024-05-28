@@ -30,6 +30,7 @@ export function EditSeason(props: {
 
   function closeDialog() {
     setVisible(false);
+    document.body.style.overflowY = "visible";
   }
 
   return (

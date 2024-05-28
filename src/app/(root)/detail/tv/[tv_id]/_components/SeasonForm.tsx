@@ -1,8 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState, type ChangeEvent } from "react";
+
+import Image from "next/image";
 import { TMDB_IMAGE_URL, changeDateInvoValue } from "~/_utils/utils";
+
 import {
   type DBSeasonWatchedType,
   type StatusWatchedType,
@@ -100,8 +102,11 @@ export function SeasonForm(props: {
     close();
   }
 
+  document.body.style.overflowY = "hidden";
+
   return (
     <section className="left-0 top-0 z-40 h-[70%] w-[70%] cursor-default rounded-md bg-white text-black">
+      {/* Serie info and image */}
       <div className="grid h-full w-full grid-cols-3">
         <div className="col-span-1 flex h-full w-full flex-col items-center justify-center">
           <div>
@@ -117,6 +122,7 @@ export function SeasonForm(props: {
           </div>
         </div>
 
+        {/* Episode Count */}
         <div className="col-span-2 flex h-full w-full flex-col items-center justify-center gap-4">
           <div className="mt-auto flex w-full flex-col items-center justify-center gap-2">
             <label htmlFor="episodes">Episode watched: </label>
@@ -127,7 +133,7 @@ export function SeasonForm(props: {
               onChange={handleEpisodes}
             >
               <option value="0">_</option>
-              {ep_arr.map((a, index) => (
+              {ep_arr.map((_, index) => (
                 <option
                   className="cursor-pointer"
                   value={index + 1}
@@ -140,6 +146,7 @@ export function SeasonForm(props: {
             <p>Value: {episodeCount}</p>
           </div>
 
+          {/* Status */}
           <div className="flex w-full flex-col items-center justify-center">
             <label htmlFor="status">Status: </label>
             <select
@@ -158,36 +165,53 @@ export function SeasonForm(props: {
           </div>
 
           {/* Date */}
-          <div className="flex flex-col">
-            <div>
+          <div className="flex w-full flex-col gap-2 md:w-[70%]">
+            <div className="flex flex-col">
               <label htmlFor="started">Start Date: </label>
-              <input
-                type="date"
-                name="started"
-                max={
-                  ended
-                    ? changeDateInvoValue(ended)
-                    : changeDateInvoValue(today)
-                }
-                value={changeDateInvoValue(started)}
-                onChange={handleStarted}
-              />
-              <button onClick={() => setStarted(today)}>Today</button>
+              <div className="flex justify-between">
+                <input
+                  className="cursor-pointer rounded-sm border border-black px-4 py-2"
+                  type="date"
+                  name="started"
+                  max={
+                    ended
+                      ? changeDateInvoValue(ended)
+                      : changeDateInvoValue(today)
+                  }
+                  value={changeDateInvoValue(started)}
+                  onChange={handleStarted}
+                />
+                <button
+                  className="rounded-sm bg-sky-600 px-4 py-2 uppercase text-white"
+                  onClick={() => setStarted(today)}
+                >
+                  Today
+                </button>
+              </div>
             </div>
-            <div>
-              <label htmlFor="ended">Ended Date: </label>
-              <input
-                type="date"
-                name="ended"
-                min={changeDateInvoValue(started)}
-                max={changeDateInvoValue(today)}
-                value={changeDateInvoValue(ended)}
-                onChange={handleEnded}
-              />
-              <button onClick={() => setEnded(today)}>Today</button>
+            <div className="flex flex-col">
+              <label htmlFor="started">End Date: </label>
+              <div className="flex justify-between">
+                <input
+                  className="cursor-pointer rounded-sm border border-black px-4 py-2"
+                  type="date"
+                  name="ended"
+                  min={changeDateInvoValue(started)}
+                  max={changeDateInvoValue(today)}
+                  value={changeDateInvoValue(ended)}
+                  onChange={handleEnded}
+                />
+                <button
+                  className="rounded-sm bg-sky-600 px-4 py-2 uppercase text-white"
+                  onClick={() => setEnded(today)}
+                >
+                  Today
+                </button>
+              </div>
             </div>
           </div>
 
+          {/* Buttons */}
           <div className="mx-4 mt-auto w-full space-y-3 p-2">
             <button
               onClick={handleSubmit}

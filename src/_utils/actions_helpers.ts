@@ -1,4 +1,5 @@
-import { eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
+import { ADLaM_Display } from "next/font/google";
 import { type UpdateSeasonWatchData } from "~/app/(root)/detail/actions";
 import { db } from "~/server/db";
 import {
@@ -430,6 +431,80 @@ export async function checkIfSerieIsCompleted(userId: string, serieId: string) {
     completed: season_count === seasons.length,
     seasonCount: season_count,
   };
+}
+
+export async function updateSerieCompletition(userId: string, serieId: string) {
+  const query = await db.query.seriesWatchedTable.findFirst({
+    where: (serieWatch, { eq, and }) =>
+      and(eq(serieWatch.userId, userId), eq(serieWatch.serieId, serieId)),
+    with: {
+      seasonWatched: {
+        with: {
+          season: true,
+        },
+      },
+      serie: true,
+    },
+  });
+
+  if (query === undefined) return;
+
+  const {
+    serie: { serie_data: serie },
+    seasonWatched,
+  } = query;
+
+  let isCompleted = true;
+
+  console.log(serie.seasons.length, seasonWatched.length);
+  if (serie.seasons.length === seasonWatched.length) {
+    for (const seasonWatch of seasonWatched) {
+      if (seasonWatch.status !== "COMPLETED") {
+        isCompleted = false;
+        break;
+      }
+    }
+  } else {
+    isCompleted = false;
+  }
+
+  const allStartDate = seasonWatched.map((el) => el.started);
+  const allEndDate = seasonWatched.map((el) => el.ended);
+
+  function getS(all: (string | null)[], min: boolean) {
+    let now: string | null = null;
+
+    for (const start of all) {
+      if (start === null) continue;
+      if (now === null) now = start;
+      const compare = new Date(start);
+      const oldest = new Date(now);
+      if (min && compare < oldest) {
+        now = start;
+      } else if (!min && compare > oldest) {
+        now = start;
+      }
+    }
+
+    return now;
+  }
+
+  const starter = getS(allStartDate, true);
+  const ender = isCompleted ? getS(allEndDate, false) : null;
+
+  await db
+    .update(seriesWatchedTable)
+    .set({
+      status: isCompleted ? "COMPLETED" : "WATCHING",
+      started: starter,
+      ended: ender,
+    })
+    .where(
+      and(
+        eq(seriesWatchedTable.userId, userId),
+        eq(seriesWatchedTable.serieId, serieId),
+      ),
+    );
 }
 
 export async function updateInfoWatchComp(userId: string) {
