@@ -39,3 +39,12 @@ export function addZero(n: number | string | undefined) {
   n = n as number;
   return n > 10 ? n.toString() : "0" + n;
 }
+
+export function changeDateInvoValue(date: Date | null) {
+  if (date === null) return;
+  const day = date.getDate(),
+    month = date.getMonth() + 1,
+    year = date.getFullYear();
+
+  return `${year}-${addZero(month)}-${addZero(day)}`;
+}

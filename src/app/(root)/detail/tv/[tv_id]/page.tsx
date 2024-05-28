@@ -139,6 +139,7 @@ async function DisplaySeason(props: {
                 await addEpisodeToSeasonWatched(userId, tv, season, {
                   episodeCount: season.episode_count,
                   status: "COMPLETED",
+                  ended: new Date(),
                 });
               }
 
@@ -148,6 +149,8 @@ async function DisplaySeason(props: {
                 await addEpisodeToSeasonWatched(userId, tv, season, {
                   episodeCount: 0,
                   status: null,
+                  started: null,
+                  ended: null,
                 });
               }
 

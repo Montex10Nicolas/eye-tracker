@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { type UpdateSeasonWatchData } from "~/app/(root)/detail/actions";
 import { db } from "~/server/db";
 import {
@@ -16,6 +16,7 @@ import {
   type StatusWatchedType,
 } from "~/server/db/types";
 import { type MovieDetail, type Season, type Serie } from "~/types/tmdb_detail";
+import { changeDateInvoValue } from "./utils";
 
 export async function getOrCreateInfo(userId: string) {
   let info: DBUserInfoType | undefined = await db.query.userInfoTable.findFirst(
@@ -191,21 +192,6 @@ async function createTVSeasonsWatched(
 ) {
   "use server";
 
-  console.log("C_TVSW", seasonId, userId, serieId, serieWatchId);
-
-  const query = db
-    .insert(seasonWatchedTable)
-    .values({
-      userId: userId,
-      serieWatch: serieWatchId,
-      serieId: serieId,
-      seasonId: seasonId,
-      episodeWatched: 0,
-    })
-    .toSQL();
-
-  console.log(query);
-
   const tvWatched = await db
     .insert(seasonWatchedTable)
     .values({
@@ -216,8 +202,6 @@ async function createTVSeasonsWatched(
       episodeWatched: 0,
     })
     .returning();
-
-  console.log("C_TVSW", seasonId, userId, serieId, serieWatchId);
 
   if (tvWatched[0] === undefined) {
     throw new Error("wtf tv season should exist");
@@ -354,13 +338,27 @@ export async function updateOrCreateSeasonWatch(
 ): Promise<[DBSeasonWatchedType, DBSeasonWatchedType]> {
   const season = await getOrCreateTVSeasonWatched(userId, serieId, seasonId);
 
-  const { episodeCount, status } = updateInfo;
+  const { episodeCount, status, started, ended } = updateInfo;
+  let startedUTC;
+  if (started === undefined) {
+    startedUTC = season.started;
+  } else {
+    startedUTC = changeDateInvoValue(started);
+  }
+  let endedUTC;
+  if (ended === undefined) {
+    endedUTC = season.ended;
+  } else {
+    endedUTC = changeDateInvoValue(ended);
+  }
 
   const newData = await db
     .update(seasonWatchedTable)
     .set({
       status: status,
       episodeWatched: episodeCount,
+      started: startedUTC ?? null,
+      ended: endedUTC ?? null,
     })
     .where(eq(seasonWatchedTable.id, season.id))
     .returning();

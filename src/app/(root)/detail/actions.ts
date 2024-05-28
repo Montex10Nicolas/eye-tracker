@@ -193,6 +193,8 @@ export async function getUserWatchedTVAndSeason(
 export interface UpdateSeasonWatchData {
   episodeCount: number;
   status: StatusWatchedType;
+  started?: Date | null;
+  ended?: Date | null;
 }
 
 export async function addEpisodeToSeasonWatched(
@@ -204,8 +206,6 @@ export async function addEpisodeToSeasonWatched(
   const serieId = serie.id.toString(),
     seasonId = season.id.toString();
 
-  console.log(serieId, seasonId, newInfo);
-
   await getOrCreateTVSeriesWatched(serieId, userId);
   await getOrCreateTVSeason(seasonId, season, serieId, serie.name);
   const [pre, post] = await updateOrCreateSeasonWatch(
@@ -216,10 +216,8 @@ export async function addEpisodeToSeasonWatched(
   );
 
   if (pre === undefined || post === undefined) {
-    throw new Error("I can this two be undefined");
+    throw new Error("How can this two be undefined");
   }
-
-  console.log(pre, post);
 
   // UPDATE INFO AND SERIE WATCH
   const ep_diff = post.episodeWatched - pre.episodeWatched;

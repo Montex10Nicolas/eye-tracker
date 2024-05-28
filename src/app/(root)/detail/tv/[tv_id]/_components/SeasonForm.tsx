@@ -2,22 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useState, type ChangeEvent } from "react";
-import { TMDB_IMAGE_URL, addZero } from "~/_utils/utils";
+import { TMDB_IMAGE_URL, changeDateInvoValue } from "~/_utils/utils";
 import {
   type DBSeasonWatchedType,
   type StatusWatchedType,
 } from "~/server/db/types";
 import { type Season, type Serie } from "~/types/tmdb_detail";
 import { type addEpisodeToSeasonWatched } from "../../../actions";
-
-function changeDateInvoValue(date: Date | null) {
-  if (date === null) return;
-  const day = date.getDate(),
-    month = date.getMonth() + 1,
-    year = date.getFullYear();
-
-  return `${year}-${addZero(month)}-${addZero(day)}`;
-}
 
 export function SeasonForm(props: {
   serie: Serie;
@@ -50,11 +41,23 @@ export function SeasonForm(props: {
 
   function handleStarted(event: ChangeEvent<HTMLDataElement>) {
     const value = event.target.value;
+    // Handle clear
+    if (value.length === 0) {
+      setStarted(null);
+      return;
+    }
+
     const date = new Date(value);
     setStarted(date);
   }
   function handleEnded(event: ChangeEvent<HTMLDataElement>) {
     const value = event.target.value;
+    // Handle clear
+    if (value.length === 0) {
+      setEnded(null);
+      return;
+    }
+
     const date = new Date(value);
     setEnded(date);
   }
@@ -63,6 +66,12 @@ export function SeasonForm(props: {
     if (seasonWatch === undefined) return;
     setEpisode(seasonWatch.episodeWatched);
     setStatus(seasonWatch.status);
+
+    const started = seasonWatch.started as Date | null;
+    const ended = seasonWatch.ended as Date | null;
+
+    setStarted(started);
+    setEnded(ended);
   }, [seasonWatch]);
 
   useEffect(() => {
@@ -85,6 +94,8 @@ export function SeasonForm(props: {
     await addEpisode(userId, serie, season, {
       episodeCount: episodeCount,
       status: status,
+      started: started,
+      ended: ended,
     });
     close();
   }
@@ -103,8 +114,6 @@ export function SeasonForm(props: {
               alt={`Poster season ${season.name}`}
               className="mx-auto my-auto"
             />
-
-            <code>{JSON.stringify(seasonWatch, null, 2)}</code>
           </div>
         </div>
 
