@@ -125,6 +125,14 @@ export const seriesRelations = relations(seriesTable, ({ many }) => ({
   watchedBy: many(seriesWatchedTable),
 }));
 
+const SeasonStatusEnum: readonly [string, ...string[]] = [
+  "PLANNING",
+  "WATCHING",
+  "COMPLETED",
+  "DROPPED",
+  "PAUSED",
+];
+
 export const seriesWatchedTable = createTable("tv-series-watched", {
   id: serial_without_erros("id").primaryKey(),
   serieId: varchar("serie_id", { length: 256 })
@@ -143,7 +151,7 @@ export const seriesWatchedTable = createTable("tv-series-watched", {
   ended: date("ended"),
   seasonCount: smallint("season_count").notNull().default(0),
   status: text("status", {
-    enum: ["PLANNING", "WATCHING", "COMPLETED", "DROPPED"],
+    enum: SeasonStatusEnum,
   }),
   createdAt: date("created_at").$defaultFn(() => {
     return new Date().toString();
@@ -218,7 +226,7 @@ export const seasonWatchedTable = createTable("tv-season-watched", {
   started: date("started"),
   ended: date("ended"),
   status: text("status", {
-    enum: ["PLANNING", "WATCHING", "COMPLETED", "DROPPED"],
+    enum: SeasonStatusEnum,
   }),
 });
 

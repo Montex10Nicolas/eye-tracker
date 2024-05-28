@@ -21,7 +21,6 @@ import {
 import {
   type DBErorr,
   type DBSeasonWatchedType,
-  type DBSerieType,
   type DBSerieWatchedType,
   type StatusWatchedType,
 } from "~/server/db/types";

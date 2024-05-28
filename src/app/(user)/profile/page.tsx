@@ -1,6 +1,8 @@
 import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Radar } from "react-chartjs-2";
 import { TMDB_IMAGE_URL, addZero } from "~/_utils/utils";
 import {
   addEpisodeToSeasonWatched,
@@ -32,6 +34,7 @@ import {
 import { type DBUserInfoType } from "~/server/db/types";
 import { type Serie, type User } from "~/types/tmdb_detail";
 import { myWatchedMovie } from "../user_action";
+import { SummaryGraph } from "./_components/SummaryGraph";
 
 function generic(n: number, divident: number): [number, number] {
   const whole = Math.floor(n / divident);
@@ -55,31 +58,16 @@ function handleVisualizationMinute(start: number) {
 
 function Summary(props: { user: User; info: DBUserInfoType | undefined }) {
   const { user, info } = props;
+
+  if (info === undefined) {
+    redirect("/signin");
+  }
+
   return (
     <section className="mx-4  rounded-md bg-white p-4 text-slate-950">
-      <div>{user.username}</div>
+      <h1 className="text-3xl font-bold">{user.username}</h1>
 
-      {info !== undefined ? (
-        <section className="flex flex-row justify-evenly gap-4">
-          <div className="w-[40%] border border-slate-800">
-            <h2>Movie count: {info.movieCountTotal}</h2>
-            <div className="">
-              Movie duration:
-              {handleVisualizationMinute(info.movieDurationTotal)}
-            </div>
-          </div>
-
-          <div className="w-[40%] border border-slate-800">
-            <h2>Episodes:</h2>
-            <div>
-              {handleVisualizationMinute(info.tvDurationTotal)} Duratoin
-            </div>
-            <div>{info.tvEpisodeCount} episodes</div>
-            <div>{info.tvSerieCompleted} completed</div>
-            <div>{info.tvSerieWatching} watching</div>
-          </div>
-        </section>
-      ) : null}
+      <SummaryGraph info={info} />
     </section>
   );
 }

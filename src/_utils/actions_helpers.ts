@@ -535,7 +535,7 @@ export async function updateSerieCompletition(userId: string, serieId: string) {
   const allStartDate = seasonWatched.map((el) => el.started);
   const allEndDate = seasonWatched.map((el) => el.ended);
 
-  function getS(all: (string | null)[], min: boolean) {
+  function getStartOrEndDate(all: (string | null)[], start: boolean) {
     let now: string | null = null;
 
     for (const start of all) {
@@ -543,9 +543,9 @@ export async function updateSerieCompletition(userId: string, serieId: string) {
       if (now === null) now = start;
       const compare = new Date(start);
       const oldest = new Date(now);
-      if (min && compare < oldest) {
+      if (start && compare < oldest) {
         now = start;
-      } else if (!min && compare > oldest) {
+      } else if (!start && compare > oldest) {
         now = start;
       }
     }
@@ -553,8 +553,8 @@ export async function updateSerieCompletition(userId: string, serieId: string) {
     return now;
   }
 
-  const starter = getS(allStartDate, true);
-  const ender = isCompleted ? getS(allEndDate, false) : null;
+  const starter = getStartOrEndDate(allStartDate, true);
+  const ender = isCompleted ? getStartOrEndDate(allEndDate, false) : null;
 
   await db
     .update(seriesWatchedTable)
