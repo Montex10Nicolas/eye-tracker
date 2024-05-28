@@ -2,7 +2,6 @@ import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Radar } from "react-chartjs-2";
 import { TMDB_IMAGE_URL, addZero } from "~/_utils/utils";
 import {
   addEpisodeToSeasonWatched,
@@ -43,16 +42,16 @@ function generic(n: number, divident: number): [number, number] {
 }
 
 // Convert minutes into Days/Hours/Minutes
-function handleVisualizationMinute(start: number) {
+function handleVisualizationTimestamp(start: number) {
   const [toHours, minutes] = generic(start, 60);
   const [toDays, hours] = generic(toHours, 24);
   const [, days] = generic(toDays, 31);
 
   return (
     <div className="flex flex-wrap gap-2">
-      {days > 0 ? <span>{days} days</span> : null}
-      <span>{addZero(hours)}hours</span>
-      <span>{addZero(minutes)}minutes</span>
+      {days > 0 ? <span>{days}d</span> : null}
+      <span>{addZero(hours)}h</span>
+      <span>{addZero(minutes)}m</span>
     </div>
   );
 }
@@ -65,10 +64,44 @@ function Summary(props: { user: User; info: DBUserInfoType | undefined }) {
   }
 
   return (
-    <section className="mx-4  rounded-md bg-white p-4 text-slate-950">
+    <section className="mx-4 h-[500px] rounded-md bg-white p-4 text-slate-950">
       <h1 className="text-3xl font-bold">{user.username}</h1>
 
-      <SummaryGraph info={info} />
+      {/*  Stats */}
+      <div className="mx-auto my-2 flex h-20 w-full flex-row items-center justify-around rounded-sm bg-gray-800/90 px-6 py-2 text-xl text-white">
+        <h1>
+          {handleVisualizationTimestamp(
+            info.movieDurationTotal + info.tvDurationTotal,
+          )}
+        </h1>
+        <div>{info.tvEpisodeCount} Episodes</div>
+        <div className="space-x-4">
+          <span>
+            {info.tvSerieCompleted +
+              info.tvSeriePaused +
+              info.tvSerieDropped +
+              info.tvSeriePaused +
+              info.tvSeriePlanned +
+              info.tvSerieWatching}
+          </span>
+          <span>Series</span>
+        </div>
+        <div className="space-x-4">
+          <span>
+            {info.tvSeasonCompleted +
+              info.tvSeasonPaused +
+              info.tvSeasonDropped +
+              info.tvSeasonPaused +
+              info.tvSeasonPlanned +
+              info.tvSeasonWatching}
+          </span>
+          <span>Seasons</span>
+        </div>
+      </div>
+
+      <div className="my-2 h-[80%] p-2">
+        <SummaryGraph info={info} />
+      </div>
     </section>
   );
 }
@@ -158,7 +191,6 @@ async function DispalyAllSeries(props: { user: User }) {
               <TableHead>Ended</TableHead>
               <TableHead>Progress</TableHead>
               <TableHead>Edit</TableHead>
-              <TableHead>Link</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -192,12 +224,19 @@ async function DispalyAllSeries(props: { user: User }) {
                   <TableCell>
                     <div className="flex flex-col justify-center">
                       {ses.season.seasonName}
-                      <Image
-                        src={TMDB_IMAGE_URL(ses.season.season_data.poster_path)}
-                        height={150}
-                        width={100}
-                        alt={ses.season.season_data.name}
-                      />
+                      <Link
+                        className="font-semibold text-blue-600 hover:underline"
+                        href={`/detail/tv/${ses.serieId}`}
+                      >
+                        <Image
+                          src={TMDB_IMAGE_URL(
+                            ses.season.season_data.poster_path,
+                          )}
+                          height={150}
+                          width={100}
+                          alt={ses.season.season_data.name}
+                        />
+                      </Link>
                     </div>
                   </TableCell>
                   <TableCell>{ses.status}</TableCell>
@@ -245,14 +284,7 @@ async function DispalyAllSeries(props: { user: User }) {
                       />
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <Link
-                      className="font-semibold text-blue-600 hover:underline"
-                      href={`/detail/tv/${ses.serieId}`}
-                    >
-                      Detail
-                    </Link>
-                  </TableCell>
+                  <TableCell></TableCell>
                 </TableRow>
               );
             })}
@@ -282,7 +314,7 @@ async function DispalyAllSeries(props: { user: User }) {
             <Accordion type="single" collapsible key={serieData.id}>
               <AccordionItem value={`serie-${index}`}>
                 <AccordionTrigger>
-                  <div className="flex items-center gap-4">
+                  <div className="flex w-full items-center gap-4">
                     <Image
                       src={TMDB_IMAGE_URL(serieData.poster_path)}
                       width={100}
@@ -293,6 +325,12 @@ async function DispalyAllSeries(props: { user: User }) {
                     <div>{serieWatch.status}</div>
                     <div>{started !== undefined && `Started: ${started}`}</div>
                     <div>{ended !== undefined && `Ended: ${ended}`}</div>
+                    <Link
+                      className="ml-auto mr-6 font-semibold text-blue-600 hover:underline"
+                      href={`/detail/tv/${serieData.id}`}
+                    >
+                      Detail
+                    </Link>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>

@@ -165,8 +165,8 @@ export const seriesWatchedTable = createTable("tv-series-watched", {
   status: text("status", {
     enum: SeasonStatusEnum,
   }),
-  createdAt: date("created_at").$defaultFn(() => {
-    return new Date().toString();
+  createdAt: timestamp("created_at").$defaultFn(() => {
+    return new Date();
   }),
 });
 

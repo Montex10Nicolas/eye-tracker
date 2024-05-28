@@ -7,14 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
   queryTMDBMovieDetail,
   queryTMDBMovieRecomendation,
-<<<<<<< HEAD
-} from "~/server/queries";
-import { type MovieDetail, type Serie, type User } from "~/types/tmdb_detail";
-=======
   queryTMDBProvider,
 } from "~/server/queries";
 import { type MovieDetail, type User } from "~/types/tmdb_detail";
->>>>>>> main
 import { DisplayGenres, DisplayMovies } from "../../_components/Display";
 import { default as Provider } from "../../_components/Providers";
 import { DisplayCastCrew } from "../../_components/Summary";
