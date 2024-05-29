@@ -201,12 +201,10 @@ async function DispalyAllSeries(props: { user: User }) {
                 ses.started === null
                   ? "not set"
                   : new Date(ses.started).toLocaleDateString();
-              ("default");
               const ended =
                 ses.ended === null
                   ? "not set"
                   : new Date(ses.ended).toLocaleDateString();
-              ("default");
 
               async function addOne() {
                 "use server";
