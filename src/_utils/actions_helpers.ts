@@ -401,7 +401,7 @@ export async function updateOrCreateOrDeleteSeasonWatch(
   userId: string,
   updateInfo: UpdateSeasonWatchData,
 ): Promise<[DBSeasonWatchedType, DBSeasonWatchedType | null]> {
-  const season = await getOrCreateTVSeasonWatched(userId, serieId, seasonId);
+  const before = await getOrCreateTVSeasonWatched(userId, serieId, seasonId);
 
   const { episodeCount, status, started, ended } = updateInfo;
 
@@ -427,13 +427,13 @@ export async function updateOrCreateOrDeleteSeasonWatch(
 
   let startedUTC;
   if (started === undefined) {
-    startedUTC = season.started;
+    startedUTC = before.started;
   } else {
     startedUTC = changeDateInvoValue(started);
   }
   let endedUTC;
   if (ended === undefined) {
-    endedUTC = season.ended;
+    endedUTC = before.ended;
   } else {
     endedUTC = changeDateInvoValue(ended);
   }
@@ -446,14 +446,14 @@ export async function updateOrCreateOrDeleteSeasonWatch(
       started: startedUTC ?? null,
       ended: endedUTC ?? null,
     })
-    .where(eq(seasonWatchedTable.id, season.id))
+    .where(eq(seasonWatchedTable.id, before.id))
     .returning();
 
   if (newData[0] === undefined) throw new Error("I can newData be undefined");
 
-  const post = newData[0];
+  const after = newData[0];
 
-  return [season, post];
+  return [before, after];
 }
 
 export async function checkIfSeasonIsCompleted(
