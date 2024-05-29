@@ -1,18 +1,9 @@
 "use server";
-<<<<<<< HEAD
-import { and, eq } from "drizzle-orm";
-=======
 import { and, eq, sql, type SQL } from "drizzle-orm";
->>>>>>> temp-branch
 import { revalidatePath } from "next/cache";
 import {
   getOrCreateTVSeason,
   getOrCreateTVSeriesWatched,
-<<<<<<< HEAD
-  updateInfo,
-  updateInfoWatchComp,
-  updateOrCreateSeasonWatch,
-=======
   getTVSeriesWatched,
   updateInfo,
   updateInfoWatchComp,
@@ -20,7 +11,6 @@ import {
   updateSeasonCompletitionByID,
   updateSeasonCompletitionByUser,
   updateSerieStatusWatch,
->>>>>>> temp-branch
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
@@ -188,12 +178,6 @@ export async function getUserWatchedTVAndSeason(
     return undefined;
   }
 
-<<<<<<< HEAD
-  const serie: DBSerieWatchedType = await getOrCreateTVSeriesWatched(
-    serieId,
-    userId,
-  );
-=======
   const serie: DBSerieWatchedType | undefined = await getTVSeriesWatched(
     userId,
     serieId,
@@ -202,7 +186,6 @@ export async function getUserWatchedTVAndSeason(
   if (serie === undefined) {
     return undefined;
   }
->>>>>>> temp-branch
 
   const seasons = await db.query.seasonWatchedTable.findMany({
     where: (ses, { and, eq }) =>
@@ -218,8 +201,6 @@ export async function getUserWatchedTVAndSeason(
 export interface UpdateSeasonWatchData {
   episodeCount: number;
   status: StatusWatchedType;
-<<<<<<< HEAD
-=======
   started?: Date | null;
   ended?: Date | null;
 }
@@ -252,7 +233,6 @@ export async function addOrRemoveOneEpisode(
   await updateSerieStatusWatch(userId, serieId);
   await updateInfo(userId, 0, 0, runtime, episodeCount, 0, 0);
   await updateInfoWatchComp(userId);
->>>>>>> temp-branch
 }
 
 export async function addEpisodeToSeasonWatched(
@@ -263,19 +243,10 @@ export async function addEpisodeToSeasonWatched(
 ) {
   const serieId = serie.id.toString(),
     seasonId = season.id.toString();
-<<<<<<< HEAD
-
-  console.log(serieId, seasonId, newInfo);
-
-  await getOrCreateTVSeriesWatched(serieId, userId);
-  await getOrCreateTVSeason(seasonId, season, serieId, serie.name);
-  const [pre, post] = await updateOrCreateSeasonWatch(
-=======
 
   await getOrCreateTVSeriesWatched(serieId, userId);
   await getOrCreateTVSeason(seasonId, season, serieId, serie.name);
   const [pre, post] = await updateOrCreateOrDeleteSeasonWatch(
->>>>>>> temp-branch
     seasonId,
     serieId,
     userId,
@@ -283,29 +254,11 @@ export async function addEpisodeToSeasonWatched(
   );
 
   if (pre === undefined || post === undefined) {
-<<<<<<< HEAD
-    throw new Error("I can this two be undefined");
-  }
-
-  console.log(pre, post);
-
-  // UPDATE INFO AND SERIE WATCH
-  const ep_diff = post.episodeWatched - pre.episodeWatched;
-
-  // RUNTIME
-  const ep_runtime = serie.episode_run_time[0];
-  const DEFAULT_RUNTIME = 40;
-  const runtime =
-    ep_runtime === undefined ? DEFAULT_RUNTIME : ep_runtime * ep_diff;
-
-  await updateInfo(userId, 0, 0, runtime, ep_diff, 0, 0);
-=======
     throw new Error("How can this two be undefined");
   }
 
   // UPDATE INFO AND SERIE WATCH
   const ep_diff = post !== null ? post.episodeWatched : 0 - pre.episodeWatched;
->>>>>>> temp-branch
 
   // RUNTIME
   const ep_runtime = serie.episode_run_time[0];

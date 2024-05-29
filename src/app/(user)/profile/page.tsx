@@ -1,13 +1,6 @@
 import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
-<<<<<<< HEAD
-import { TMDB_IMAGE_URL } from "~/_utils/utils";
-import { getUser, myInfo } from "~/app/(user)/user_action";
-import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
-import { type DBUserInfoType } from "~/server/db/types";
-import { type User } from "~/types/tmdb_detail";
-=======
 import { redirect } from "next/navigation";
 import { TMDB_IMAGE_URL, addZero } from "~/_utils/utils";
 import {
@@ -41,7 +34,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { type DBUserInfoType } from "~/server/db/types";
 import { type Serie, type User } from "~/types/tmdb_detail";
->>>>>>> temp-branch
 import { myWatchedMovie } from "../user_action";
 import { SummaryGraph } from "./_components/SummaryGraph";
 
@@ -66,11 +58,7 @@ function handleVisualizationTimestamp(start: number) {
   );
 }
 
-<<<<<<< HEAD
-function Summary(props: { user: User; info: DBUserInfoType }) {
-=======
 function Summary(props: { user: User; info: DBUserInfoType | undefined }) {
->>>>>>> temp-branch
   const { user, info } = props;
 
   if (info === undefined) {
@@ -183,11 +171,6 @@ async function DisplayMovie(props: { user: User }) {
   );
 }
 
-<<<<<<< HEAD
-export default async function Page() {
-  const user = await getUser();
-  let info: DBUserInfoType;
-=======
 async function DispalyAllSeries(props: { user: User }) {
   const { user } = props;
   const userId = user.id.toString();
@@ -434,7 +417,6 @@ async function DispalyAllSeries(props: { user: User }) {
 
 export default async function Page() {
   const user = await getUser();
->>>>>>> temp-branch
 
   if (user === null) {
     return (

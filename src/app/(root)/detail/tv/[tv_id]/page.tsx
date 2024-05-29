@@ -147,10 +147,7 @@ async function DisplaySeason(props: {
                 await addEpisodeToSeasonWatched(userId, tv, season, {
                   episodeCount: season.episode_count,
                   status: "COMPLETED",
-<<<<<<< HEAD
-=======
                   ended: new Date(),
->>>>>>> temp-branch
                 });
               }
 
@@ -158,15 +155,10 @@ async function DisplaySeason(props: {
                 "use server";
                 if (userId === undefined) return;
                 await addEpisodeToSeasonWatched(userId, tv, season, {
-<<<<<<< HEAD
-                  episodeCount: 0,
-                  status: null,
-=======
                   episodeCount: -1,
                   status: null,
                   started: null,
                   ended: null,
->>>>>>> temp-branch
                 });
               }
 
@@ -184,19 +176,6 @@ async function DisplaySeason(props: {
                       alt={`Poster ${season.name}`}
                       className="object-fill"
                     />
-<<<<<<< HEAD
-                    <p className="absolute right-1 top-1 flex w-fit flex-col rounded-sm bg-white p-1 text-xs font-bold text-black">
-                      <p>{watchedS?.status}</p>
-                      <p className="ml-auto">
-                        {watchedS?.status === "WATCHING" ? (
-                          <>
-                            <span>{watchedS?.episodeWatched}</span> /
-                            <span>{season.episode_count}</span>
-                          </>
-                        ) : null}
-                      </p>
-                    </p>
-=======
                     {watchedS !== undefined &&
                     watchedS.status !== "PLANNING" &&
                     watchedS.status !== "COMPLETED" ? (
@@ -210,7 +189,6 @@ async function DisplaySeason(props: {
                         </p>
                       </div>
                     ) : null}
->>>>>>> temp-branch
                   </div>
                   {loggedIn ? (
                     <div className="mt-auto flex h-12 flex-row justify-around">
@@ -225,11 +203,7 @@ async function DisplaySeason(props: {
                         </form>
                       ) : null}
 
-<<<<<<< HEAD
-                      <button className="flex h-full w-full items-center justify-center bg-sky-600">
-=======
                       <div className="flex h-full w-full items-center justify-center bg-sky-600">
->>>>>>> temp-branch
                         <EditSeason
                           addEpisode={addEpisodeToSeasonWatched}
                           serie={tv}
@@ -237,11 +211,7 @@ async function DisplaySeason(props: {
                           userId={user.id.toString()}
                           season_w={watchedS}
                         />
-<<<<<<< HEAD
-                      </button>
-=======
                       </div>
->>>>>>> temp-branch
                       {watchedS?.status != null && watchedS != undefined ? (
                         <form
                           className="flex h-full w-full items-center justify-center bg-red-600"

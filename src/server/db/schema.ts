@@ -164,14 +164,10 @@ export const seriesWatchedTable = createTable("tv-series-watched", {
   ended: date("ended"),
   seasonCount: smallint("season_count").notNull().default(0),
   status: text("status", {
-<<<<<<< HEAD
-    enum: ["PLANNING", "WATCHING", "COMPLETED", "DROPPED"],
-=======
     enum: SeasonStatusEnum,
   }),
   createdAt: timestamp("created_at").$defaultFn(() => {
     return new Date();
->>>>>>> temp-branch
   }),
 });
 
@@ -240,15 +236,10 @@ export const seasonWatchedTable = createTable("tv-season-watched", {
       onUpdate: "no action",
     }),
   episodeWatched: smallint("episode_watched").notNull().default(0),
-<<<<<<< HEAD
-  status: text("status", {
-    enum: ["PLANNING", "WATCHING", "COMPLETED", "DROPPED"],
-=======
   started: date("started"),
   ended: date("ended"),
   status: text("status", {
     enum: SeasonStatusEnum,
->>>>>>> temp-branch
   }),
 });
 

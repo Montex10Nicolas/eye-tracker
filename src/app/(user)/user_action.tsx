@@ -12,12 +12,6 @@ import {
   seriesWatchedTable,
   userInfoTable,
   userTable,
-<<<<<<< HEAD
-  type seriesTable,
-  type seriesWatchedTable,
-} from "~/server/db/schema";
-import { type DBUserInfoType } from "~/server/db/types";
-=======
 } from "~/server/db/schema";
 import {
   type DBSeasonType,
@@ -25,7 +19,6 @@ import {
   type DBSerieType,
   type DBUserInfoType,
 } from "~/server/db/types";
->>>>>>> temp-branch
 import { type MovieDetail } from "~/types/tmdb_detail";
 
 export const PASSWORD_HASH_PAR = {
@@ -188,8 +181,6 @@ export async function myInfo(userId: string) {
   return info;
 }
 
-<<<<<<< HEAD
-=======
 export type seasonWatchWithSeason = {
   season: DBSeasonType;
 } & DBSeasonWatchedType;
@@ -199,7 +190,6 @@ export type SeriesAndSeasonWatched = typeof seriesWatchedTable.$inferSelect & {
   serie: DBSerieType;
 };
 
->>>>>>> temp-branch
 export async function myWatchedSeries(userId: string) {
   "use server";
 
