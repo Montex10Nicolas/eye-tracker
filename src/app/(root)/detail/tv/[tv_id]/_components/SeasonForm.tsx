@@ -77,6 +77,11 @@ export function SeasonForm(props: {
   }, [seasonWatch]);
 
   useEffect(() => {
+    if (ended === null) return;
+    setStatus("COMPLETED");
+  }, [ended]);
+
+  useEffect(() => {
     if (status === "COMPLETED") {
       setEpisode(episode_count);
     } else if (status === "PLANNING") {

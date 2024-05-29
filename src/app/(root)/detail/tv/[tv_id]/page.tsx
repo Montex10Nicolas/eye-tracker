@@ -6,9 +6,17 @@ import {
   type DBSeasonWatchedType,
   type DBSerieWatchedType,
 } from "~/server/db/types";
-import { queryTMDBProvider, queryTMDBTVDetail } from "~/server/queries";
+import {
+  queryTMDBProvider,
+  queryTMDBTVDetail,
+  queryTMDBTVRecomendation,
+} from "~/server/queries";
 import { type Season, type Serie, type User } from "~/types/tmdb_detail";
-import { DisplayCredits, DisplayGenres } from "../../_components/Display";
+import {
+  DisplayCredits,
+  DisplayGenres,
+  DisplayTV,
+} from "../../_components/Display";
 import { AddIcon, TrashIcon } from "../../_components/Icons";
 import Provider from "../../_components/Providers";
 import {
@@ -168,19 +176,19 @@ async function DisplaySeason(props: {
                       alt={`Poster ${season.name}`}
                       className="object-fill"
                     />
-                    <div className="absolute right-1 top-1 flex w-fit flex-col rounded-sm bg-white p-1 text-xs font-bold text-black">
-                      <p>{watchedS?.status}</p>
-                      <p className="ml-auto">
-                        {watchedS !== undefined &&
-                        watchedS.status !== "PLANNING" &&
-                        watchedS.status !== "COMPLETED" ? (
+                    {watchedS !== undefined &&
+                    watchedS.status !== "PLANNING" &&
+                    watchedS.status !== "COMPLETED" ? (
+                      <div className="absolute right-1 top-1 flex w-fit flex-col rounded-sm bg-white p-1 text-xs font-bold text-black">
+                        <p>{watchedS?.status}</p>
+                        <p className="ml-auto">
                           <>
                             <span>{watchedS.episodeWatched}</span> /
                             <span>{season.episode_count}</span>
                           </>
-                        ) : null}
-                      </p>
-                    </div>
+                        </p>
+                      </div>
+                    ) : null}
                   </div>
                   {loggedIn ? (
                     <div className="mt-auto flex h-12 flex-row justify-around">
@@ -227,6 +235,29 @@ async function DisplaySeason(props: {
   );
 }
 
+async function DisplayReccomendation(props: { serieId: string }) {
+  const { serieId } = props;
+  const reccomendations = await queryTMDBTVRecomendation(serieId, 1);
+  return (
+    <section className="my-6 flex-col rounded-md bg-white p-4 text-black">
+      <h1 className="text-xl font-semibold">Recomendation</h1>
+      <ScrollArea className="h-[500px] w-full overflow-hidden pt-2">
+        <div className="mt-6 flex flex-row flex-wrap justify-between gap-4">
+          {reccomendations.results.map((tv_reccomend) => {
+            return (
+              <DisplayTV
+                key={tv_reccomend.id}
+                result={tv_reccomend}
+                background_url={tv_reccomend.backdrop_path}
+              />
+            );
+          })}
+        </div>
+      </ScrollArea>
+    </section>
+  );
+}
+
 export default async function Page(props: { params: { tv_id: string } }) {
   const tv_id = props.params.tv_id;
 
@@ -248,6 +279,7 @@ export default async function Page(props: { params: { tv_id: string } }) {
         seasonsWatched={seriesAndSeasonWatched?.seasons}
       />
       <DisplayCredits credits={tv.credits} />
+      <DisplayReccomendation serieId={tv_id} />
     </div>
   );
 }

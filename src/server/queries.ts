@@ -113,7 +113,7 @@ export async function queryTMDBTVDetail(id: string) {
   return data;
 }
 
-export async function queryTMDBTVRecomendation(tvId: number, page: number) {
+export async function queryTMDBTVRecomendation(tvId: string, page: number) {
   "use server";
   const id = tvId.toString();
   const url = new URL(`/3/tv/${id}/recommendations`, TMDB_URL);
