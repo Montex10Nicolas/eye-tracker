@@ -9,12 +9,23 @@ import { lucia } from "~/lib/auth";
 import { db } from "~/server/db";
 import {
   seasonWatchedTable,
+  seriesWatchedTable,
   userInfoTable,
   userTable,
+<<<<<<< HEAD
   type seriesTable,
   type seriesWatchedTable,
 } from "~/server/db/schema";
 import { type DBUserInfoType } from "~/server/db/types";
+=======
+} from "~/server/db/schema";
+import {
+  type DBSeasonType,
+  type DBSeasonWatchedType,
+  type DBSerieType,
+  type DBUserInfoType,
+} from "~/server/db/types";
+>>>>>>> temp-branch
 import { type MovieDetail } from "~/types/tmdb_detail";
 
 export const PASSWORD_HASH_PAR = {
@@ -177,6 +188,18 @@ export async function myInfo(userId: string) {
   return info;
 }
 
+<<<<<<< HEAD
+=======
+export type seasonWatchWithSeason = {
+  season: DBSeasonType;
+} & DBSeasonWatchedType;
+
+export type SeriesAndSeasonWatched = typeof seriesWatchedTable.$inferSelect & {
+  seasonsWatched: seasonWatchWithSeason[];
+  serie: DBSerieType;
+};
+
+>>>>>>> temp-branch
 export async function myWatchedSeries(userId: string) {
   "use server";
 
@@ -189,25 +212,25 @@ export async function myWatchedSeries(userId: string) {
         },
       },
     },
+    orderBy: desc(seriesWatchedTable.createdAt),
   });
-
-  type SeriesAndSeasonWatched = typeof seriesWatchedTable.$inferSelect & {
-    season: (typeof seasonWatchedTable.$inferSelect)[];
-    serie: typeof seriesTable.$inferSelect;
-  };
-
   const series: SeriesAndSeasonWatched[] = [];
 
   for (const serie of results) {
-    const season_watched: (typeof seasonWatchedTable.$inferSelect)[] = [];
+    const season_watched: seasonWatchWithSeason[] = [];
     for (const season of serie.serie.seasons) {
       const seasonId = season.id.toString();
-      const seasonWatchRes = await db.query.seasonWatchedTable.findFirst({
-        where: (ses, { eq, and }) =>
-          and(eq(ses.userId, userId), eq(ses.seasonId, seasonId)),
-      });
+      const seasonWatchRes: seasonWatchWithSeason | undefined =
+        await db.query.seasonWatchedTable.findFirst({
+          where: (ses, { eq, and }) =>
+            and(eq(ses.userId, userId), eq(ses.seasonId, seasonId)),
+          with: {
+            season: true,
+          },
+        });
+      if (seasonWatchRes === undefined) continue;
 
-      if (seasonWatchRes !== undefined) season_watched.push(seasonWatchRes);
+      season_watched.push(seasonWatchRes);
     }
 
     const a: SeriesAndSeasonWatched = {
@@ -216,8 +239,11 @@ export async function myWatchedSeries(userId: string) {
       serieId: serie.serieId,
       status: serie.status,
       userId: serie.userId,
-      season: season_watched,
       serie: serie.serie,
+      started: serie.started,
+      ended: serie.ended,
+      seasonsWatched: season_watched,
+      createdAt: null,
     };
 
     series.push(a);

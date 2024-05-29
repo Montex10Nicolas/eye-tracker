@@ -30,3 +30,21 @@ export function ageCalculator(d1: Date, d2: Date) {
 
 export const NOT_FOUND_POSTER = "/poster_not_found.png";
 export const MISSING_PERSON = "/missing_person.webp";
+
+export function addZero(n: number | string | undefined) {
+  if (n === undefined) return;
+  if (typeof n === typeof "a") {
+    n = parseInt(n as string);
+  }
+  n = n as number;
+  return n > 10 ? n.toString() : "0" + n;
+}
+
+export function changeDateInvoValue(date: Date | null) {
+  if (date === null) return;
+  const day = date.getDate(),
+    month = date.getMonth() + 1,
+    year = date.getFullYear();
+
+  return `${year}-${addZero(month)}-${addZero(day)}`;
+}

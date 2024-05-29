@@ -30,6 +30,10 @@ export function EditSeason(props: {
 
   function closeDialog() {
     setVisible(false);
+<<<<<<< HEAD
+=======
+    document.body.style.overflowY = "visible";
+>>>>>>> temp-branch
   }
 
   return (

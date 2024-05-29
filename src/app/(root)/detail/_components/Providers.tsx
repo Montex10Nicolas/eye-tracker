@@ -39,12 +39,22 @@ function DisplayProvider(props: { provider: ProviderResult | undefined }) {
 
   let colLen = final.length;
   if (colLen > 4) colLen = 4;
+<<<<<<< HEAD
 
   return (
     <div className={`grid grid-cols-${colLen} gap-2`}>
       {final.map((prov) => {
         return (
           <div key={prov.provider_id}>
+=======
+  const gridCol = `grid gap-2 ${colLen === 4 ? "grid-cols-4" : "grid-cols-2"} grid-cols-2`;
+
+  return (
+    <div className={gridCol}>
+      {final.map((prov) => {
+        return (
+          <div key={prov.provider_id} className="grid-cols-1">
+>>>>>>> temp-branch
             <img
               className="rounded-sm border border-slate-800 object-fill"
               src={TMDB_IMAGE_URL(prov.logo_path)}

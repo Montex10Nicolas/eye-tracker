@@ -6,9 +6,17 @@ import {
   type DBSeasonWatchedType,
   type DBSerieWatchedType,
 } from "~/server/db/types";
-import { queryTMDBProvider, queryTMDBTVDetail } from "~/server/queries";
+import {
+  queryTMDBProvider,
+  queryTMDBTVDetail,
+  queryTMDBTVRecomendation,
+} from "~/server/queries";
 import { type Season, type Serie, type User } from "~/types/tmdb_detail";
-import { DisplayCredits, DisplayGenres } from "../../_components/Display";
+import {
+  DisplayCredits,
+  DisplayGenres,
+  DisplayTV,
+} from "../../_components/Display";
 import { AddIcon, TrashIcon } from "../../_components/Icons";
 import Provider from "../../_components/Providers";
 import {
@@ -139,6 +147,10 @@ async function DisplaySeason(props: {
                 await addEpisodeToSeasonWatched(userId, tv, season, {
                   episodeCount: season.episode_count,
                   status: "COMPLETED",
+<<<<<<< HEAD
+=======
+                  ended: new Date(),
+>>>>>>> temp-branch
                 });
               }
 
@@ -146,8 +158,15 @@ async function DisplaySeason(props: {
                 "use server";
                 if (userId === undefined) return;
                 await addEpisodeToSeasonWatched(userId, tv, season, {
+<<<<<<< HEAD
                   episodeCount: 0,
                   status: null,
+=======
+                  episodeCount: -1,
+                  status: null,
+                  started: null,
+                  ended: null,
+>>>>>>> temp-branch
                 });
               }
 
@@ -165,6 +184,7 @@ async function DisplaySeason(props: {
                       alt={`Poster ${season.name}`}
                       className="object-fill"
                     />
+<<<<<<< HEAD
                     <p className="absolute right-1 top-1 flex w-fit flex-col rounded-sm bg-white p-1 text-xs font-bold text-black">
                       <p>{watchedS?.status}</p>
                       <p className="ml-auto">
@@ -176,6 +196,21 @@ async function DisplaySeason(props: {
                         ) : null}
                       </p>
                     </p>
+=======
+                    {watchedS !== undefined &&
+                    watchedS.status !== "PLANNING" &&
+                    watchedS.status !== "COMPLETED" ? (
+                      <div className="absolute right-1 top-1 flex w-fit flex-col rounded-sm bg-white p-1 text-xs font-bold text-black">
+                        <p>{watchedS?.status}</p>
+                        <p className="ml-auto">
+                          <>
+                            <span>{watchedS.episodeWatched}</span> /
+                            <span>{season.episode_count}</span>
+                          </>
+                        </p>
+                      </div>
+                    ) : null}
+>>>>>>> temp-branch
                   </div>
                   {loggedIn ? (
                     <div className="mt-auto flex h-12 flex-row justify-around">
@@ -190,7 +225,11 @@ async function DisplaySeason(props: {
                         </form>
                       ) : null}
 
+<<<<<<< HEAD
                       <button className="flex h-full w-full items-center justify-center bg-sky-600">
+=======
+                      <div className="flex h-full w-full items-center justify-center bg-sky-600">
+>>>>>>> temp-branch
                         <EditSeason
                           addEpisode={addEpisodeToSeasonWatched}
                           serie={tv}
@@ -198,7 +237,11 @@ async function DisplaySeason(props: {
                           userId={user.id.toString()}
                           season_w={watchedS}
                         />
+<<<<<<< HEAD
                       </button>
+=======
+                      </div>
+>>>>>>> temp-branch
                       {watchedS?.status != null && watchedS != undefined ? (
                         <form
                           className="flex h-full w-full items-center justify-center bg-red-600"
@@ -218,6 +261,29 @@ async function DisplaySeason(props: {
           <ScrollBar orientation="vertical" />
         </ScrollArea>
       </section>
+    </section>
+  );
+}
+
+async function DisplayReccomendation(props: { serieId: string }) {
+  const { serieId } = props;
+  const reccomendations = await queryTMDBTVRecomendation(serieId, 1);
+  return (
+    <section className="my-6 flex-col rounded-md bg-white p-4 text-black">
+      <h1 className="text-xl font-semibold">Recomendation</h1>
+      <ScrollArea className="h-[500px] w-full overflow-hidden pt-2">
+        <div className="mt-6 flex flex-row flex-wrap justify-between gap-4">
+          {reccomendations.results.map((tv_reccomend) => {
+            return (
+              <DisplayTV
+                key={tv_reccomend.id}
+                result={tv_reccomend}
+                background_url={tv_reccomend.backdrop_path}
+              />
+            );
+          })}
+        </div>
+      </ScrollArea>
     </section>
   );
 }
@@ -243,6 +309,7 @@ export default async function Page(props: { params: { tv_id: string } }) {
         seasonsWatched={seriesAndSeasonWatched?.seasons}
       />
       <DisplayCredits credits={tv.credits} />
+      <DisplayReccomendation serieId={tv_id} />
     </div>
   );
 }
