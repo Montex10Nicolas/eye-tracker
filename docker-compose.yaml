@@ -1,16 +1,8 @@
 version: "3.3"
 services:
   database:
-    image: postgres:13.14-bullseye
     ports:
+    container_name: siuwi-db
       - "5432:5432"
     environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-  swagger:
-    image: swaggerapi/swagger-ui
-    ports:
-      - "80:8080"
-    environment:
-      - SWAGGER_JSON="./tmdb_v3.json"
+      - POSTGRES_PASSWORD=ciao
