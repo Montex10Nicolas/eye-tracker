@@ -1,5 +1,5 @@
 import { hash, verify } from "@node-rs/argon2";
-import { asc, desc } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import { generateIdFromEntropySize } from "lucia";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -8,12 +8,10 @@ import { cache } from "react";
 import { lucia } from "~/lib/auth";
 import { db } from "~/server/db";
 import {
-  seasonTable,
   seasonWatchedTable,
   seriesWatchedTable,
   userInfoTable,
   userTable,
-  type seriesTable,
 } from "~/server/db/schema";
 import {
   type DBSeasonType,
