@@ -245,8 +245,6 @@ export async function addEpisodeToSeasonWatched(
   const serieId = serie.id.toString(),
     seasonId = season.id.toString();
 
-  console.log(newInfo);
-
   await getOrCreateTVSeriesWatched(serieId, userId);
   await getOrCreateTVSeason(seasonId, season, serieId, serie.name);
   const [pre, post] = await updateOrCreateOrDeleteSeasonWatch(
