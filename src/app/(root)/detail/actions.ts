@@ -16,6 +16,7 @@ import { db } from "~/server/db";
 import {
   movieWatchedTable,
   moviesTable,
+  seasonWatchedTable,
   userInfoTable,
 } from "~/server/db/schema";
 import {
