@@ -1,4 +1,4 @@
-import { and, count, eq } from "drizzle-orm";
+import { and, asc, count, desc, eq } from "drizzle-orm";
 import { type UpdateSeasonWatchData } from "~/app/(root)/detail/actions";
 import { db } from "~/server/db";
 import {

@@ -64,7 +64,7 @@ function Summary(props: { user: User; info: DBUserInfoType | undefined }) {
   }
 
   return (
-    <section className="mx-4 h-[500px] rounded-md bg-white p-4 text-slate-950">
+    <section className="mx-4  rounded-md bg-white p-4 text-slate-950 md:h-[500px]">
       <h1 className="text-3xl font-bold">{user.username}</h1>
 
       {/*  Stats */}

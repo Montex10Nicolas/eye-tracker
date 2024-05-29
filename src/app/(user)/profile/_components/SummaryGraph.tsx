@@ -32,9 +32,6 @@ export function SummaryGraph(props: { info: DBUserInfoType }) {
   const { info } = props;
   const {
     movieWatched,
-    movieDurationTotal,
-    tvDurationTotal,
-    tvEpisodeCount,
     tvSerieCompleted,
     tvSerieWatching,
     tvSeasonCompleted,
@@ -80,7 +77,7 @@ export function SummaryGraph(props: { info: DBUserInfoType }) {
   };
 
   return (
-    <div className="flex h-full w-full justify-between">
+    <div className="flex h-full w-full flex-col justify-between md:flex-row">
       <Bar
         className="h-full w-[30%]"
         options={{

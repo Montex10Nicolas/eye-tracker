@@ -204,7 +204,7 @@ export async function myWatchedSeries(userId: string) {
         },
       },
     },
-    orderBy: asc(seriesWatchedTable.createdAt),
+    orderBy: desc(seriesWatchedTable.createdAt),
   });
   const series: SeriesAndSeasonWatched[] = [];
 
