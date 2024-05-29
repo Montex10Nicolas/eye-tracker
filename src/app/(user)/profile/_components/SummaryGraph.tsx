@@ -77,9 +77,9 @@ export function SummaryGraph(props: { info: DBUserInfoType }) {
   };
 
   return (
-    <div className="flex h-full w-full flex-col justify-between md:flex-row">
+    <div className="grid grid-rows-2 items-center justify-center md:grid-cols-2 md:grid-rows-1">
       <Bar
-        className="h-full w-[30%]"
+        className="max-h-[300px] max-w-[400px]"
         options={{
           scales: {
             y: {
@@ -92,7 +92,7 @@ export function SummaryGraph(props: { info: DBUserInfoType }) {
         data={data}
       />
       <Radar
-        className="h-full w-[50%]"
+        className="max-h-[300px] max-w-[400px]"
         options={{
           scales: {
             y: {

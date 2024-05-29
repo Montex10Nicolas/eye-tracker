@@ -99,7 +99,7 @@ function Summary(props: { user: User; info: DBUserInfoType | undefined }) {
         </div>
       </div>
 
-      <div className="my-2 h-[80%] p-2">
+      <div className="">
         <SummaryGraph info={info} />
       </div>
     </section>
