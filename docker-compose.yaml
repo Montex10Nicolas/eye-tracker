@@ -1,8 +1,9 @@
 version: "3.3"
 services:
   database:
-    ports:
+    image: postgres
     container_name: siuwi-db
+    ports:
       - "5432:5432"
-    environment:
-      - POSTGRES_PASSWORD=ciao
+    env_file:
+      - .env
