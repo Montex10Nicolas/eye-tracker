@@ -145,6 +145,7 @@ const SeasonStatusEnum: readonly [string, ...string[]] = [
   "DROPPED",
   "PAUSED",
 ];
+
 export const seriesWatchedTable = createTable("tv-series-watched", {
   id: serial_without_erros("id").primaryKey(),
   serieId: varchar("serie_id", { length: 256 })

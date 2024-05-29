@@ -12,6 +12,7 @@ import {
   getUser,
   myInfo,
   myWatchedSeries,
+  type SeriesAndSeasonWatched,
   type seasonWatchWithSeason,
 } from "~/app/(user)/user_action";
 import {
@@ -30,6 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { type DBUserInfoType } from "~/server/db/types";
 import { type Serie, type User } from "~/types/tmdb_detail";
 import { myWatchedMovie } from "../user_action";
@@ -99,7 +101,7 @@ function Summary(props: { user: User; info: DBUserInfoType | undefined }) {
         </div>
       </div>
 
-      <div className="my-2 h-[80%] p-2">
+      <div className="">
         <SummaryGraph info={info} />
       </div>
     </section>
@@ -199,12 +201,10 @@ async function DispalyAllSeries(props: { user: User }) {
                 ses.started === null
                   ? "not set"
                   : new Date(ses.started).toLocaleDateString();
-              ("default");
               const ended =
                 ses.ended === null
                   ? "not set"
                   : new Date(ses.ended).toLocaleDateString();
-              ("default");
 
               async function addOne() {
                 "use server";
@@ -294,10 +294,20 @@ async function DispalyAllSeries(props: { user: User }) {
     );
   }
 
-  function DisplaySeries() {
+  function DisplaySeries(props: { data: SeriesAndSeasonWatched[] }) {
+    const { data } = props;
+
+    if (data.length === 0) {
+      return (
+        <div>
+          <h1>There are no Serie in this category</h1>
+        </div>
+      );
+    }
+
     return (
       <>
-        {seriesWatched.map((serieWatch, index) => {
+        {data.map((serieWatch, index) => {
           const serieData = serieWatch.serie.serie_data;
           const seasonsWatched = serieWatch.seasonsWatched;
 
@@ -344,10 +354,63 @@ async function DispalyAllSeries(props: { user: User }) {
     );
   }
 
+  const all = seriesWatched;
+  const watching = seriesWatched.filter((c) => c.status === "WATCHING");
+  const completed = seriesWatched.filter((c) => c.status === "COMPLETED");
+  const paused = seriesWatched.filter((c) => c.status === "PAUSED");
+  const planning = seriesWatched.filter((c) => c.status === "PLANNING");
+  const dropped = seriesWatched.filter((c) => c.status === "DROPPED");
+
   return (
     <section className="mx-4 mt-3 rounded-md bg-white p-4 text-black">
       <h1 className="text-xl font-semibold">Serie:</h1>
-      <DisplaySeries />
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="h-50 flex w-full flex-col sm:h-fit sm:flex-row">
+          <TabsTrigger value="planning">Planing</TabsTrigger>
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="watching">Watching</TabsTrigger>
+          <TabsTrigger value="completed">Completed</TabsTrigger>
+          <TabsTrigger value="paused">Paused</TabsTrigger>
+          <TabsTrigger value="dropped">Dropped</TabsTrigger>
+        </TabsList>
+        {/* Looks like a mess but it's the right way to do it */}
+        <TabsContent value="all">
+          <ScrollArea className="h-[600px] pr-6">
+            <DisplaySeries data={all} />
+            <ScrollBar />
+          </ScrollArea>
+        </TabsContent>
+        <TabsContent value="watching">
+          <ScrollArea className="h-[600px] pr-6">
+            <DisplaySeries data={watching} />
+            <ScrollBar />
+          </ScrollArea>
+        </TabsContent>
+        <TabsContent value="planning">
+          <ScrollArea className="h-[600px] pr-6">
+            <DisplaySeries data={planning} />
+            <ScrollBar />
+          </ScrollArea>
+        </TabsContent>
+        <TabsContent value="completed">
+          <ScrollArea className="h-[600px] pr-6">
+            <DisplaySeries data={completed} />
+            <ScrollBar />
+          </ScrollArea>
+        </TabsContent>
+        <TabsContent value="paused">
+          <ScrollArea className="h-[600px] pr-6">
+            <DisplaySeries data={paused} />
+            <ScrollBar />
+          </ScrollArea>
+        </TabsContent>
+        <TabsContent value="dropped">
+          <ScrollArea className="h-[600px] pr-6">
+            <DisplaySeries data={dropped} />
+            <ScrollBar />
+          </ScrollArea>
+        </TabsContent>
+      </Tabs>
     </section>
   );
 }

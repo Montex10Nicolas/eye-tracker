@@ -206,6 +206,7 @@ export interface UpdateSeasonWatchData {
   ended?: Date | null;
 }
 
+// Function for button "+/-" in profile
 export async function addOrRemoveOneEpisode(
   userId: string,
   dbSeasonId: number,
