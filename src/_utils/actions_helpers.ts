@@ -363,7 +363,6 @@ export async function updateSeasonCompletitionByUser(
       .update(seasonWatchedTable)
       .set({
         status: status,
-        ended: null,
       })
       .where(eq(seasonWatchedTable.id, seasonWatch.id));
   }
@@ -449,6 +448,7 @@ export async function updateOrCreateOrDeleteSeasonWatch(
     })
     .where(eq(seasonWatchedTable.id, season.id))
     .returning();
+
   if (newData[0] === undefined) throw new Error("I can newData be undefined");
 
   const post = newData[0];

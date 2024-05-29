@@ -206,6 +206,7 @@ export interface UpdateSeasonWatchData {
   ended?: Date | null;
 }
 
+// Function for button "+/-" in profile
 export async function addOrRemoveOneEpisode(
   userId: string,
   dbSeasonId: number,
@@ -243,6 +244,8 @@ export async function addEpisodeToSeasonWatched(
 ) {
   const serieId = serie.id.toString(),
     seasonId = season.id.toString();
+
+  console.log(newInfo);
 
   await getOrCreateTVSeriesWatched(serieId, userId);
   await getOrCreateTVSeason(seasonId, season, serieId, serie.name);

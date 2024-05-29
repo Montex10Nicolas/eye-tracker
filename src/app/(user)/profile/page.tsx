@@ -347,7 +347,10 @@ async function DispalyAllSeries(props: { user: User }) {
   return (
     <section className="mx-4 mt-3 rounded-md bg-white p-4 text-black">
       <h1 className="text-xl font-semibold">Serie:</h1>
-      <DisplaySeries />
+      <ScrollArea className="h-[600px] pr-6">
+        <DisplaySeries />
+        <ScrollBar />
+      </ScrollArea>
     </section>
   );
 }
