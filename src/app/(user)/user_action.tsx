@@ -261,11 +261,7 @@ export interface MyMovieType {
   };
 }
 
-export async function myWatchedMovie(
-  userId: string,
-  limit = 25,
-  offset: number,
-) {
+export async function myWatchedMovie(userId: string, limit = 25, offset = 0) {
   "use server";
   const results = await db.query.movieWatchedTable.findMany({
     with: {
