@@ -1,6 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
+import {
+  TMDB_IMAGE_URL,
+  displayHumanDate,
+  numberToGender,
+} from "~/_utils/utils";
 import { Badge } from "~/components/ui/badge";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
@@ -12,17 +16,6 @@ import {
   type TVResultType,
 } from "~/types/tmdb_detail";
 import { DisplayCastCrew } from "./Summary";
-
-function convertGender(gender: number) {
-  switch (gender) {
-    case 0:
-      return "Male";
-    case 1:
-      return "Female";
-    default:
-      return "Not known";
-  }
-}
 
 export function DisplayTV(props: {
   result: TVResultType;
@@ -64,18 +57,18 @@ export function DisplayPerson(props: {
 
   return (
     <Link href={`/detail/person/${person.id}`}>
-      <div className="max-w-[200px] cursor-pointer overflow-hidden bg-sky-600">
+      <div className="max-h-[400px] max-w-[200px] cursor-pointer overflow-hidden border border-black text-black hover:border-yellow-600">
         <Image
           src={TMDB_IMAGE_URL(background_url)}
           width={200}
           height={300}
           alt={`Poster ${person.name}`}
-          className="image object-fit min-h-[300px] min-w-[200px] overflow-hidden  transition-all duration-200 ease-in-out hover:relative hover:top-[-16px] hover:scale-110"
+          className="image min-h-[300px] min-w-[200px] overflow-hidden object-cover transition-all duration-200 ease-in-out hover:relative hover:scale-110"
         />
-        <div className="z-10 overflow-hidden p-2">
-          <div>{person.name}</div>
+        <div className="p-2">
+          <div className="text-xl font-semibold">{person.name}</div>
           <div className="flex justify-between">
-            <span>{convertGender(person.gender)}</span>
+            <span>{numberToGender(person.gender)}</span>
             <span>{person.known_for_department}</span>
           </div>
         </div>

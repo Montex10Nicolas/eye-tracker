@@ -5,6 +5,7 @@ import {
   TMDB_IMAGE_URL,
   ageCalculator,
   displayHumanDate,
+  numberToGender,
 } from "~/_utils/utils";
 import {
   getUser,
@@ -55,20 +56,6 @@ function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
   });
 
   return sorted;
-}
-
-function numberToGender(num: number) {
-  if (num < 0 || num > 3) return "";
-  switch (num) {
-    case 0:
-      return "Not specified";
-    case 1:
-      return "Female";
-    case 2:
-      return "Male";
-    case 3:
-      return "Non-binary";
-  }
 }
 
 function DisplayInfo(person: PersonDetailType) {

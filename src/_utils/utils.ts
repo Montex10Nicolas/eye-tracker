@@ -48,3 +48,17 @@ export function changeDateInvoValue(date: Date | null) {
 
   return `${year}-${addZero(month)}-${addZero(day)}`;
 }
+
+export function numberToGender(num: number) {
+  if (num < 0 || num > 3) return "";
+  switch (num) {
+    case 0:
+      return "Not specified";
+    case 1:
+      return "Female";
+    case 2:
+      return "Male";
+    case 3:
+      return "Non-binary";
+  }
+}
