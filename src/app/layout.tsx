@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { Logout, getUser } from "~/app/(user)/user_action";
+import NavBar from "~/components/NavBar";
 import Profile from "~/components/profile";
 
 const inter = Inter({
@@ -22,33 +23,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getUser();
-  const loggedIn = user !== null;
-
   return (
     <html lang="en">
       <body
         className={`font-sans ${inter.variable} flex min-h-screen flex-col bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white`}
       >
-        <section className="mx-2 mb-6 flex flex-row items-center justify-between rounded-b-2xl bg-slate-200 px-6 py-2 text-black">
-          <div></div>
-          <div className="ml-auto text-3xl font-bold">
-            <Link className="cursor-pointer" href={"/"}>
-              <h1>Siuwi Tracker</h1>
-            </Link>
-          </div>
-          <div className="ml-auto">
-            {loggedIn ? (
-              <Profile logout={Logout} />
-            ) : (
-              <Link href={"/login"}>
-                <button className="rounded-md bg-sky-700 px-4 py-2 font-semibold  text-white">
-                  Sign In
-                </button>
-              </Link>
-            )}
-          </div>
-        </section>
+        <NavBar />
         {children}
         <div id="modal-root"></div>
 

@@ -9,12 +9,12 @@ export async function DisplaySearchMultiple() {
   }
 
   return (
-    <form action={searchMovieSeries} className="mb-3 mt-2 flex justify-center">
+    <form action={searchMovieSeries} className="-mt-2 flex justify-center">
       <input
         type="text"
         name="search"
         placeholder={"Search a TV Series a Movie or a Person"}
-        className="w-96 rounded-full px-4 py-2 text-lg text-black"
+        className="border-3 m-4 w-96 rounded-sm border border-slate-900 px-4 py-2 text-lg text-black "
       />
     </form>
   );
