@@ -18,7 +18,7 @@ export function PersonSummaryCast(props: { person: Cast }) {
         width={100}
         height={300}
         alt={`${person.name}`}
-        className=""
+        className="object-cover"
       />
       <div className="mt-auto">
         <span className="font-semibold">{person.name}</span>

@@ -58,13 +58,15 @@ export function DisplayPerson(props: {
   return (
     <Link href={`/detail/person/${person.id}`}>
       <div className="max-h-[400px] max-w-[200px] cursor-pointer overflow-hidden border border-black text-black hover:border-yellow-600">
-        <Image
-          src={TMDB_IMAGE_URL(background_url)}
-          width={200}
-          height={300}
-          alt={`Poster ${person.name}`}
-          className="image min-h-[300px] min-w-[200px] overflow-hidden object-cover transition-all duration-200 ease-in-out hover:relative hover:scale-110"
-        />
+        <div className="overflow-hidden">
+          <Image
+            src={TMDB_IMAGE_URL(background_url)}
+            width={200}
+            height={300}
+            alt={`Poster ${person.name}`}
+            className="min-h-[300px] min-w-[200px] object-cover transition-all duration-200 ease-in-out hover:relative hover:scale-110"
+          />
+        </div>
         <div className="p-2">
           <div className="text-xl font-semibold">{person.name}</div>
           <div className="flex justify-between">
@@ -91,7 +93,7 @@ export function DisplayMovies(props: {
             width={500}
             height={300}
             alt={`Poster ${found.title}`}
-            className="image min-h-[300px] min-w-[200px] overflow-hidden rounded-b-3xl object-cover transition-all duration-200 ease-in-out hover:relative hover:top-[-16px] hover:scale-110"
+            className="image min-h-[300px] min-w-[200px] object-cover transition-all duration-200 ease-in-out hover:relative hover:scale-110"
           />
           <div className="absolute right-1 top-1 rounded-sm bg-white px-2 py-1 font-semibold uppercase text-black">
             Movie

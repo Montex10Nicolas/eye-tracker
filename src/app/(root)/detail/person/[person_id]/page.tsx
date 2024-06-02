@@ -95,7 +95,7 @@ function DisplayInfo(person: PersonDetailType) {
             <span className="italic text-slate-400/80">Gender: </span>
             <span>{numberToGender(person.gender)}</span>
           </div>
-          <div className="mt-auto">{person.biography}</div>
+          <div className="mt-auto p-4">{person.biography}</div>
         </div>
       </div>
     </div>
@@ -122,7 +122,7 @@ function DisplayCredit(
             width={192}
             height={250}
             alt={`${cred.original_title}`}
-            className="min-h-[250px]"
+            className="min-h-[250px] object-cover"
           />
           <div className="absolute right-1 top-1 rounded-sm bg-white px-2 py-1 font-semibold uppercase text-black">
             {movie ? "Movie" : "TV"}
