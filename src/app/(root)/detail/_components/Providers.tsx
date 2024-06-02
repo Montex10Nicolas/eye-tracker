@@ -1,5 +1,6 @@
 "use client";
 import { useState, type ChangeEvent } from "react";
+import { fromIsoToName, getAllIso } from "~/_utils/available_region";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
 import { type FlatRentBuy, type ProviderResult } from "~/types/tmdb_detail";
 
@@ -71,20 +72,21 @@ export default function Provider(props: {
     setCountry(value.toUpperCase());
   }
 
-  const keys = Object.keys(providers);
+  const keys = getAllIso();
 
   return (
     <div className="flex flex-col gap-2">
       <select
         onChange={handleChange}
         value={country}
-        className="cursor-pointer rounded-sm bg-white px-4 py-2 text-center text-black"
+        className="cursor-pointer rounded-sm bg-white px-4 py-2 text-black"
       >
         {keys.map((key) => {
-          const provider = providers[key];
-          if (provider === undefined)
-            return <div key={key}>{key} undefined</div>;
-          return <option key={key}>{key}</option>;
+          return (
+            <option key={key} value={key}>
+              {fromIsoToName(key)}
+            </option>
+          );
         })}
       </select>
       <DisplayProvider provider={providerData} />

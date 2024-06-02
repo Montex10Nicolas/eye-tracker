@@ -1,5 +1,3 @@
-import regions_json from "../_utils/available_region.json";
-
 export interface User {
   id: string;
   username?: string;
