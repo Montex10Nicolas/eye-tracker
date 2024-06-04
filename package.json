@@ -41,6 +41,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "18.2.0",
+    "sharp": "^0.33.4",
     "siuwi-tracker": "link:",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
