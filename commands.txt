@@ -1,0 +1,8 @@
+# make_dump.sh
+docker exec -t siuwi-db pg_dumpall -c -U postgres --database=siuwi-tracker > /home/siuwi-db_dump/dump_`date +%Y-%m-%d"_"%H_%M_%S".sql
+
+# restore_dump.sh
+cat file.sql | docker exec -i siuwi-db psql -U postgres
+
+#pm2
+pm2 start pnpm --name siuwi -- start -p 3000
