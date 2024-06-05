@@ -23,12 +23,17 @@ import { type MovieDetail, type Season, type Serie } from "~/types/tmdb_detail";
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
+
+const sqlNow = sql`timezone('utc', now())`;
+
 export const createTable = pgTableCreator((name) => `siuwi-tracker_${name}`);
 
 export const userTable = createTable("user", {
   id: varchar("id", { length: 256 }).primaryKey(),
   username: varchar("username", { length: 256 }).notNull().unique(),
   password_hash: varchar("password", { length: 256 }).notNull(),
+  createatedAt: timestamp("created_at").default(sqlNow),
+  updatedAt: timestamp("updated_at").default(sqlNow),
 });
 
 export const userTableRelation = relations(userTable, ({ one }) => ({
@@ -63,6 +68,8 @@ export const userInfoTable = createTable("user_info", {
   tvSeasonPlanned: integer("tv_season_planned").notNull().default(0),
   tvSeasonDropped: integer("tv_season_dropped").notNull().default(0),
   tvSeasonPaused: integer("tv_season_paused").notNull().default(0),
+
+  updatedAt: timestamp("updated_at").notNull().default(sqlNow),
 });
 
 export const sessionTable = createTable("session", {
@@ -107,6 +114,8 @@ export const movieWatchedTable = createTable(
     duration: smallint("duration").notNull().default(-1),
     timeWatched: smallint("time_watched").notNull(),
     watchedAt: timestamp("watched_at").default(sql`timezone('utc', now())`),
+    updatedAt: timestamp("updated_at").notNull().default(sqlNow),
+    createdAt: timestamp("created_at").default(sqlNow),
   },
   (uToM) => ({
     union: primaryKey({
@@ -166,9 +175,8 @@ export const seriesWatchedTable = createTable("tv-series-watched", {
   status: text("status", {
     enum: SeasonStatusEnum,
   }),
-  createdAt: timestamp("created_at").$defaultFn(() => {
-    return new Date();
-  }),
+  updatedAt: timestamp("updated_at").notNull().default(sqlNow),
+  createdAt: timestamp("created_at").default(sqlNow),
 });
 
 export const seriesWatchedRelations = relations(
@@ -241,6 +249,9 @@ export const seasonWatchedTable = createTable("tv-season-watched", {
   status: text("status", {
     enum: SeasonStatusEnum,
   }),
+
+  updatedAt: timestamp("updated_at").notNull().default(sqlNow),
+  createdAt: timestamp("created_at").default(sqlNow),
 });
 
 export const seasonWatchedRelations = relations(
