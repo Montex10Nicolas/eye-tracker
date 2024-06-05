@@ -223,7 +223,7 @@ export async function myWatchedSeries(userId: string) {
       season_watched.push(seasonWatchRes);
     }
 
-    const a: SeriesAndSeasonWatched = {
+    const serieAndSeasons: SeriesAndSeasonWatched = {
       id: serie.id,
       seasonCount: serie.seasonCount,
       serieId: serie.serieId,
@@ -233,10 +233,11 @@ export async function myWatchedSeries(userId: string) {
       started: serie.started,
       ended: serie.ended,
       seasonsWatched: season_watched,
-      createdAt: null,
+      createdAt: serie.createdAt,
+      updatedAt: serie.updatedAt,
     };
 
-    series.push(a);
+    series.push(serieAndSeasons);
   }
 
   return series;

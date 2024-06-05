@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { type UpdateSeasonWatchData } from "~/app/(root)/detail/actions";
 import { db } from "~/server/db";
 import {
@@ -73,6 +73,7 @@ export async function updateInfo(
       tvEpisodeCount: newTVCount,
       tvSerieCompleted: newTVCompleted,
       tvSerieWatching: newTVWatching,
+      updatedAt: new Date(),
     })
     .where(eq(userInfoTable.userId, userId));
 }
@@ -321,7 +322,12 @@ export async function updateOrCreateSerieWatch(
 
   await db
     .update(seriesWatchedTable)
-    .set({ status: status, seasonCount: seasonCount })
+    .set({
+      status: status,
+      seasonCount: seasonCount,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
     .where(eq(seriesWatchedTable.id, serie.id));
 }
 
@@ -336,6 +342,7 @@ export async function updateSeasonWatch(
     .set({
       status: status,
       episodeWatched: episodeCount,
+      updatedAt: new Date(),
     })
     .where(eq(seasonWatchedTable.id, seasonWatchId));
 }
@@ -388,11 +395,12 @@ export async function updateSeasonCompletitionByID(DBSeasonID: number) {
         ? "COMPLETED"
         : "WATCHING";
 
-  const newData = await db
+  await db
     .update(seasonWatchedTable)
     .set({
       status: status,
       ended: null,
+      updatedAt: new Date(),
     })
     .where(eq(seasonWatchedTable.id, DBSeasonID));
 }
@@ -447,6 +455,7 @@ export async function updateOrCreateOrDeleteSeasonWatch(
       episodeWatched: episodeCount,
       started: startedUTC ?? null,
       ended: endedUTC ?? null,
+      updatedAt: new Date(),
     })
     .where(eq(seasonWatchedTable.id, before.id))
     .returning();
@@ -595,6 +604,7 @@ export async function updateSerieStatusWatch(userId: string, serieId: string) {
       status: isCompleted ? "COMPLETED" : lastStatus,
       started: starter,
       ended: ender,
+      updatedAt: new Date(),
     })
     .where(
       and(
@@ -663,6 +673,8 @@ export async function updateInfoWatchComp(userId: string) {
       tvSerieWatching: serieWatching,
       tvSerieDropped: serieDropped,
       tvSeriePaused: seriePaused,
+
+      updatedAt: new Date(),
     })
     .where(eq(userInfoTable.userId, userId));
 }
