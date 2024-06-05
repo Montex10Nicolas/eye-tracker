@@ -54,12 +54,12 @@ async function LatestSerie(props: { user: User }) {
   }
 
   return (
-    <div className="relative max-h-[800px] min-h-[50%] w-full overflow-auto border-0 border-b-4 border-slate-950 sm:h-full sm:min-h-96 sm:w-[50%] sm:border-b-0 sm:border-r-4">
+    <div className="relative max-h-[800px] min-h-[50%] w-full overflow-auto sm:h-full sm:min-h-96 sm:w-[50%]">
       <div className="sticky top-0 bg-slate-700 p-2 text-xl">
         <h2>Serie</h2>
       </div>
 
-      <div className="">
+      <div className="border-0 border-b-4 border-slate-950 sm:border-b-0 sm:border-r-4">
         <DisplaySeries />
       </div>
     </div>
