@@ -1,6 +1,7 @@
 import { hash, verify } from "@node-rs/argon2";
 import { desc } from "drizzle-orm";
 import { generateIdFromEntropySize } from "lucia";
+import { KoHo } from "next/font/google";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
@@ -275,4 +276,19 @@ export async function myWatchedMovie(userId: string, limit = 25, offset = 0) {
   });
 
   return results;
+}
+
+export async function myLatestSeries(userId: string, limit = 25, offset = 0) {
+  "use server";
+  const series = await db.query.seriesWatchedTable.findMany({
+    with: {
+      serie: true,
+    },
+    where: (serie, { eq }) => eq(serie.userId, userId),
+    orderBy: desc(seriesWatchedTable.updatedAt),
+    limit: limit,
+    offset: offset,
+  });
+
+  return series;
 }
