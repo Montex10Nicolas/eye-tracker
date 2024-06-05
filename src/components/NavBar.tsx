@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DisplaySearchMultiple } from "~/app/(root)/detail/_components/Search";
 import { Logout, getUser } from "~/app/(user)/user_action";
 import Profile from "./profile";
 
@@ -10,7 +11,7 @@ async function HandleLogged() {
   }
   return (
     <Link href="/login">
-      <button className="rounded-sm bg-sky-600 px-4 py-2 font-semibold uppercase text-white">
+      <button className="rounded-sm bg-sky-500 px-4 py-2 text-sm font-semibold uppercase text-white">
         Sign in
       </button>
     </Link>
@@ -19,14 +20,13 @@ async function HandleLogged() {
 
 export default async function NavBar() {
   return (
-    <section className="mb-6 flex flex-col gap-4 bg-slate-200 px-6 py-2 text-black sm:flex-row sm:items-center sm:justify-around">
+    <section className="max-w-screen flex flex-row bg-white p-2 py-4 sm:p-4">
       <div className=""></div>
-      <div className="mx-auto text-3xl font-bold ">
+      <div className="flex w-full  flex-row items-center justify-between text-black">
         <Link className="cursor-pointer" href={"/"}>
-          <h1>Siuwi Tracker</h1>
+          <h1 className="text-lg font-bold sm:text-2xl">Siuwi Tracker</h1>
         </Link>
-      </div>
-      <div className="flex flex-row gap-4">
+        <DisplaySearchMultiple />
         <HandleLogged />
       </div>
     </section>
