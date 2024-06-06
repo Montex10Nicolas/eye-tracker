@@ -1,8 +1,9 @@
 import { type User } from "lucia";
 import Image from "next/image";
 import Link from "next/link";
-import { TMDB_IMAGE_URL } from "~/_utils/utils";
+import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { Separator } from "~/components/ui/separator";
+import { queryMoviePopular, queryTVPopular } from "~/server/queries";
 import { getUser, myLatestSeries, myWatchedMovie } from "./(user)/user_action";
 
 async function LatestSerie(props: { user: User }) {
@@ -21,7 +22,7 @@ async function LatestSerie(props: { user: User }) {
     }
 
     return (
-      <section className="flex flex-col">
+      <section className="flex h-full flex-col">
         {series.map((serie) => {
           const serieData = serie.serie.serie_data;
           const { poster_path, name } = serieData;
@@ -36,7 +37,7 @@ async function LatestSerie(props: { user: User }) {
                     alt={name}
                     width={100}
                     height={100}
-                    className="p-1"
+                    className="h-[250px] w-[200px] p-1"
                   />
                 </div>
                 <div className="flex w-full flex-col justify-between py-1 text-xl">
@@ -54,7 +55,7 @@ async function LatestSerie(props: { user: User }) {
   }
 
   return (
-    <div className="relative max-h-[800px] min-h-[50%] w-full overflow-auto sm:h-full sm:min-h-96 sm:w-[50%]">
+    <div className="relative h-full min-h-[50%] w-full overflow-auto sm:h-full sm:min-h-96 sm:w-[50%]">
       <div className="sticky top-0 bg-slate-700 p-2 text-xl">
         <h2>Serie</h2>
       </div>
@@ -97,7 +98,7 @@ async function LatestMovie(props: { user: User }) {
                     alt={title}
                     width={100}
                     height={100}
-                    className="p-1"
+                    className="h-[250px] w-[200px] p-1"
                   />
                 </div>
                 <div className="flex w-full flex-col justify-between py-1 text-lg">
@@ -114,7 +115,7 @@ async function LatestMovie(props: { user: User }) {
   }
 
   return (
-    <div className="relative max-h-[800px] min-h-[50%] w-full overflow-auto sm:h-full sm:min-h-96 sm:w-[50%]">
+    <div className="relative h-full min-h-[50%] w-full overflow-auto sm:h-full sm:min-h-96 sm:w-[50%]">
       <div className="sticky bg-slate-700 p-2 text-xl">
         <h2>Movie</h2>
       </div>
@@ -141,20 +142,119 @@ function DisplayNotLogged() {
   );
 }
 
+async function DisplayPopular() {
+  const { results: seriesPopular } = await queryTVPopular();
+  const { results: moviesPopular } = await queryMoviePopular();
+
+  function Series() {
+    return (
+      <div>
+        <h2 className="p-2 text-2xl">Serie: </h2>
+        <div className="my-4 flex flex-row flex-wrap justify-around gap-4 gap-y-10 p-2">
+          {seriesPopular.map((serie) => {
+            const { id, name, poster_path, original_language, first_air_date } =
+              serie;
+
+            return (
+              <div
+                key={id}
+                className="max-h-[250px] min-h-[250px] max-w-[150px]"
+              >
+                <Link href={`/detail/movie/${id}`}>
+                  <div>
+                    <Image
+                      src={TMDB_IMAGE_URL(poster_path)}
+                      alt="alt"
+                      width={150}
+                      height={250}
+                      className="max-h-[200px] max-w-[150px]"
+                    />
+                  </div>
+                  <div className="h-16">
+                    <p>{name}</p>
+                    <div className="flex justify-between">
+                      <p>{original_language}</p>
+                      <p>{displayHumanDate(first_air_date)}</p>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  function Movies() {
+    return (
+      <div>
+        <h2 className="p-2 text-2xl">Movies: </h2>
+        <div className="my-4 flex flex-row flex-wrap justify-around gap-4 gap-y-10 p-2">
+          {moviesPopular.map((movie) => {
+            const { id, title, poster_path, original_language, release_date } =
+              movie;
+
+            return (
+              <div key={id} className="max-h-[250px] max-w-[150px]">
+                <Link href={`/detail/movie/${id}`}>
+                  <div>
+                    <Image
+                      src={TMDB_IMAGE_URL(poster_path)}
+                      alt="alt"
+                      width={150}
+                      height={250}
+                      className="max-h-[200px] max-w-[150px]"
+                    />
+                  </div>
+                  <div className="text-wrap">
+                    <p className="text-wrap">{title}</p>
+                    <div className="flex justify-between">
+                      <p>{original_language}</p>
+                      <p>
+                        {displayHumanDate(release_date.toLocaleLowerCase())}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto my-10 w-[90%]">
+      <div className="flex h-16 items-center bg-slate-700 px-1  text-xl">
+        <h1 className="bottom-0">Popular</h1>
+      </div>
+      <div className="flex flex-col sm:flex-row">
+        <div className="w-full bg-red-500 sm:w-[50%]">{Series()}</div>
+        <div className="w-full bg-blue-500 sm:w-[50%]">{Movies()}</div>
+      </div>
+    </div>
+  );
+}
+
 export default async function Page() {
   const user = await getUser();
   const logged = user !== null;
 
   return (
-    <main className="w-screen">
-      {logged ? (
-        <div className="mx-auto mt-10 flex w-[90%] flex-col overflow-auto bg-white sm:flex-row">
-          <LatestSerie user={user} />
-          <LatestMovie user={user} />
-        </div>
-      ) : (
-        <DisplayNotLogged />
-      )}
+    <main className="min-h-screen w-screen">
+      <div className="">
+        {logged ? (
+          <div className="mx-auto mt-10 flex max-h-[800px] w-[90%]  flex-col overflow-auto bg-white sm:flex-row">
+            <LatestSerie user={user} />
+            <LatestMovie user={user} />
+          </div>
+        ) : (
+          <DisplayNotLogged />
+        )}
+      </div>
+      <DisplayPopular />
     </main>
   );
 }

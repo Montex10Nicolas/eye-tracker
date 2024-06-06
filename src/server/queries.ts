@@ -164,3 +164,23 @@ export async function queryTMDBProvider(type: "tv" | "movie", id: number) {
 
   return (await response.json()) as WatchProvider;
 }
+
+export async function queryTVPopular() {
+  const url = new URL(`3/tv/popular`, TMDB_URL);
+  const response = await fetch(url, {
+    ...Headers,
+    cache: "no-cache",
+  });
+
+  return (await response.json()) as Search<TVResultType>;
+}
+
+export async function queryMoviePopular() {
+  const url = new URL(`3/movie/popular`, TMDB_URL);
+  const response = await fetch(url, {
+    ...Headers,
+    cache: "no-cache",
+  });
+
+  return (await response.json()) as Search<MovieResultType>;
+}
