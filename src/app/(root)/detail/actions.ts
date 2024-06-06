@@ -3,6 +3,8 @@ import { and, eq, sql, type SQL } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import {
   getOrCreateTVSeason,
+  getOrCreateTVSeasonWatched,
+  getOrCreateTVSeries,
   getOrCreateTVSeriesWatched,
   getTVSeriesWatched,
   updateInfo,
@@ -10,13 +12,16 @@ import {
   updateOrCreateOrDeleteSeasonWatch,
   updateSeasonCompletitionByID,
   updateSeasonCompletitionByUser,
+  updateSeasonWatch,
   updateSerieStatusWatch,
+  updateSerieWatch,
 } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import {
   movieWatchedTable,
   moviesTable,
   seasonWatchedTable,
+  seriesWatchedTable,
   userInfoTable,
 } from "~/server/db/schema";
 import {
@@ -273,4 +278,64 @@ export async function addEpisodeToSeasonWatched(
   await updateInfoWatchComp(userId);
 
   revalidatePath(`/detail/tv/${serie.id}`);
+}
+
+export async function markSeriesAsCompleted(
+  userId: string,
+  serieId: string,
+  serieData: Serie,
+) {
+  const watched = await getOrCreateTVSeriesWatched(serieId, userId);
+
+  // Get or create all season of a series and then update each one of them
+  const serie = await getOrCreateTVSeries(serieId, serieData);
+  const {
+    serie_data: { seasons },
+    name: serieName,
+  } = serie;
+
+  for (const season of seasons) {
+    const seasonId = season.id.toString();
+
+    await getOrCreateTVSeason(seasonId, season, serieId, serieName);
+
+    const seasonWatched = await getOrCreateTVSeasonWatched(
+      userId,
+      serieId,
+      seasonId,
+    );
+    const seasonWatchId = seasonWatched.id;
+
+    await updateSeasonWatch(seasonWatchId, {
+      episodeCount: season.episode_count,
+      status: "COMPLETED",
+      ended: new Date(),
+    });
+  }
+
+  const serieWatchedId = watched.id;
+  await updateSerieWatch(serieWatchedId, {
+    seasonCount: serie.serie_data.seasons.length,
+    status: "COMPLETED",
+    ended: new Date(),
+  });
+}
+
+export async function removeAllSerie(userId: string, serieId: string) {
+  const serieWatched = await getOrCreateTVSeriesWatched(serieId, userId);
+
+  const seasonsWatched = await db.query.seasonWatchedTable.findMany({
+    where: (season, { and, eq }) =>
+      and(eq(season.userId, userId), eq(season.serieId, serieId)),
+  });
+
+  for (const seasonWatched of seasonsWatched) {
+    await db
+      .delete(seasonWatchedTable)
+      .where(eq(seasonWatchedTable.id, seasonWatched.id));
+  }
+
+  await db
+    .delete(seriesWatchedTable)
+    .where(eq(seriesWatchedTable.id, serieWatched.id));
 }

@@ -212,8 +212,6 @@ async function createTVSeasonsWatched(
     })
     .returning();
 
-  console.log("C_TVSW", seasonId, userId, serieId, serieWatchId);
-
   if (tvWatched[0] === undefined) {
     throw new Error("wtf tv season should exist");
   }
@@ -345,6 +343,26 @@ export async function updateSeasonWatch(
       updatedAt: new Date(),
     })
     .where(eq(seasonWatchedTable.id, seasonWatchId));
+}
+
+interface UpdateSerieWatchData {
+  ended: Date | null;
+  seasonCount: number;
+  status: StatusWatchedType;
+}
+export async function updateSerieWatch(
+  serieWatchId: number,
+  updateInfo: UpdateSerieWatchData,
+) {
+  const { ended, seasonCount, status } = updateInfo;
+  await db
+    .update(seriesWatchedTable)
+    .set({
+      seasonCount: seasonCount,
+      status: status,
+      ended: ended?.toString(),
+    })
+    .where(eq(seriesWatchedTable.id, serieWatchId));
 }
 
 // DB the ID of the record not the seasonId
@@ -678,3 +696,5 @@ export async function updateInfoWatchComp(userId: string) {
     })
     .where(eq(userInfoTable.userId, userId));
 }
+
+export async function removeSeasonWatched() {}

@@ -1,5 +1,7 @@
 import { type User } from "lucia";
+import { revalidatePath } from "next/cache";
 import Image from "next/image";
+import Link from "next/link";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
@@ -14,6 +16,8 @@ import Provider from "../../_components/Providers";
 import {
   addEpisodeToSeasonWatched,
   getUserWatchedTVAndSeason,
+  markSeriesAsCompleted,
+  removeAllSerie,
   type SeriesAndSeasonsWatched,
 } from "../../actions";
 import { EditSeason } from "./_components/EditSeason";
@@ -46,6 +50,25 @@ async function Info(props: {
   const logged = user !== null;
   const providers = await queryTMDBProvider("tv", serie.id);
 
+  const userId = user?.id.toString();
+  const serieId = serie.id.toString();
+
+  async function AddAllSerie() {
+    "use server";
+    if (user === null) return;
+    await markSeriesAsCompleted(userId!, serieId, serie);
+
+    return revalidatePath(`/detail/tv/${serieId}`);
+  }
+
+  async function removeSerie() {
+    "use server";
+    if (user === null) return;
+    await removeAllSerie(userId!, serieId);
+
+    return revalidatePath(`/detail/tv/${serieId}`);
+  }
+
   return (
     <section className="w-full">
       {/* BG TOP */}
@@ -74,13 +97,23 @@ async function Info(props: {
             {logged ? (
               <div className="grid h-12 w-full place-items-center bg-slate-800">
                 {watched?.serie.status === "COMPLETED" ? (
-                  <button className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase">
-                    Remove
-                  </button>
+                  <form className="h-full w-full" action={removeSerie}>
+                    <button
+                      type="submit"
+                      className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase"
+                    >
+                      remove
+                    </button>
+                  </form>
                 ) : (
-                  <button className="h-full w-full items-center justify-center bg-blue-500 font-semibold uppercase">
-                    add
-                  </button>
+                  <form className="h-full w-full" action={AddAllSerie}>
+                    <button
+                      type="submit"
+                      className="h-full w-full items-center justify-center bg-blue-500 font-semibold uppercase"
+                    >
+                      add
+                    </button>
+                  </form>
                 )}
               </div>
             ) : null}
@@ -157,8 +190,8 @@ async function Info(props: {
             ))}
           </div>
           <div></div>
-          <Provider providers={providers.results} />
           <p className="mt-auto text-xl">{overview}</p>
+          <Provider providers={providers.results} />
         </div>
       </div>
     </section>
@@ -338,24 +371,26 @@ async function Credits(props: { credits: Credits }) {
           const { name, profile_path, character, original_name } = cast;
           return (
             <div key={cast.id} className="w-48 text-xl">
-              <div>
-                <Image
-                  src={TMDB_IMAGE_URL(profile_path ?? "")}
-                  alt="alt"
-                  width={200}
-                  height={100}
-                />
-              </div>
-              <div>
-                <p className="flex w-full flex-wrap space-x-2">
-                  <span>{name}</span>
-                  <span>|</span>
-                  <span>{original_name}</span>
-                </p>
-                <p className="mt-4">
-                  <span>{character}</span>
-                </p>
-              </div>
+              <Link href={`/detail/person/${cast.id}`}>
+                <div>
+                  <Image
+                    src={TMDB_IMAGE_URL(profile_path ?? "")}
+                    alt="alt"
+                    width={200}
+                    height={100}
+                  />
+                </div>
+                <div>
+                  <p className="flex w-full flex-wrap space-x-2">
+                    <span>{name}</span>
+                    <span>|</span>
+                    <span>{original_name}</span>
+                  </p>
+                  <p className="mt-4">
+                    <span>{character}</span>
+                  </p>
+                </div>
+              </Link>
             </div>
           );
         })}
@@ -367,23 +402,25 @@ async function Credits(props: { credits: Credits }) {
     return (
       <div className="flex flex-row flex-wrap gap-8">
         {crews.map((crew) => {
-          const { name, profile_path, department } = crew;
+          const { name, profile_path, department, id } = crew;
 
           return (
             <div key={crew.id}>
-              <div className="">
-                <Image
-                  src={TMDB_IMAGE_URL(profile_path ?? "")}
-                  alt={name}
-                  width={200}
-                  height={100}
-                  className="h-full w-full"
-                />
-              </div>
-              <div>
-                <p>{name}</p>
-                <p>{department}</p>
-              </div>
+              <Link href={`/detail/person/${crew.id}`}>
+                <div>
+                  <Image
+                    src={TMDB_IMAGE_URL(profile_path ?? "")}
+                    alt={name}
+                    width={200}
+                    height={100}
+                    className="h-full w-full"
+                  />
+                </div>
+                <div>
+                  <p>{name}</p>
+                  <p>{department}</p>
+                </div>
+              </Link>
             </div>
           );
         })}

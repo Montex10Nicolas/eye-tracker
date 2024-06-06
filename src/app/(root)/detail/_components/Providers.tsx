@@ -80,6 +80,7 @@ export default function Provider(props: {
 
   return (
     <div className="flex flex-col gap-2">
+      <DisplayProvider provider={providerData} />
       <select
         onChange={handleChange}
         value={country}
@@ -93,7 +94,6 @@ export default function Provider(props: {
           );
         })}
       </select>
-      <DisplayProvider provider={providerData} />
     </div>
   );
 }
