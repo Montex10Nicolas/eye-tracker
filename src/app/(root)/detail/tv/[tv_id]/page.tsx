@@ -102,7 +102,6 @@ async function Info(props: {
       <div className="flex w-full flex-row">
         {/* Poster */}
         <div className="relative min-w-36 sm:min-w-56 sm:max-w-56">
-          {/* <div className="-top-8 sm:absolute sm:-top-40 sm:left-12 lg:left-10"> */}
           <div className="-mt-8 ml-2 sm:-mt-40 sm:ml-8">
             <Image
               src={TMDB_IMAGE_URL(poster_path)}
@@ -139,7 +138,7 @@ async function Info(props: {
 
         <div className="ml-4 space-y-4 p-2">
           <div className="flex flex-row items-center gap-2">
-            <h1 className="text-3xl">{name}</h1>
+            <h1 className="text-3xl font-bold">{name}</h1>
             <span>|</span>
             <h3 className="text-xl">{original_name}</h3>
           </div>

@@ -1,237 +1,334 @@
+import { type User } from "lucia";
 import { revalidatePath } from "next/cache";
 import Image from "next/image";
+import Link from "next/link";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
-import { ScrollArea } from "~/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
   queryTMDBMovieDetail,
   queryTMDBMovieRecomendation,
-  queryTMDBProvider,
 } from "~/server/queries";
-import { type MovieDetail, type User } from "~/types/tmdb_detail";
-import { DisplayGenres, DisplayMovies } from "../../_components/Display";
-import { default as Provider } from "../../_components/Providers";
-import { DisplayCastCrew } from "../../_components/Summary";
+import { Credits, type MovieDetail } from "~/types/tmdb_detail";
+import { DisplayGenres } from "../../_components/Display";
 import {
+  addMovie,
   addToMovieWatched,
   checkMovieWatched,
   removeFromMovieWatched,
 } from "../../actions";
 
-async function addMovie(user: User | null, movie: MovieDetail) {
-  "use server";
-
-  if (user === null) {
-    return;
-  }
-  const userId = user.id;
-  const movieId = movie.id;
-
-  await addToMovieWatched(userId, movie);
-  revalidatePath(`/detail/movie${movieId}`);
-}
-
-async function removeMovie(user: User | null, movie: MovieDetail) {
-  "use server";
-
-  if (user === null) {
-    throw new Error("hello user not logged in");
-  }
-
-  const userId = user.id;
-  const movieId = movie.id;
-  await removeFromMovieWatched(userId, movie);
-  revalidatePath(`/detail/movie${movieId}`);
-}
-
-async function DisplayInfo(props: { movie: MovieDetail; user: User | null }) {
-  const { movie, user } = props;
-  const isLogged = user !== null;
-
-  const background_url = movie.backdrop_path;
+async function Info(props: { user: User | null; movie: MovieDetail }) {
+  const { user, movie } = props;
+  const logged = user !== null;
+  const movieId = movie.id.toString();
 
   let watched = false;
-  if (isLogged) {
-    watched = await checkMovieWatched(user.id, movie.id.toString());
+  if (logged) {
+    const userId = user.id.toString();
+    watched = await checkMovieWatched(userId, movieId);
   }
 
-  const providers = await queryTMDBProvider("movie", movie.id);
+  const {
+    title,
+    backdrop_path,
+    budget,
+    genres,
+    id,
+    origin_country,
+    original_language,
+    original_title,
+    overview,
+    poster_path,
+    release_date,
+    revenue,
+    runtime,
+    status,
+    spoken_languages,
+    production_companies,
+    production_countries,
+  } = movie;
 
-  async function add() {
-    "use server";
-    await addMovie(user, movie);
-  }
+  async function HandleButton() {
+    const userId = user!.id.toString();
+    async function add() {
+      "use server";
+      await addToMovieWatched(userId, movie);
 
-  async function remove() {
-    "use server";
-    await removeMovie(user, movie);
+      return revalidatePath(`/detail/movie/${id}`);
+    }
+
+    async function remove() {
+      "use server";
+      await removeFromMovieWatched(userId, movie);
+
+      return revalidatePath(`/detail/movie/${id}`);
+    }
+
+    if (watched) {
+      return (
+        <div className="h-full w-full">
+          <form action={remove}>
+            <button className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase text-white">
+              remove
+            </button>
+          </form>
+        </div>
+      );
+    }
+
+    return (
+      <div className="h-full w-full">
+        <form action={add}>
+          <button
+            type="submit"
+            className="h-full w-full items-center justify-center bg-blue-500 font-semibold uppercase text-white"
+          >
+            add
+          </button>
+        </form>
+      </div>
+    );
   }
 
   return (
-    <section className="relative flex flex-row gap-4 overflow-hidden rounded-md border border-white bg-transparent p-4 text-white">
-      <div className="flex max-w-40 shrink-0 flex-col gap-2">
-        <div className="min-w-[50%]">
-          <Image
-            src={TMDB_IMAGE_URL(movie.poster_path)}
-            width={130}
-            height={130}
-            alt={`Poster ${movie.title}`}
-            priority
-            className="w-full object-cover"
-          />
-          <div className="mt-2">
-            <Provider providers={providers.results} />
-          </div>
-        </div>
+    <div>
+      {/* Background Image */}
+      <div className="h-[300px] overflow-hidden">
+        <Image
+          src={TMDB_IMAGE_URL(backdrop_path)}
+          alt="alt"
+          width={1920}
+          height={1080}
+          className="-translate-y-20"
+        />
       </div>
 
-      <div className="flex flex-col">
-        <div className="space-x-2">
-          <span className="font-bold">{movie.title}</span>
-          <span>|</span>
-          <span className="italic text-slate-400">{movie.status}</span>
+      {/* Info */}
+      <div className="flex w-full flex-row">
+        <div className="relative min-w-36 sm:min-w-56 sm:max-w-56">
+          {/* Poster */}
+          <div className="absolute -top-40 left-8 h-[200px] w-[150px]">
+            <Image
+              src={TMDB_IMAGE_URL(poster_path)}
+              alt="alt"
+              width={150}
+              height={200}
+              className="max-h-full max-w-full"
+            />
+            {logged ? (
+              <div className="min-h-96 w-full">{HandleButton()}</div>
+            ) : null}
+          </div>
         </div>
 
-        <div className="flex flex-col flex-wrap gap-1">
-          <div>
-            <div className="flex flex-row gap-2 italic text-slate-300">
-              <span>Language(s):</span>
-              <div>
-                {movie.spoken_languages.map((lang, index) => (
-                  <span key={lang.iso_639_1}>
-                    {index > 0 ? "-" : ""}
-                    {lang.english_name}
-                  </span>
+        <div className="ml-4 flex flex-col space-y-4 p-2">
+          <div className="flex flex-row items-center gap-2">
+            <h1 className="text-3xl font-bold">{title}</h1>
+            <span>|</span>
+            <h3 className="text-xl">{original_title}</h3>
+          </div>
+
+          <div className="flex flex-row flex-wrap gap-4 gap-y-2 text-lg">
+            <p>
+              <span>Status: </span>
+              <span>{status}</span>
+            </p>
+            <p>
+              <span>Runtime: </span>
+              <span>{runtime}</span>
+            </p>
+            <p>
+              <span>Release Date: </span>
+              <span>{displayHumanDate(release_date)}</span>
+            </p>
+            <p>
+              <span>Origin Language: </span>
+              <span>{original_language}</span>
+            </p>
+            <p>
+              <span>Origin Country: </span>
+              <span>{origin_country.join(" - ")}</span>
+            </p>
+            <p>
+              <span>Languages: </span>
+              <span className="space-x-2">
+                {spoken_languages.map((lang) => (
+                  <span key={lang.iso_639_1}>{lang.english_name}</span>
                 ))}
-              </div>
-            </div>
-          </div>
-          <p>
-            <span className="italic text-slate-300">Runtime: </span>
-            <span>{movie.runtime}</span>m
-          </p>
-          <p className="">
-            <span className="italic text-slate-300">Released: </span>
-            <span>{displayHumanDate(movie.release_date)}</span>
-          </p>
-          <div>
-            <DisplayGenres genres={movie.genres} />
+              </span>
+            </p>
+            <p>
+              <span>Production: </span>
+              <span>{production_companies.map((company) => company.name)}</span>
+            </p>
+            <p>
+              <span>Countries: </span>
+              <span>{production_countries.map((country) => country.name)}</span>
+            </p>
+            <p>
+              <span>Budget: </span>
+              <span>{budget}</span>
+            </p>
+            <p>
+              <span>Revenue: </span>
+              <span>
+                {revenue} ({revenue - budget})
+              </span>
+            </p>
+            <DisplayGenres genres={genres} />
+            <p>{overview}</p>
           </div>
         </div>
-        <p className="mb-4 mt-auto">
-          <span className=" text-slate-300">Overview: </span> {movie.overview}
-        </p>
-        {isLogged ? (
-          <form className="flex flex-row items-center justify-around gap-4">
-            {!watched ? (
-              <button
-                className="uppser w-full rounded-sm bg-green-700 px-4 py-2
-          font-semibold uppercase"
-                formAction={add}
-              >
-                Add
-              </button>
-            ) : (
-              <>
-                <button
-                  className="uppser w-full rounded-sm bg-green-700 px-4 py-2
-          font-semibold uppercase"
-                  formAction={add}
-                >
-                  rewatch
-                </button>
-                <button
-                  className="uppser w-full rounded-sm bg-red-700 px-4 py-2
-          font-semibold uppercase"
-                  formAction={remove}
-                >
-                  remove
-                </button>
-              </>
-            )}
-          </form>
-        ) : null}
       </div>
-
-      <img
-        src={TMDB_IMAGE_URL(background_url)}
-        alt={movie.title}
-        className="absolute left-0 top-0 -z-10 h-full w-full object-cover opacity-40"
-      />
-    </section>
+    </div>
   );
 }
 
-async function DisplayCredits(props: { movie: MovieDetail }) {
-  const { movie } = props;
+async function Credits(props: { credits: Credits }) {
+  const {
+    credits: { cast: casts, crew: crews },
+  } = props;
+
+  function Cast() {
+    return (
+      <div className="flex flex-row flex-wrap justify-around gap-8">
+        {casts.map((cast) => {
+          const { name, profile_path, character, original_name } = cast;
+          return (
+            <div key={cast.id} className="w-48 text-xl">
+              <Link href={`/detail/person/${cast.id}`}>
+                <div className="overflow-hidden">
+                  <Image
+                    src={TMDB_IMAGE_URL(profile_path ?? "")}
+                    alt="alt"
+                    width={200}
+                    height={100}
+                    className="transition-transform duration-500 ease-in-out hover:scale-125"
+                  />
+                </div>
+                <div>
+                  <p className="flex w-full flex-wrap space-x-2">
+                    <span>{name}</span>
+                    <span>|</span>
+                    <span>{original_name}</span>
+                  </p>
+                  <p className="mt-4">
+                    <span>{character}</span>
+                  </p>
+                </div>
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  function Crew() {
+    return (
+      <div className="flex flex-row flex-wrap justify-around gap-8">
+        {crews.map((crew) => {
+          const { name, profile_path, department } = crew;
+
+          return (
+            <div key={crew.id}>
+              <Link href={`/detail/person/${crew.id}`}>
+                <div>
+                  <Image
+                    src={TMDB_IMAGE_URL(profile_path ?? "")}
+                    alt={name}
+                    width={200}
+                    height={100}
+                    className="h-full w-full"
+                  />
+                </div>
+                <div>
+                  <p>{name}</p>
+                  <p>{department}</p>
+                </div>
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
-    <section className="mt-4 rounded-md border bg-white p-4 text-black">
-      <Tabs defaultValue="cast" className="relative">
-        <h1 className="text-xl font-semibold">Credits</h1>
-        <TabsList className="mt-2 flex w-full flex-row border bg-black">
-          <TabsTrigger value="cast" className="w-full uppercase">
-            <span>cast</span>
+    <div className="mx-auto w-[90%]">
+      <Tabs defaultValue="cast" className="w-full">
+        <TabsList className="w-full">
+          <TabsTrigger className="w-full" value="cast">
+            <div className="w-[50%]">cast</div>
           </TabsTrigger>
-          <TabsTrigger value="crew" className="w-full uppercase">
-            <span>crew</span>
+          <TabsTrigger className="w-[50%]" value="crew">
+            <div className="w-[50%]">crew</div>
           </TabsTrigger>
         </TabsList>
-        <ScrollArea className="h-[500] w-full overflow-hidden pt-2">
-          <TabsContent value="cast" className="mt-6">
-            <DisplayCastCrew cast={true} persons={movie.credits.cast} />
-          </TabsContent>
-          <TabsContent value="crew" className="mt-6">
-            <DisplayCastCrew cast={false} persons={movie.credits.crew} />
-          </TabsContent>
-        </ScrollArea>
+        <TabsContent value="cast">{Cast()}</TabsContent>
+        <TabsContent value="crew">{Crew()}</TabsContent>
       </Tabs>
-    </section>
+    </div>
   );
 }
 
-async function DisplayReccomendation(props: { movie: MovieDetail }) {
+async function Reccomendations(props: { movie: MovieDetail }) {
   const { movie } = props;
-  const id = movie.id;
-  const reccomendations = await queryTMDBMovieRecomendation(id, 1);
+  const movieId = movie.id;
+  const { results } = await queryTMDBMovieRecomendation(movieId, 1);
+
   return (
-    <section className="my-6 flex-col rounded-md bg-white p-4 text-black">
-      <h1 className="text-xl font-semibold">
-        Movie similar to
-        <span className="ml-1 italic">&quot;{movie.title}&quot;</span>
-      </h1>
-      <ScrollArea className="h-[500px] w-full overflow-hidden pt-2">
-        <div className="mt-6 flex flex-row flex-wrap justify-between gap-4">
-          {reccomendations.results.map((tv_reccomend) => {
-            return (
-              <DisplayMovies
-                key={tv_reccomend.id}
-                result={tv_reccomend}
-                background_url={tv_reccomend.backdrop_path}
-              />
-            );
-          })}
-        </div>
-      </ScrollArea>
-    </section>
+    <div className="mx-auto mb-6 w-[90%] p-2">
+      <h2 className="text-2xl">Reccomendations</h2>
+
+      <div className="flex flex-row flex-wrap justify-around gap-8">
+        {results.map((serie) => {
+          const { id, title, poster_path, original_language, release_date } =
+            serie;
+
+          return (
+            <div key={serie.id} className="max-w-[100px]">
+              <Link href={`/detail/movie/${id}`}>
+                <div className="h-[150px] max-h-[150px]">
+                  <Image
+                    src={TMDB_IMAGE_URL(poster_path)}
+                    alt="alt"
+                    width={100}
+                    height={100}
+                    className="max-h-full max-w-full"
+                  />
+                </div>
+                <div className="text-wrap">
+                  <p className="text-wrap">{title}</p>
+                  <p className="flex justify-between">
+                    <span>{original_language}</span>
+                    <span>{displayHumanDate(release_date)}</span>
+                  </p>
+                </div>
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
 export default async function Page(props: { params: { movie_id: number } }) {
-  const id = props.params.movie_id;
-
-  const movie = await queryTMDBMovieDetail(id);
+  const {
+    params: { movie_id },
+  } = props;
   const user = await getUser();
-
-  if (Number.isNaN(id)) {
-    throw new Error("Not a number");
-  }
+  const movieData = await queryTMDBMovieDetail(movie_id);
 
   return (
-    <main className="mx-auto w-[80%]">
-      <DisplayInfo movie={movie} user={user} />
-      <DisplayCredits movie={movie} />
-      <DisplayReccomendation movie={movie} />
-    </main>
+    <div className="mx-auto">
+      <Info user={user} movie={movieData} />
+      <hr className="my-4 w-full" />
+      <Credits credits={movieData.credits} />
+      <hr className="my-4 w-full" />
+      <Reccomendations movie={movieData} />
+    </div>
   );
 }
