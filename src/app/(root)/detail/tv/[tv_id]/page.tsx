@@ -348,7 +348,7 @@ export async function Seasons(props: {
 
           return (
             <div key={id}>
-              <div className="relative h-96">
+              <div className="relative h-96 max-w-[256px]">
                 <Image
                   src={TMDB_IMAGE_URL(poster_path)}
                   alt="alt"
@@ -399,12 +399,13 @@ async function Credits(props: { credits: Credits }) {
           return (
             <div key={cast.id} className="w-48 text-xl">
               <Link href={`/detail/person/${cast.id}`}>
-                <div>
+                <div className="overflow-hidden">
                   <Image
                     src={TMDB_IMAGE_URL(profile_path ?? "")}
                     alt="alt"
                     width={200}
                     height={100}
+                    className="transition-transform duration-500 ease-in-out hover:scale-125"
                   />
                 </div>
                 <div>
@@ -429,7 +430,7 @@ async function Credits(props: { credits: Credits }) {
     return (
       <div className="flex flex-row flex-wrap gap-8">
         {crews.map((crew) => {
-          const { name, profile_path, department, id } = crew;
+          const { name, profile_path, department } = crew;
 
           return (
             <div key={crew.id}>

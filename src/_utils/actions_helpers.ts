@@ -343,13 +343,14 @@ export async function updateSeasonWatch(
   seasonWatchId: number,
   updateInfo: UpdateSeasonWatchData,
 ) {
-  const { episodeCount, status } = updateInfo;
+  const { episodeCount, status, ended } = updateInfo;
   await db
     .update(seasonWatchedTable)
     .set({
       status: status,
       episodeWatched: episodeCount,
       updatedAt: new Date(),
+      ended: ended?.toString(),
     })
     .where(eq(seasonWatchedTable.id, seasonWatchId));
 }
