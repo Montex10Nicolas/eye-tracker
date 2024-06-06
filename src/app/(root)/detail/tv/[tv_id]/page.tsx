@@ -1,9 +1,12 @@
 import { type User } from "lucia";
 import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
-import { getUser } from "~/app/(user)/user_action";
+import { getUser, seasonWatchWithSeason } from "~/app/(user)/user_action";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { type StatusWatchedType } from "~/server/db/types";
+import {
+  type DBSeasonWatchedType,
+  type StatusWatchedType,
+} from "~/server/db/types";
 import { queryTMDBProvider, queryTMDBTVDetail } from "~/server/queries";
 import { type Credits, type Season, type Serie } from "~/types/tmdb_detail";
 import { DisplayGenres } from "../../_components/Display";
@@ -171,7 +174,10 @@ export async function Seasons(props: {
   const logged = user !== null;
   const userId = user!.id.toString();
 
-  function handleButton(season: Season, found: Season) {
+  function handleButton(
+    season: Season,
+    found: DBSeasonWatchedType | undefined,
+  ) {
     async function DBAddSeason() {
       "use server";
 
