@@ -335,7 +335,7 @@ export async function Seasons(props: {
     return (
       <div className="mt-10 flex flex-row flex-wrap gap-16">
         {seasons.map((season) => {
-          const { poster_path, season_number, id } = season;
+          const { poster_path, season_number, id, name } = season;
           const found = watched?.seasons.find(
             (ses) => ses.seasonId === season.id.toString(),
           );
@@ -361,7 +361,7 @@ export async function Seasons(props: {
                   </p>
                 ) : null}
                 <p className="absolute right-5 top-3 text-3xl font-bold text-yellow-950 shadow-2xl shadow-blue-500">
-                  {season_number}
+                  {season_number === 0 ? name : season_number}
                 </p>
               </div>
               {logged ? handleButton(season, found) : null}
