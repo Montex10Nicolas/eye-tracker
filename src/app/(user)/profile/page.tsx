@@ -37,17 +37,11 @@ import { type Serie, type User } from "~/types/tmdb_detail";
 import { myWatchedMovie } from "../user_action";
 import { SummaryGraph } from "./_components/SummaryGraph";
 
-function generic(n: number, divident: number): [number, number] {
-  const whole = Math.floor(n / divident);
-  const left = n % divident;
-  return [whole, left];
-}
-
 // Convert minutes into Days/Hours/Minutes
 function handleVisualizationTimestamp(start: number) {
-  const [toHours, minutes] = generic(start, 60);
-  const [toDays, hours] = generic(toHours, 24);
-  const [, days] = generic(toDays, 31);
+  const [toHours, minutes] = myModule(start, 60);
+  const [toDays, hours] = myModule(toHours, 24);
+  const [, days] = myModule(toDays, 31);
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -119,8 +113,8 @@ async function DisplayMovie(props: { user: User }) {
     return myMovies.map((watch) => {
       const movie = watch.movie.movie_data;
 
-      const [toHours, minutes] = generic(watch.duration, 60);
-      const [, hours] = generic(toHours, 60);
+      const [toHours, minutes] = myModule(watch.duration, 60);
+      const [, hours] = myModule(toHours, 60);
       return (
         <div
           className="border-1 min-w-fit border border-black"

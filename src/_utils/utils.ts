@@ -62,3 +62,18 @@ export function numberToGender(num: number) {
       return "Non-binary";
   }
 }
+// % but get the whole and what is left
+export function myModule(n: number, divident: number): [number, number] {
+  const whole = Math.floor(n / divident);
+  const left = n % divident;
+  return [whole, left];
+}
+
+// Convert minutes into days/hours/years
+export function convertMinute(start: number) {
+  const [toHours, minutes] = myModule(start, 60);
+  const [toDays, hours] = myModule(toHours, 24);
+  const [months, days] = myModule(toDays, 31);
+
+  return [months, days, hours, minutes] as const;
+}

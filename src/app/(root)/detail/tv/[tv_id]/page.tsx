@@ -68,9 +68,18 @@ async function Info(props: {
   async function removeSerie() {
     "use server";
     if (user === null) return;
-    await removeAllSerie(userId!, serieId);
+    await removeAllSerie(userId!, serieId, serie);
 
     return revalidatePath(`/detail/tv/${serieId}`);
+  }
+
+  function TotalRuntime() {
+    if (episode_run_time[0] === undefined) return "~";
+    const [months, days, hours, minutes] = convertMinute(
+      episode_run_time[0] * number_of_episodes,
+    );
+    const date = `${months > 0 ? months + "M " : " "}${days > 0 ? days + "d " : ""}${hours > 0 ? hours + "h " : ""}${minutes}m`;
+    return date;
   }
 
   return (
@@ -148,6 +157,10 @@ async function Info(props: {
               <span>{episode_run_time}m</span>
             </p>
             <p>
+              <span>Total runtime: </span>
+              <span>{TotalRuntime()}</span>
+            </p>
+            <p>
               <span>Origin Country: </span>
               <span>{origin_country.join(" - ")}</span>
             </p>
@@ -217,8 +230,6 @@ export async function Seasons(props: {
   ) {
     async function DBAddSeason() {
       "use server";
-
-      console.log("dbaddseason");
 
       await addEpisodeToSeasonWatched(userId, serie, season, {
         episodeCount: season.episode_count,
