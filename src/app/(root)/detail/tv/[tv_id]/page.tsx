@@ -5,15 +5,16 @@ import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { type StatusWatchedType } from "~/server/db/types";
-import { queryTMDBTVDetail } from "~/server/queries";
+import { queryTMDBProvider, queryTMDBTVDetail } from "~/server/queries";
 import { type Credits, type Season, type Serie } from "~/types/tmdb_detail";
 import { DisplayGenres } from "../../_components/Display";
+import Provider from "../../_components/Providers";
 import {
   getUserWatchedTVAndSeason,
   type SeriesAndSeasonsWatched,
 } from "../../actions";
 
-function Info(props: {
+async function Info(props: {
   serie: Serie;
   user: User | null;
   watched: SeriesAndSeasonsWatched | undefined;
@@ -39,6 +40,8 @@ function Info(props: {
     overview,
   } = serie;
   const logged = user !== null;
+  const providers = await queryTMDBProvider("tv", serie.id);
+
   return (
     <section className="w-full">
       {/* BG TOP */}
@@ -150,6 +153,7 @@ function Info(props: {
             ))}
           </div>
           <div></div>
+          <Provider providers={providers.results} />
           <p className="mt-auto text-xl">{overview}</p>
         </div>
       </div>
