@@ -507,7 +507,7 @@ async function Reccomendations(props: { serieId: string }) {
           return (
             <div
               key={id}
-              className="max-h-[300px] max-w-[150px] hover:scale-110"
+              className="max-h-[300px] max-w-[150px] duration-200 ease-in-out hover:scale-110"
             >
               <Link href={`/detail/tv/${id}`}>
                 <div className="h-[200px] max-h-[200px] w-[150px] max-w-[150px] overflow-hidden">
