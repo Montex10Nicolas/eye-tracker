@@ -329,6 +329,11 @@ export interface Serie {
   vote_average: number;
   vote_count: number;
   credits: Credits;
+  keywords: Keywords;
+}
+
+export interface Keywords {
+  results: { name: string; id: number }[];
 }
 
 export interface CreatedBy {

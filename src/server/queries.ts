@@ -102,7 +102,7 @@ export async function queryTMDBTVDetail(id: string) {
   "use server";
 
   const url = new URL(`/3/tv/${id}`, TMDB_URL);
-  url.searchParams.set("append_to_response", "credits");
+  url.searchParams.set("append_to_response", "credits,keywords");
 
   const response = await fetch(url, {
     ...Headers,
