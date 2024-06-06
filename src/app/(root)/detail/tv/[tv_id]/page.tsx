@@ -1,7 +1,7 @@
 import { type User } from "lucia";
 import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
-import { getUser, seasonWatchWithSeason } from "~/app/(user)/user_action";
+import { getUser } from "~/app/(user)/user_action";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
   type DBSeasonWatchedType,
