@@ -105,10 +105,10 @@ async function Info(props: { user: User | null; movie: MovieDetail }) {
       </div>
 
       {/* Info */}
-      <div className="flex w-full flex-row">
+      <div className="w-full flex-row sm:flex">
         <div className="relative min-w-36 sm:min-w-56 sm:max-w-56">
           {/* Poster */}
-          <div className="absolute -top-40 left-1 h-[300px] w-[200px] sm:left-8">
+          <div className="absolute -top-40 left-1 h-[100px] w-[80px] sm:left-8 sm:h-[300px] sm:w-[200px]">
             <Image
               src={TMDB_IMAGE_URL(poster_path)}
               alt="alt"

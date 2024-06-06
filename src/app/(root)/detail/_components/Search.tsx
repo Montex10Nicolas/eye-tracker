@@ -14,7 +14,7 @@ export async function DisplaySearchMultiple() {
         type="text"
         name="search"
         placeholder={"Search a TV Series a Movie or a Person"}
-        className="w-16 rounded-md border border-slate-900 px-4 py-2 sm:w-56"
+        className="rounded-md border border-slate-900 px-4 py-2 sm:w-56 sm:min-w-48 lg:min-w-96"
       />
     </form>
   );

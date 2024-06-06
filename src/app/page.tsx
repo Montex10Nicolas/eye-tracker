@@ -30,14 +30,14 @@ async function LatestSerie(props: { user: User }) {
 
           return (
             <Link href={`/detail/tv/${serie.serieId}`} key={serie.id}>
-              <div key={serie.id} className="m-4 flex flex-row bg-yellow-500">
+              <div key={serie.id} className="m-2 flex flex-row bg-yellow-500">
                 <div>
                   <Image
                     src={TMDB_IMAGE_URL(poster_path)}
                     alt={name}
                     width={100}
                     height={100}
-                    className="h-[250px] w-[200px] p-1"
+                    className="h-[200px] w-[180px] p-1"
                   />
                 </div>
                 <div className="flex w-full flex-col justify-between py-1 text-xl">
@@ -55,7 +55,7 @@ async function LatestSerie(props: { user: User }) {
   }
 
   return (
-    <div className="relative h-full min-h-[50%] w-full overflow-auto sm:h-full sm:min-h-96 sm:w-[50%]">
+    <div className="sm:w-[50%]">
       <div className="sticky top-0 bg-slate-700 p-2 text-xl">
         <h2>Serie</h2>
       </div>
@@ -91,14 +91,14 @@ async function LatestMovie(props: { user: User }) {
 
           return (
             <Link href={`/detail/movie/${movie.movieId}`} key={id}>
-              <div className="m-4 flex flex-row bg-yellow-500">
+              <div className="m-2 flex flex-row bg-yellow-500">
                 <div>
                   <Image
                     src={TMDB_IMAGE_URL(poster_path)}
                     alt={title}
                     width={100}
                     height={100}
-                    className="h-[250px] w-[200px] p-1"
+                    className="h-[200px] w-[180px] p-1"
                   />
                 </div>
                 <div className="flex w-full flex-col justify-between py-1 text-lg">
@@ -115,7 +115,7 @@ async function LatestMovie(props: { user: User }) {
   }
 
   return (
-    <div className="relative h-full min-h-[50%] w-full overflow-auto sm:h-full sm:min-h-96 sm:w-[50%]">
+    <div className="sm:w-[50%]">
       <div className="sticky bg-slate-700 p-2 text-xl">
         <h2>Movie</h2>
       </div>

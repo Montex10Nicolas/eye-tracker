@@ -99,10 +99,10 @@ async function Info(props: {
         />
       </div>
 
-      <div className="flex w-full flex-row">
+      <div className="flex w-full flex-col sm:flex-row">
         {/* Poster */}
         <div className="relative min-w-36 sm:min-w-56 sm:max-w-56">
-          <div className="absolute -mt-8 ml-2 h-[300px] w-[200px] sm:-mt-40 sm:ml-8">
+          <div className="absolute -mt-40 ml-2 h-[100px] w-[80px] sm:ml-8 sm:h-[300px] sm:w-[200px]">
             <Image
               src={TMDB_IMAGE_URL(poster_path)}
               width={400}
@@ -111,7 +111,7 @@ async function Info(props: {
               className="h-full"
             />
             {logged ? (
-              <div className="grid h-12 w-full place-items-center bg-slate-800">
+              <div className="grid h-12 w-full place-items-center  bg-slate-800">
                 {watched?.serie.status === "COMPLETED" ? (
                   <form className="h-full w-full" action={removeSerie}>
                     <button
@@ -395,7 +395,7 @@ async function Credits(props: { credits: Credits }) {
 
   function Cast() {
     return (
-      <div className="flex flex-row flex-wrap gap-8">
+      <div className="flex flex-row flex-wrap justify-around gap-8">
         {casts.map((cast) => {
           const { name, profile_path, character, original_name } = cast;
           return (
@@ -430,7 +430,7 @@ async function Credits(props: { credits: Credits }) {
 
   function Crew() {
     return (
-      <div className="flex flex-row flex-wrap gap-8">
+      <div className="flex flex-row flex-wrap justify-around gap-8">
         {crews.map((crew) => {
           const { name, profile_path, department } = crew;
 
