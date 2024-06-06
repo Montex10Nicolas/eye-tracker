@@ -95,7 +95,7 @@ async function Info(props: {
           width={2000}
           height={300}
           alt={``}
-          className="z-0 w-full sm:-translate-y-12"
+          className="relative -z-10 w-full sm:-translate-y-12"
         />
       </div>
 
@@ -217,7 +217,7 @@ async function Info(props: {
   );
 }
 
-export async function Seasons(props: {
+async function Seasons(props: {
   serie: Serie;
   watched: SeriesAndSeasonsWatched | undefined;
   user: User | null;

@@ -99,7 +99,7 @@ async function Info(props: { user: User | null; movie: MovieDetail }) {
           alt=""
           width={2000}
           height={300}
-          className="w-full sm:-translate-y-24"
+          className="relative w-full sm:-translate-y-24"
         />
       </div>
 

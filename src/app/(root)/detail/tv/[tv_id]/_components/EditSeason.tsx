@@ -4,7 +4,6 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { type DBSeasonWatchedType } from "~/server/db/types";
 import { type Season, type Serie } from "~/types/tmdb_detail";
-import { EditIcon } from "../../../_components/Icons";
 import { type addEpisodeToSeasonWatched } from "../../../actions";
 import { SeasonForm } from "./SeasonForm";
 

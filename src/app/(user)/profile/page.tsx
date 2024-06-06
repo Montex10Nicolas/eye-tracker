@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { TMDB_IMAGE_URL, addZero, myModule } from "~/_utils/utils";
+import { EditIcon } from "~/app/(root)/detail/_components/Icons";
 import {
   addEpisodeToSeasonWatched,
   addOrRemoveOneEpisode,
@@ -275,6 +276,7 @@ async function DispalyAllSeries(props: { user: User }) {
                         season={ses.season.season_data}
                         userId={user.id.toString()}
                         season_w={ses}
+                        myButton={<EditIcon />}
                       />
                     </div>
                   </TableCell>
