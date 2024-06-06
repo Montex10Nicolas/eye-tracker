@@ -330,7 +330,13 @@ export async function Seasons(props: {
 
   // Handle the display of seasons
   function Seasons() {
-    const { seasons } = serie;
+    const { seasons: original } = serie;
+    // Move special from first to last place in the array
+    if (original[0]?.season_number === 0) {
+      const first = original.shift();
+      original.push(first!);
+    }
+    const seasons = original;
 
     return (
       <div className="mt-10 flex flex-row flex-wrap gap-16">
