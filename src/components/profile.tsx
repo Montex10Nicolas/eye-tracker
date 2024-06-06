@@ -24,7 +24,7 @@ export default function Profile(props: { logout: () => Promise<never> }) {
   }
 
   return (
-    <section className="flex gap-4">
+    <section className="z-100 z-100 flex gap-4">
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Avatar>

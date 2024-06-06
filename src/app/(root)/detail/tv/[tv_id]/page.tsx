@@ -45,13 +45,13 @@ async function Info(props: {
   return (
     <section className="w-full">
       {/* BG TOP */}
-      <div className="relative h-64 w-full overflow-hidden">
+      <div className="relative -z-10 h-64 w-full overflow-hidden">
         <Image
           src={TMDB_IMAGE_URL(backdrop_path)}
           width={2000}
           height={300}
           alt={``}
-          className="-top-30 absolute w-full lg:-top-48"
+          className="-top-30 absolute z-0 w-full lg:-top-48"
         />
       </div>
 
