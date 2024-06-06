@@ -1,18 +1,23 @@
 import { mysqlDatabase } from "drizzle-orm/mysql-core";
 import { type User } from "lucia";
+import { Edit } from "lucide-react";
 import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { db } from "~/server/db";
 import { type StatusWatchedType } from "~/server/db/types";
 import { queryTMDBProvider, queryTMDBTVDetail } from "~/server/queries";
 import { type Credits, type Season, type Serie } from "~/types/tmdb_detail";
 import { DisplayGenres } from "../../_components/Display";
 import Provider from "../../_components/Providers";
 import {
+  addEpisodeToSeasonWatched,
   getUserWatchedTVAndSeason,
   type SeriesAndSeasonsWatched,
 } from "../../actions";
+import { EditSeason } from "./_components/EditSeason";
+import { SeasonForm } from "./_components/SeasonForm";
 
 async function Info(props: {
   serie: Serie;
@@ -168,51 +173,107 @@ export async function Seasons(props: {
 }) {
   const { serie, watched, user } = props;
   const logged = user !== null;
+  const userId = user!.id.toString();
 
   function handleButton(season: Season) {
+    async function DBAddSeason() {
+      "use server";
+
+      console.log("dbaddseason");
+
+      await addEpisodeToSeasonWatched(userId, serie, season, {
+        episodeCount: season.episode_count,
+        status: "COMPLETED",
+        ended: new Date(),
+      });
+    }
+
+    async function DBRemoveSeason() {
+      "use server";
+      await addEpisodeToSeasonWatched(userId, serie, season, {
+        episodeCount: -1,
+        status: null,
+        ended: null,
+        started: null,
+      });
+    }
+
+    const AddBtn = (
+      <form className="h-full w-full" action={DBAddSeason}>
+        <button
+          type="submit"
+          className="h-full w-full items-center justify-center bg-blue-500 font-semibold uppercase text-white"
+        >
+          Add
+        </button>
+      </form>
+    );
+
     const found = watched?.seasons.find(
       (ses) => ses.seasonId === season.id.toString(),
     );
 
     if (found === undefined) {
-      return (
-        <div className="h-16">
-          <button className="h-full w-full items-center justify-center bg-blue-500 font-semibold uppercase text-white">
-            ADD
-          </button>
-        </div>
-      );
+      return <div className="h-16">{AddBtn}</div>;
     }
     const { status } = found;
     const myStatus = status as StatusWatchedType;
 
-    let buttons: JSX.Element | null = null;
+    let customBtn: JSX.Element | null = null;
+
+    const RemoveBtn = (
+      <form action={DBRemoveSeason} className="h-full w-full">
+        <button
+          type="submit"
+          className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase text-white"
+        >
+          Remove
+        </button>
+      </form>
+    );
+
+    const EditBtn = (
+      <div className="h-full w-full">
+        <EditSeason
+          serie={serie}
+          season={season}
+          userId={userId}
+          addEpisode={addEpisodeToSeasonWatched}
+          season_w={found}
+          myButton={
+            <button className="h-full w-full cursor-pointer items-center justify-center bg-green-500 font-semibold uppercase text-white">
+              edit
+            </button>
+          }
+        />
+      </div>
+    );
 
     if (myStatus === "COMPLETED") {
-      buttons = (
+      customBtn = (
         <>
-          <button className="h-full w-full items-center justify-center bg-green-500 font-semibold uppercase text-white">
-            edit
-          </button>
-          <button className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase text-white">
-            remove
-          </button>
+          {EditBtn}
+          {RemoveBtn}
+        </>
+      );
+    } else if (myStatus === "WATCHING") {
+      customBtn = (
+        <>
+          {AddBtn}
+          {EditBtn}
+          {RemoveBtn}
         </>
       );
     } else {
-      buttons = (
+      customBtn = (
         <>
-          <button className="h-full w-full items-center justify-center bg-blue-500 uppercase text-white">
-            Add
-          </button>
-          <button className="h-full w-full items-center justify-center bg-green-500 uppercase text-white">
-            Edit
-          </button>
+          {AddBtn}
+          {EditBtn}
         </>
       );
     }
 
-    return <div className="flex h-16">{buttons}</div>;
+    return <div className="flex h-16">{customBtn}</div>;
   }
 
   // Handle the display of seasons

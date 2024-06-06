@@ -14,17 +14,22 @@ export function EditSeason(props: {
   userId: string;
   addEpisode: typeof addEpisodeToSeasonWatched;
   season_w: DBSeasonWatchedType | undefined;
+  myButton: JSX.Element;
 }) {
   const [visible, setVisible] = useState(false);
-  const { serie, season, addEpisode, userId, season_w } = props;
+  const { serie, season, addEpisode, userId, season_w, myButton } = props;
 
   if (!visible) {
     return (
-      <div>
-        <button onClick={() => setVisible(true)}>
-          <EditIcon />
-        </button>
-      </div>
+      <>
+        <div
+          className="h-full w-full appearance-none"
+          onClick={() => setVisible(true)}
+        >
+          {/* <EditIcon /> */}
+          {myButton}
+        </div>
+      </>
     );
   }
 
