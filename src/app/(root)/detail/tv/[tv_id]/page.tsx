@@ -350,7 +350,7 @@ export async function Seasons(props: {
 
           return (
             <div key={id} className="w-48">
-              <div className="relative">
+              <div className="relative h-[290px]">
                 <Image
                   src={TMDB_IMAGE_URL(poster_path)}
                   alt="alt"

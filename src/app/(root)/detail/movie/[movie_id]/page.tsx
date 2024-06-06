@@ -9,10 +9,9 @@ import {
   queryTMDBMovieDetail,
   queryTMDBMovieRecomendation,
 } from "~/server/queries";
-import { Credits, type MovieDetail } from "~/types/tmdb_detail";
+import { type Credits, type MovieDetail } from "~/types/tmdb_detail";
 import { DisplayGenres } from "../../_components/Display";
 import {
-  addMovie,
   addToMovieWatched,
   checkMovieWatched,
   removeFromMovieWatched,

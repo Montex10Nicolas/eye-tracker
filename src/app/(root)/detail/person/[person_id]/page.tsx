@@ -20,6 +20,7 @@ import {
   type PersonsCast,
   type TvCredits,
 } from "~/types/tmdb_detail";
+import { DisplayGenres } from "../../_components/Display";
 
 function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
   const all = [...movie.cast, ...movie.crew, ...tv.cast, ...tv.crew];
@@ -59,43 +60,65 @@ function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
 }
 
 function DisplayInfo(person: PersonDetailType) {
-  return (
-    <div className="flex w-full shrink flex-row rounded-md bg-white p-4 text-xl text-black">
-      <Image
-        className="max-h-[300px] shrink-0"
-        src={`${TMDB_IMAGE_URL(person.profile_path)}`}
-        alt={`Profile ${person.name}`}
-        width={200}
-        height={300}
-      />
+  const {
+    name,
+    also_known_as,
+    birthday,
+    deathday,
+    gender,
+    biography,
+    place_of_birth,
+    profile_path,
+  } = person;
 
-      <div className="m-4">
-        <div className="flex h-14 items-center gap-4">
-          <h2 className="shrink-0 text-xl font-bold">{person.name}</h2>
-          <div className="text-sm text-slate-600/90">
-            ({person.also_known_as.join(" - ")})
-          </div>
+  return (
+    <div className="mx-auto w-[90%]">
+      {/* Profile */}
+      <div className="flex w-full flex-row">
+        <div className="h-[200px] w-[150px] shrink-0 sm:h-[300px] sm:w-[200px]">
+          <Image
+            src={TMDB_IMAGE_URL(profile_path)}
+            alt={`Profile ${name}`}
+            width={300}
+            height={200}
+            className="h-full w-full"
+          />
         </div>
-        <hr className="mb-3 h-2 bg-slate-900/80" />
-        <div className="flex h-[90%] flex-col gap-2 py-2">
-          <div>
-            <span className="italic text-slate-400/80">Born in: </span>
-            <span>{person.place_of_birth}</span>
+
+        <div className="ml-6 flex flex-col text-lg">
+          <div className="flex items-center gap-4">
+            <h1 className="min-w-fit text-3xl font-semibold">{name}</h1>
+            <div className="space-x-2 text-xl">
+              {also_known_as.map((name, idx) => (
+                <span key={name}>
+                  {name}
+                  {idx > 0 ? " - " : ""}
+                </span>
+              ))}
+            </div>
           </div>
-          <div>
-            <span className="italic text-slate-400/80">DOB: </span>
-            <span>{displayHumanDate(person.birthday)}</span>
-            <span className="ml-2">
-              {person.deathday === null
-                ? `${ageCalculator(new Date(person.birthday), new Date())}yo`
-                : displayHumanDate(person.deathday)}
-            </span>
+          <hr className="my-4 w-full" />
+          <div className="flex flex-row flex-wrap gap-8">
+            <p>
+              <span>Gender: </span>
+              <span>{numberToGender(gender)}</span>
+            </p>
+            <p>
+              <span>Place of Birth: </span>
+              <span>{place_of_birth}</span>
+            </p>
+            <p>
+              <span>Birthday: </span>
+              <span>{displayHumanDate(birthday)}</span>
+            </p>
+            <p>
+              <span>{deathday === null ? "Age: " : "Death: "}</span>
+              <span>
+                {deathday ?? ageCalculator(new Date(birthday), new Date())}
+              </span>
+            </p>
           </div>
-          <div>
-            <span className="italic text-slate-400/80">Gender: </span>
-            <span>{numberToGender(person.gender)}</span>
-          </div>
-          <div className="mt-auto p-4">{person.biography}</div>
+          <p className="mt-auto">{biography}</p>
         </div>
       </div>
     </div>
@@ -152,6 +175,7 @@ function DisplayCredit(
 async function DisplayCreditsPerson(credits: PersonsCast[]) {
   const user = await getUser();
 
+  // Get all the Movie/Series that the user has watched
   if (user) {
     const userId = user.id.toString();
     const mySeries = await myWatchedSeries(userId);
@@ -178,9 +202,8 @@ async function DisplayCreditsPerson(credits: PersonsCast[]) {
     });
 
     return (
-      <div className="items-around my-6 flex flex-col rounded-md bg-white p-4 text-base text-black">
+      <div className="">
         <h1 className="text-xl font-bold">Credits</h1>
-        <hr className="h-2 bg-slate-900" />
         <div className="mt-4 flex flex-row flex-wrap justify-around gap-4">
           {credits.map((cred) => {
             const movie = cred.release_date !== undefined;
@@ -222,8 +245,9 @@ export default async function Page(props: { params: { person_id: number } }) {
   const credits = mergeCredits(person.movie_credits, person.tv_credits);
 
   return (
-    <main className="mx-auto w-[95%] sm:w-[85%] md:w-[70%]">
+    <main className="mb-8 mt-8 w-screen">
       {DisplayInfo(person)}
+      <hr className="my-2 w-full" />
       {DisplayCreditsPerson(credits)}
     </main>
   );
