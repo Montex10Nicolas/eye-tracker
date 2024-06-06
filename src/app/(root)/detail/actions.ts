@@ -6,6 +6,7 @@ import {
   getOrCreateTVSeasonWatched,
   getOrCreateTVSeries,
   getOrCreateTVSeriesWatched,
+  getTVSeried,
   getTVSeriesWatched,
   updateInfo,
   updateInfoWatchComp,
@@ -306,11 +307,27 @@ export async function markSeriesAsCompleted(
     );
     const seasonWatchId = seasonWatched.id;
 
+    const preEp = seasonWatched.episodeWatched;
+
     await updateSeasonWatch(seasonWatchId, {
       episodeCount: season.episode_count,
       status: "COMPLETED",
       ended: new Date(),
     });
+
+    console.log(seasonId, season.name, serieName, preEp, season.episode_count);
+    const {
+      serie_data: { episode_run_time },
+    } = serie;
+    let runtime = 40;
+    if (episode_run_time[0] !== undefined) {
+      runtime = episode_run_time[0];
+    }
+    const episodeCount = season.episode_count - preEp;
+    const time = runtime * episodeCount;
+    const watching = seasonWatched.status === "WATCHING" ? -1 : 0;
+
+    await updateInfo(userId, 0, 0, time, episodeCount, 1, watching);
   }
 
   const serieWatchedId = watched.id;
@@ -319,9 +336,19 @@ export async function markSeriesAsCompleted(
     status: "COMPLETED",
     ended: new Date(),
   });
+
+  await updateInfoWatchComp(userId);
 }
 
-export async function removeAllSerie(userId: string, serieId: string) {
+export async function removeAllSerie(
+  userId: string,
+  serieId: string,
+  serie: Serie,
+) {
+  let serieData = await getTVSeried(serieId);
+  if (serieData === null) {
+    serieData = await getOrCreateTVSeries(serieId, serie);
+  }
   const serieWatched = await getOrCreateTVSeriesWatched(serieId, userId);
 
   const seasonsWatched = await db.query.seasonWatchedTable.findMany({
@@ -329,13 +356,35 @@ export async function removeAllSerie(userId: string, serieId: string) {
       and(eq(season.userId, userId), eq(season.serieId, serieId)),
   });
 
+  const {
+    serie_data: { episode_run_time },
+  } = serieData;
+  let runtime = 40;
+
+  if (episode_run_time[0] !== undefined) {
+    runtime = episode_run_time[0];
+  }
+
   for (const seasonWatched of seasonsWatched) {
-    await db
+    const record = await db
       .delete(seasonWatchedTable)
-      .where(eq(seasonWatchedTable.id, seasonWatched.id));
+      .where(eq(seasonWatchedTable.id, seasonWatched.id))
+      .returning();
+
+    const seasonRecord = record[0];
+    if (seasonRecord === undefined) continue;
+
+    const { episodeWatched } = seasonRecord;
+    const time = episodeWatched * runtime;
+    const completed = seasonRecord.status === "COMPLETED" ? -1 : 0;
+    const watching = seasonRecord.status === "WATCHING" ? -1 : 0;
+
+    await updateInfo(userId, 0, 0, -time, -episodeWatched, completed, watching);
   }
 
   await db
     .delete(seriesWatchedTable)
     .where(eq(seriesWatchedTable.id, serieWatched.id));
+
+  await updateInfoWatchComp(userId);
 }

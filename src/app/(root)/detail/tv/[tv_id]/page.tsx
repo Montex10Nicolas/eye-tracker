@@ -2,7 +2,11 @@ import { type User } from "lucia";
 import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
-import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
+import {
+  TMDB_IMAGE_URL,
+  convertMinute,
+  displayHumanDate,
+} from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
@@ -225,6 +229,7 @@ export async function Seasons(props: {
 
     async function DBRemoveSeason() {
       "use server";
+
       await addEpisodeToSeasonWatched(userId, serie, season, {
         episodeCount: -1,
         status: null,
@@ -244,25 +249,6 @@ export async function Seasons(props: {
       </form>
     );
 
-    if (found === undefined) {
-      return <div className="h-16">{AddBtn}</div>;
-    }
-    const { status } = found;
-    const myStatus = status as StatusWatchedType;
-
-    let customBtn: JSX.Element | null = null;
-
-    const RemoveBtn = (
-      <form action={DBRemoveSeason} className="h-full w-full">
-        <button
-          type="submit"
-          className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase text-white"
-        >
-          Remove
-        </button>
-      </form>
-    );
-
     const EditBtn = (
       <div className="h-full w-full">
         <EditSeason
@@ -278,6 +264,30 @@ export async function Seasons(props: {
           }
         />
       </div>
+    );
+
+    if (found === undefined) {
+      return (
+        <div className="flex h-16">
+          {AddBtn}
+          {EditBtn}
+        </div>
+      );
+    }
+    const { status } = found;
+    const myStatus = status as StatusWatchedType;
+
+    let customBtn: JSX.Element | null = null;
+
+    const RemoveBtn = (
+      <form action={DBRemoveSeason} className="h-full w-full">
+        <button
+          type="submit"
+          className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase text-white"
+        >
+          Remove
+        </button>
+      </form>
     );
 
     if (myStatus === "COMPLETED") {

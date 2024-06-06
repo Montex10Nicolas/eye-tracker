@@ -42,6 +42,7 @@ export async function getOrCreateInfo(userId: string) {
   return info;
 }
 
+// Update every data about info
 export async function updateInfo(
   userId: string,
   movieDurationTotal = 0,
@@ -127,6 +128,14 @@ async function updateSeries(serieId: string, serie: Serie) {
     .returning();
   if (serie_db[0] === undefined) throw new Error("How serie is undefined");
   return serie_db[0];
+}
+
+export async function getTVSeried(serieId: string) {
+  const tvSeries = await db.query.seriesTable.findFirst({
+    where: (serie, { eq }) => eq(serie.id, serieId),
+  });
+
+  return tvSeries ?? null;
 }
 
 export async function getOrCreateTVSeries(serieId: string, series: Serie) {
@@ -632,6 +641,7 @@ export async function updateSerieStatusWatch(userId: string, serieId: string) {
     );
 }
 
+// Update all about movie, Serie and season status
 export async function updateInfoWatchComp(userId: string) {
   const seriesStatus = await db
     .select({
@@ -696,5 +706,3 @@ export async function updateInfoWatchComp(userId: string) {
     })
     .where(eq(userInfoTable.userId, userId));
 }
-
-export async function removeSeasonWatched() {}
