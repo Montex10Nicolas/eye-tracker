@@ -1,11 +1,8 @@
-import { mysqlDatabase } from "drizzle-orm/mysql-core";
 import { type User } from "lucia";
-import { Edit } from "lucide-react";
 import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { db } from "~/server/db";
 import { type StatusWatchedType } from "~/server/db/types";
 import { queryTMDBProvider, queryTMDBTVDetail } from "~/server/queries";
 import { type Credits, type Season, type Serie } from "~/types/tmdb_detail";
@@ -17,7 +14,6 @@ import {
   type SeriesAndSeasonsWatched,
 } from "../../actions";
 import { EditSeason } from "./_components/EditSeason";
-import { SeasonForm } from "./_components/SeasonForm";
 
 async function Info(props: {
   serie: Serie;
@@ -175,7 +171,7 @@ export async function Seasons(props: {
   const logged = user !== null;
   const userId = user!.id.toString();
 
-  function handleButton(season: Season) {
+  function handleButton(season: Season, found: Season) {
     async function DBAddSeason() {
       "use server";
 
@@ -207,10 +203,6 @@ export async function Seasons(props: {
           Add
         </button>
       </form>
-    );
-
-    const found = watched?.seasons.find(
-      (ses) => ses.seasonId === season.id.toString(),
     );
 
     if (found === undefined) {
@@ -283,7 +275,10 @@ export async function Seasons(props: {
     return (
       <div className="mt-10 flex flex-row flex-wrap gap-16">
         {seasons.map((season) => {
-          const { name, poster_path, season_number, id } = season;
+          const { poster_path, season_number, id } = season;
+          const found = watched?.seasons.find(
+            (ses) => ses.seasonId === season.id.toString(),
+          );
 
           return (
             <div key={id}>
@@ -295,11 +290,21 @@ export async function Seasons(props: {
                   height={100}
                   className="h-full w-full"
                 />
+                {logged && found && watched ? (
+                  <p className="absolute left-5 top-4 text-xl font-bold text-yellow-950">
+                    <span>{watched.serie.status}</span>
+                    <div className="w-full space-x-2 text-center">
+                      <span>{found.episodeWatched}</span>
+                      <span>/</span>
+                      <span>{season.episode_count}</span>
+                    </div>
+                  </p>
+                ) : null}
                 <p className="absolute right-5 top-3 text-3xl font-bold text-yellow-950 shadow-2xl shadow-blue-500">
                   {season_number}
                 </p>
               </div>
-              {logged ? handleButton(season) : null}
+              {logged ? handleButton(season, found) : null}
             </div>
           );
         })}
