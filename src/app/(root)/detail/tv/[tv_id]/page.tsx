@@ -13,7 +13,11 @@ import {
   type DBSeasonWatchedType,
   type StatusWatchedType,
 } from "~/server/db/types";
-import { queryTMDBProvider, queryTMDBTVDetail } from "~/server/queries";
+import {
+  queryTMDBProvider,
+  queryTMDBTVDetail,
+  queryTMDBTVRecomendation,
+} from "~/server/queries";
 import { type Credits, type Season, type Serie } from "~/types/tmdb_detail";
 import { DisplayGenres } from "../../_components/Display";
 import Provider from "../../_components/Providers";
@@ -206,7 +210,6 @@ async function Info(props: {
               </span>
             ))}
           </div>
-          <div></div>
           <p className="mt-auto text-xl">{overview}</p>
           <Provider providers={providers.results} />
         </div>
@@ -357,14 +360,14 @@ export async function Seasons(props: {
                   className="h-full w-full"
                 />
                 {logged && found && watched ? (
-                  <p className="absolute left-5 top-4 text-xl font-bold text-yellow-950">
+                  <div className="absolute left-5 top-4 text-xl font-bold text-yellow-950">
                     <span>{watched.serie.status}</span>
-                    <div className="w-full space-x-2 text-center">
+                    <p className="w-full space-x-2 text-center">
                       <span>{found.episodeWatched}</span>
                       <span>/</span>
                       <span>{season.episode_count}</span>
-                    </div>
-                  </p>
+                    </p>
+                  </div>
                 ) : null}
                 <p className="absolute right-5 top-3 text-3xl font-bold text-yellow-950 shadow-2xl shadow-blue-500">
                   {season_number === 0 ? name : season_number}
@@ -485,6 +488,52 @@ async function Credits(props: { credits: Credits }) {
   );
 }
 
+async function Reccomendations(props: { serieId: string }) {
+  const { serieId } = props;
+
+  const { results: reccomendations } = await queryTMDBTVRecomendation(
+    serieId,
+    1,
+  );
+
+  return (
+    <div className="mx-auto mb-6 w-[90%] p-2">
+      <h2 className="text-2xl">Reccomendations: </h2>
+      <div className="mt-8 flex flex-row flex-wrap gap-8">
+        {reccomendations.map((serie) => {
+          const { id, name, poster_path, original_language, first_air_date } =
+            serie;
+
+          return (
+            <div
+              key={id}
+              className="max-h-[300px] max-w-[150px] hover:scale-110"
+            >
+              <Link href={`/detail/tv/${id}`}>
+                <div className="h-[200px] max-h-[200px] w-[150px] max-w-[150px] overflow-hidden">
+                  <Image
+                    src={TMDB_IMAGE_URL(poster_path)}
+                    alt={name}
+                    width={150}
+                    height={200}
+                  />
+                </div>
+                <div className="text-wrap">
+                  <p className="text-wrap">{name}</p>
+                  <p className="flex justify-between">
+                    <span>{original_language}</span>
+                    <span>{displayHumanDate(first_air_date)}</span>
+                  </p>
+                </div>
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default async function Page(props: { params: { tv_id: string } }) {
   const tv_id = props.params.tv_id;
 
@@ -504,6 +553,7 @@ export default async function Page(props: { params: { tv_id: string } }) {
       <hr className="my-8 min-h-8 w-full" />
       <Credits credits={serie.credits} />
       <hr className="my-2 min-h-8 w-full" />
+      <Reccomendations serieId={tv_id} />
     </main>
   );
 }
