@@ -116,7 +116,7 @@ async function LatestMovie(props: { user: User }) {
 
   return (
     <div className="sm:w-[50%]">
-      <div className="sticky bg-slate-700 p-2 text-xl">
+      <div className="sticky top-0 bg-slate-700 p-2 text-xl">
         <h2>Movie</h2>
       </div>
 
