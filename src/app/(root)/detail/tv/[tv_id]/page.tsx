@@ -89,26 +89,26 @@ async function Info(props: {
   return (
     <section className="w-full">
       {/* BG TOP */}
-      <div className="relative -z-10 h-64 w-full overflow-hidden">
+      <div className="-z-10 h-[200px] w-full overflow-hidden sm:h-[300px]">
         <Image
           src={TMDB_IMAGE_URL(backdrop_path)}
           width={2000}
           height={300}
           alt={``}
-          className="-top-30 absolute z-0 w-full lg:-top-48"
+          className="z-0 w-full sm:-translate-y-12"
         />
       </div>
 
       <div className="flex w-full flex-row">
         {/* Poster */}
         <div className="relative min-w-36 sm:min-w-56 sm:max-w-56">
-          <div className="-mt-8 ml-2 sm:-mt-40 sm:ml-8">
+          <div className="absolute -mt-8 ml-2 h-[300px] w-[200px] sm:-mt-40 sm:ml-8">
             <Image
               src={TMDB_IMAGE_URL(poster_path)}
               width={400}
               height={400}
               alt={`Poster ${name}`}
-              className=""
+              className="h-full"
             />
             {logged ? (
               <div className="grid h-12 w-full place-items-center bg-slate-800">
@@ -142,7 +142,7 @@ async function Info(props: {
             <span>|</span>
             <h3 className="text-xl">{original_name}</h3>
           </div>
-          <div className="mt-4 flex flex-row flex-wrap gap-x-8 gap-y-1 text-xl">
+          <div className="mt-4 flex flex-row flex-wrap gap-x-8 gap-y-1 text-lg">
             <p>
               <span>Number of Season: </span>
               <span>{number_of_seasons}</span>
@@ -327,7 +327,7 @@ export async function Seasons(props: {
       );
     }
 
-    return <div className="flex h-16">{customBtn}</div>;
+    return <div className="flex h-12">{customBtn}</div>;
   }
 
   // Handle the display of seasons
@@ -349,8 +349,8 @@ export async function Seasons(props: {
           );
 
           return (
-            <div key={id}>
-              <div className="relative h-96 max-w-[256px]">
+            <div key={id} className="w-48">
+              <div className="relative">
                 <Image
                   src={TMDB_IMAGE_URL(poster_path)}
                   alt="alt"
@@ -399,7 +399,7 @@ async function Credits(props: { credits: Credits }) {
         {casts.map((cast) => {
           const { name, profile_path, character, original_name } = cast;
           return (
-            <div key={cast.id} className="w-48 text-xl">
+            <div key={cast.id} className="w-32">
               <Link href={`/detail/person/${cast.id}`}>
                 <div className="overflow-hidden">
                   <Image
@@ -435,7 +435,7 @@ async function Credits(props: { credits: Credits }) {
           const { name, profile_path, department } = crew;
 
           return (
-            <div key={crew.id}>
+            <div key={crew.id} className="w-32">
               <Link href={`/detail/person/${crew.id}`}>
                 <div>
                   <Image

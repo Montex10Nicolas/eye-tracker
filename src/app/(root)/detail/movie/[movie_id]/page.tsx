@@ -68,7 +68,7 @@ async function Info(props: { user: User | null; movie: MovieDetail }) {
     if (watched) {
       return (
         <div className="h-full w-full">
-          <form action={remove}>
+          <form action={remove} className="h-full w-full">
             <button className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase text-white">
               remove
             </button>
@@ -79,7 +79,7 @@ async function Info(props: { user: User | null; movie: MovieDetail }) {
 
     return (
       <div className="h-full w-full">
-        <form action={add}>
+        <form action={add} className="h-full w-full">
           <button
             type="submit"
             className="h-full w-full items-center justify-center bg-blue-500 font-semibold uppercase text-white"
@@ -92,15 +92,15 @@ async function Info(props: { user: User | null; movie: MovieDetail }) {
   }
 
   return (
-    <div>
+    <section className="w-full">
       {/* Background Image */}
-      <div className="h-[300px] overflow-hidden">
+      <div className="h-[200px] overflow-hidden sm:h-[300px]">
         <Image
           src={TMDB_IMAGE_URL(backdrop_path)}
-          alt="alt"
-          width={1920}
-          height={1080}
-          className="-translate-y-20"
+          alt=""
+          width={2000}
+          height={300}
+          className="w-full sm:-translate-y-24"
         />
       </div>
 
@@ -108,16 +108,16 @@ async function Info(props: { user: User | null; movie: MovieDetail }) {
       <div className="flex w-full flex-row">
         <div className="relative min-w-36 sm:min-w-56 sm:max-w-56">
           {/* Poster */}
-          <div className="absolute -top-40 left-8 h-[200px] w-[150px]">
+          <div className="absolute -top-40 left-1 h-[300px] w-[200px] sm:left-8">
             <Image
               src={TMDB_IMAGE_URL(poster_path)}
               alt="alt"
-              width={150}
-              height={200}
-              className="max-h-full max-w-full"
+              width={400}
+              height={400}
+              className="h-full"
             />
             {logged ? (
-              <div className="min-h-96 w-full">{HandleButton()}</div>
+              <div className="h-12 w-full">{HandleButton()}</div>
             ) : null}
           </div>
         </div>
@@ -176,12 +176,12 @@ async function Info(props: { user: User | null; movie: MovieDetail }) {
                 {revenue} ({revenue - budget})
               </span>
             </p>
-            <DisplayGenres genres={genres} />
-            <p>{overview}</p>
           </div>
+          <DisplayGenres genres={genres} />
+          <p>{overview}</p>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
@@ -196,7 +196,7 @@ async function Credits(props: { credits: Credits }) {
         {casts.map((cast) => {
           const { name, profile_path, character, original_name } = cast;
           return (
-            <div key={cast.id} className="w-48 text-xl">
+            <div key={cast.id} className="w-32">
               <Link href={`/detail/person/${cast.id}`}>
                 <div className="overflow-hidden">
                   <Image
@@ -210,8 +210,12 @@ async function Credits(props: { credits: Credits }) {
                 <div>
                   <p className="flex w-full flex-wrap space-x-2">
                     <span>{name}</span>
-                    <span>|</span>
-                    <span>{original_name}</span>
+                    {original_name !== name ? (
+                      <>
+                        <span>|</span>
+                        <span>{original_name}</span>
+                      </>
+                    ) : null}
                   </p>
                   <p className="mt-4">
                     <span>{character}</span>
@@ -232,7 +236,7 @@ async function Credits(props: { credits: Credits }) {
           const { name, profile_path, department } = crew;
 
           return (
-            <div key={crew.id}>
+            <div key={crew.id} className="w-32">
               <Link href={`/detail/person/${crew.id}`}>
                 <div>
                   <Image
@@ -258,12 +262,12 @@ async function Credits(props: { credits: Credits }) {
   return (
     <div className="mx-auto w-[90%]">
       <Tabs defaultValue="cast" className="w-full">
-        <TabsList className="w-full">
-          <TabsTrigger className="w-full" value="cast">
-            <div className="w-[50%]">cast</div>
+        <TabsList className="flex w-full bg-slate-800">
+          <TabsTrigger className="w-[50%]" value="cast">
+            <p className="font-semibold uppercase">cast</p>
           </TabsTrigger>
           <TabsTrigger className="w-[50%]" value="crew">
-            <div className="w-[50%]">crew</div>
+            <p className="font-semibold uppercase">crew</p>
           </TabsTrigger>
         </TabsList>
         <TabsContent value="cast">{Cast()}</TabsContent>
