@@ -19,6 +19,7 @@ import {
   type DBSeasonWatchedType,
   type DBSerieType,
   type DBUserInfoType,
+  type DrizzleDBError,
 } from "~/server/db/types";
 import { type MovieDetail } from "~/types/tmdb_detail";
 
@@ -93,17 +94,12 @@ export async function signup(username: string, password: string) {
       password_hash: passwordHash,
       id: userId,
     });
-
-    // Probably this is all improvable especially on the TS side of things
   } catch (e: unknown) {
-    const { code } = e;
+    const error = e as DrizzleDBError;
 
-    const found = DRIZZLE_ERROR_CODE.find((c) => {
-      const key = Object.keys(c);
-      return key[0] === code;
-    });
+    const { code } = error;
 
-    const message = Object.values(found)[0];
+    const message = DRIZZLE_ERROR_CODE[code];
 
     return new NextResponse(message ?? "Unknown error", {
       status: 401,

@@ -15,7 +15,7 @@ export default async function Login() {
   }
 
   return (
-    <div className="sm:-96 m-6 ml-auto mr-auto w-[90%] rounded-md bg-white p-4 text-black">
+    <div className="m-6 ml-auto mr-auto w-[90%] rounded-md bg-white p-4 text-black sm:w-96">
       <h1 className="mb-2 flex justify-center text-xl font-bold uppercase">
         Login
       </h1>

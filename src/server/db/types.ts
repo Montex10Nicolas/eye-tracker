@@ -38,18 +38,20 @@ export type DBSerieWatchedType = typeof seriesWatchedTable.$inferSelect;
 
 export type DBSeasonWatchedType = typeof seasonWatchedTable.$inferSelect;
 
-export const DRIZZLE_ERROR_CODE: Record<string, string>[] = [
-  {
-    "23505": "A record already exist with this username",
-  },
-  { "69": "Yes this is a good juk, cause i'm funny like that" },
-];
+export const DRIZZLE_ERROR_CODE: Record<string, string> = {
+  "23505": "A record already exist with this username",
+  "69": "Yes this is a good juk, cause i'm funny like that",
+};
 
-export function generateErrorMessage(code: number) {
-  switch (code) {
-    case 23505:
-      return "This item already exist";
-    default:
-      return "Hello";
-  }
+export interface DrizzleDBError {
+  severity_local: string;
+  severity: string;
+  code: number;
+  detail: string;
+  schema_name: string;
+  table_name: string;
+  constraint_name: string;
+  file: string;
+  line: number;
+  routine: string;
 }
