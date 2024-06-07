@@ -319,7 +319,9 @@ async function DisplayCreditsPerson(credits: PersonsCast[], person_id: number) {
 
             const found =
               serieWatched.find(
-                (serie) => serie.serieId === cred.id.toString(),
+                (serie) =>
+                  serie.serieId === cred.id.toString() &&
+                  serie.status === "COMPLETED",
               ) !== undefined ||
               moviesWatched.find(
                 (movie) => movie.movieId === cred.id.toString(),

@@ -222,7 +222,7 @@ async function Seasons(props: {
 }) {
   const { serie, watched, user } = props;
   const logged = user !== null;
-  const userId = user!.id.toString();
+  const userId = user?.id.toString();
 
   function handleButton(
     season: Season,
@@ -231,7 +231,7 @@ async function Seasons(props: {
     async function DBAddSeason() {
       "use server";
 
-      await addEpisodeToSeasonWatched(userId, serie, season, {
+      await addEpisodeToSeasonWatched(userId!, serie, season, {
         episodeCount: season.episode_count,
         status: "COMPLETED",
         ended: new Date(),
@@ -241,7 +241,7 @@ async function Seasons(props: {
     async function DBRemoveSeason() {
       "use server";
 
-      await addEpisodeToSeasonWatched(userId, serie, season, {
+      await addEpisodeToSeasonWatched(userId!, serie, season, {
         episodeCount: -1,
         status: null,
         ended: null,
@@ -265,7 +265,7 @@ async function Seasons(props: {
         <EditSeason
           serie={serie}
           season={season}
-          userId={userId}
+          userId={userId!}
           addEpisode={addEpisodeToSeasonWatched}
           season_w={found}
           myButton={
@@ -328,7 +328,7 @@ async function Seasons(props: {
     return <div className="flex h-12">{customBtn}</div>;
   }
 
-  // Handle the display of seasons
+  // Handle the display of each seasons
   function Seasons() {
     const { seasons: original } = serie;
     // Move special from first to last place in the array
@@ -341,7 +341,15 @@ async function Seasons(props: {
     return (
       <div className="mt-10 flex flex-row flex-wrap gap-16">
         {seasons.map((season) => {
-          const { poster_path, season_number, id, name } = season;
+          const {
+            poster_path,
+            season_number,
+            id,
+            name,
+            episode_count,
+            air_date,
+            vote_average,
+          } = season;
           const found = watched?.seasons.find(
             (ses) => ses.seasonId === season.id.toString(),
           );
@@ -356,6 +364,7 @@ async function Seasons(props: {
                   height={100}
                   className="h-full w-full"
                 />
+
                 {logged && found && watched ? (
                   <div className="absolute left-5 top-4 text-xl font-bold text-yellow-950">
                     <span>{watched.serie.status}</span>
@@ -369,6 +378,19 @@ async function Seasons(props: {
                 <p className="absolute right-5 top-3 text-3xl font-bold text-yellow-950 shadow-2xl shadow-blue-500">
                   {season_number === 0 ? name : season_number}
                 </p>
+              </div>
+              <div className="h-12 w-full bg-white px-2 text-black">
+                <p className="flex justify-between">
+                  <span>
+                    <span>Ep: </span>
+                    <span>{episode_count}</span>
+                  </span>
+                  <span>
+                    <span>Vote: </span>
+                    <span>{vote_average}</span>
+                  </span>
+                </p>
+                <p className="">{displayHumanDate(air_date)}</p>
               </div>
               {logged ? handleButton(season, found) : null}
             </div>
