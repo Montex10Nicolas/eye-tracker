@@ -28,7 +28,6 @@ import {
   type Serie,
   type TvCredits,
 } from "~/types/tmdb_detail";
-import { DisplayGenres } from "../../_components/Display";
 import {
   addToMovieWatched,
   markSeriesAsCompleted,
@@ -89,7 +88,7 @@ function DisplayInfo(person: PersonDetailType) {
     <div className="mx-auto w-[90%]">
       {/* Profile */}
       <div className="flex w-full flex-col sm:flex-row">
-        <div className="mx-auto h-[200px] w-[150px] shrink-0 sm:h-[300px] sm:w-[200px]">
+        <div className="mx-auto h-[200px] w-[150px] shrink-0 sm:mx-0 sm:h-[300px] sm:w-[200px]">
           <Image
             src={TMDB_IMAGE_URL(profile_path)}
             alt={`Profile ${name}`}
