@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Separator } from "~/components/ui/separator";
+import LoginForm from "../_components/LoginForm";
 import { login } from "../user_action";
 
 export default async function Login() {
@@ -9,6 +10,12 @@ export default async function Login() {
     const password = formData.get("password") as string;
 
     await login(username, password);
+  }
+
+  if (1 > 0) {
+    return <div>
+      <LoginForm />
+    </div>
   }
 
   return (
