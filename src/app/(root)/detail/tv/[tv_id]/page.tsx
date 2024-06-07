@@ -28,6 +28,7 @@ import {
   removeAllSerie,
   type SeriesAndSeasonsWatched,
 } from "../../actions";
+import { SerieButton } from "./_components/ButtonsToast";
 import { EditSeason } from "./_components/EditSeason";
 
 async function Info(props: {
@@ -111,27 +112,11 @@ async function Info(props: {
               className="h-full"
             />
             {logged ? (
-              <div className="grid h-12 w-full place-items-center  bg-slate-800">
-                {watched?.serie.status === "COMPLETED" ? (
-                  <form className="h-full w-full" action={removeSerie}>
-                    <button
-                      type="submit"
-                      className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase"
-                    >
-                      remove
-                    </button>
-                  </form>
-                ) : (
-                  <form className="h-full w-full" action={AddAllSerie}>
-                    <button
-                      type="submit"
-                      className="h-full w-full items-center justify-center bg-blue-500 font-semibold uppercase"
-                    >
-                      add
-                    </button>
-                  </form>
-                )}
-              </div>
+              <SerieButton
+                watched={watched}
+                addAllSerie={AddAllSerie}
+                removeSerie={removeSerie}
+              />
             ) : null}
           </div>
         </div>

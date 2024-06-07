@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { type DBSeasonWatchedType } from "~/server/db/types";
 import { type Season, type Serie } from "~/types/tmdb_detail";
@@ -18,6 +18,10 @@ export function EditSeason(props: {
   const [visible, setVisible] = useState(false);
   const { serie, season, addEpisode, userId, season_w, myButton } = props;
 
+  useEffect(() => {
+    document.body.style.overflowY = visible ? "hidden" : "visible";
+  }, [visible]);
+
   if (!visible) {
     return (
       <>
@@ -34,7 +38,6 @@ export function EditSeason(props: {
 
   function closeDialog() {
     setVisible(false);
-    document.body.style.overflowY = "visible";
   }
 
   return (

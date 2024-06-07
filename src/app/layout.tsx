@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { Inter } from "next/font/google";
 import Image from "next/image";
 import NavBar from "~/components/NavBar";
+import { Toaster } from "~/components/ui/sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default async function RootLayout({
       >
         <NavBar />
         {children}
+        <Toaster position="top-right" />
         <div id="modal-root"></div>
         <footer className="mt-auto flex h-20 w-full items-center justify-between bg-slate-800 p-6">
           <div>

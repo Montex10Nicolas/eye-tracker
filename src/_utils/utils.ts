@@ -40,8 +40,8 @@ export function addZero(n: number | string | undefined) {
   return n > 10 ? n.toString() : "0" + n;
 }
 
-export function changeDateInvoValue(date: Date | null) {
-  if (date === null) return;
+export function changeDateInvoValue(date: Date | null | undefined) {
+  if (date === null || date === undefined) return;
   const day = date.getDate(),
     month = date.getMonth() + 1,
     year = date.getFullYear();

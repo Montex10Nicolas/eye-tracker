@@ -207,7 +207,7 @@ export async function getUserWatchedTVAndSeason(
 
 export interface UpdateSeasonWatchData {
   episodeCount: number;
-  status: StatusWatchedType;
+  status?: StatusWatchedType;
   started?: Date | null;
   ended?: Date | null;
 }
