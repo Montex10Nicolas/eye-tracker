@@ -306,7 +306,7 @@ export interface Serie {
   id: number;
   in_production: boolean;
   languages: string[];
-  last_air_date: string;
+  last_air_date: string | null;
   last_episode_to_air: LastEpisodeToAir;
   name: string;
   next_episode_to_air: string | null;

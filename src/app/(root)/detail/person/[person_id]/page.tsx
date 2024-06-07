@@ -74,8 +74,8 @@ function DisplayInfo(person: PersonDetailType) {
   return (
     <div className="mx-auto w-[90%]">
       {/* Profile */}
-      <div className="flex w-full flex-row">
-        <div className="h-[200px] w-[150px] shrink-0 sm:h-[300px] sm:w-[200px]">
+      <div className="flex w-full flex-col sm:flex-row">
+        <div className="mx-auto h-[200px] w-[150px] shrink-0 sm:h-[300px] sm:w-[200px]">
           <Image
             src={TMDB_IMAGE_URL(profile_path)}
             alt={`Profile ${name}`}
@@ -86,7 +86,7 @@ function DisplayInfo(person: PersonDetailType) {
         </div>
 
         <div className="ml-6 flex flex-col text-lg">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center gap-4 sm:flex-row">
             <h1 className="min-w-fit text-3xl font-semibold">{name}</h1>
             <div className="space-x-2 text-xl">
               {also_known_as.map((name, idx) => (
@@ -137,7 +137,7 @@ function DisplayCredit(
       href={movie ? `/detail/movie/${cred.id}` : `/detail/tv/${cred.id}`}
     >
       <div
-        className={`flex h-full max-w-48 cursor-pointer flex-col border p-2 ${watched ? "border-4 border-amber-500" : "border-red"}`}
+        className={`flex h-full max-w-36 cursor-pointer flex-col border p-2 sm:max-w-48 ${watched ? "border-4 border-amber-500" : "border-red"}`}
       >
         <div className="relative">
           <Image
@@ -202,7 +202,7 @@ async function DisplayCreditsPerson(credits: PersonsCast[]) {
     });
 
     return (
-      <div className="">
+      <div className="mx-auto w-[90%]">
         <h1 className="text-xl font-bold">Credits</h1>
         <div className="mt-4 flex flex-row flex-wrap justify-around gap-4">
           {credits.map((cred) => {

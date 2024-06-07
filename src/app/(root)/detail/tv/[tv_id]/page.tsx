@@ -192,9 +192,7 @@ async function Info(props: {
               <span className="space-x-1">
                 <span>{displayHumanDate(first_air_date)}</span>
                 <span>-</span>
-                <span>
-                  {displayHumanDate(last_air_date.toLocaleLowerCase())}
-                </span>
+                <span>{displayHumanDate(last_air_date)}</span>
               </span>
             </p>
           </div>
