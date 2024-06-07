@@ -160,7 +160,7 @@ async function DisplayPopular() {
                 key={id}
                 className="max-h-[250px] min-h-[250px] max-w-[150px]"
               >
-                <Link href={`/detail/movie/${id}`}>
+                <Link href={`/detail/tv/${id}`}>
                   <div>
                     <Image
                       src={TMDB_IMAGE_URL(poster_path)}

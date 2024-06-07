@@ -70,10 +70,8 @@ export async function queryTMDBMovieDetail(id: number) {
     },
   });
 
-  console.log(response);
-
   if (response.status !== 200) {
-    throw new Error("Smething went wrong");
+    throw new Error("Something went wrong in queryTMDBMovieDetail");
   }
 
   const data = (await response.json()) as MovieDetail;
