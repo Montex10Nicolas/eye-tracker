@@ -1,9 +1,7 @@
 "use client";
 
 import { toast } from "sonner";
-import { type Season, type Serie } from "~/types/tmdb_detail";
 import { type SeriesAndSeasonsWatched } from "../../../actions";
-import { EditSeason } from "./EditSeason";
 
 export function SerieButton(props: {
   watched: SeriesAndSeasonsWatched | undefined;

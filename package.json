@@ -12,12 +12,14 @@
     "start": "next start"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.6.0",
     "@lucia-auth/adapter-drizzle": "^1.0.7",
     "@node-rs/argon2": "^1.8.3",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-progress": "^1.0.3",
     "@radix-ui/react-scroll-area": "^1.0.5",
@@ -43,6 +45,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.51.5",
     "sharp": "^0.33.4",
     "siuwi-tracker": "link:",
     "sonner": "^1.4.41",
