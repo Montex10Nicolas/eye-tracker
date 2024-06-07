@@ -2,21 +2,18 @@ import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
 import Image from "next/image";
-import Link from "next/link";
-import { Logout, getUser } from "~/app/(user)/user_action";
 import NavBar from "~/components/NavBar";
-import Profile from "~/components/profile";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-export const metadata = {
-  title: "Siuwi Tracker",
-  description: "The place to track all your favorite series and movies",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
-};
+// export const metadata = {
+//   title: "Siuwi Tracker",
+//   description: "The place to track all your favorite series and movies",
+//   icons: [{ rel: "icon", url: "/favicon.ico" }],
+// };
 
 export default async function RootLayout({
   children,
