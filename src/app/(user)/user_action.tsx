@@ -109,25 +109,15 @@ export async function signup(username: string, password: string) {
 
 export async function login(username: string, password: string) {
   "use server";
-  if (typeof username !== "string" || username.length < 3) {
-    return new NextResponse("Invalid username", {
-      status: 400,
-    });
-  }
-
-  if (typeof password !== "string" || password.length < 6) {
-    return new NextResponse("Invalid password", {
-      status: 400,
-    });
-  }
 
   const user = await db.query.userTable.findFirst({
     where: (user, { eq }) => eq(user.username, username),
   });
 
   if (!user) {
+    console.log("user not found");
     return new NextResponse("username or password wrong", {
-      status: 400,
+      status: 401,
       statusText: "Username or password wrong",
     });
   }
@@ -138,7 +128,7 @@ export async function login(username: string, password: string) {
 
   if (!validPassword) {
     return new NextResponse("Invalid email or password", {
-      status: 400,
+      status: 401,
     });
   }
 

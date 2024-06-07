@@ -1,21 +1,20 @@
 import Link from "next/link";
+import { type z } from "zod";
 import { Separator } from "~/components/ui/separator";
-import LoginForm from "../_components/LoginForm";
+import LoginForm, { type FormSchemaType } from "../_components/LoginForm";
 import { login } from "../user_action";
 
 export default async function Login() {
-  async function handleSubmit(formData: FormData) {
+  async function handleSubmit(formData: z.infer<FormSchemaType>) {
     "use server";
-    const username = formData.get("username") as string;
-    const password = formData.get("password") as string;
 
-    await login(username, password);
-  }
+    console.log("formData:", formData);
 
-  if (1 > 0) {
-    return <div>
-      <LoginForm />
-    </div>
+    const { username, password } = formData;
+
+    const { status, statusText } = await login(username, password);
+    console.log(status, statusText);
+    return [status, statusText] as const;
   }
 
   return (
@@ -24,37 +23,14 @@ export default async function Login() {
         Login
       </h1>
       <Separator orientation="horizontal" className="mb-4 h-1 bg-slate-600" />
-      <form action={handleSubmit} className="flex flex-col gap-2">
-        <div className="flex flex-col">
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            name="username"
-            placeholder="Insert username"
-            className="rounded-sm border border-black p-1 text-xl text-black"
-          />
-        </div>
-        <div className="flex flex-col">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            name="password"
-            placeholder="Insert password"
-            className="rounded-sm border border-black p-1 text-xl text-black"
-          />
-        </div>
-        <button
-          type="submit"
-          className="cursor-pointer rounded-md bg-slate-600 px-4 py-2 font-semibold uppercase text-white"
-        >
-          login
-        </button>
-        <Link href={"/signup"}>
-          <button className="w-full rounded-md bg-sky-700 px-4 py-2 font-semibold uppercase text-white">
-            SignUp
-          </button>
+      <LoginForm submit={handleSubmit} />
+
+      <p className="mt-4 space-x-2">
+        <span>Don&apos;t have an account yet go</span>
+        <Link href="/signup" className="text-blue-800 underline">
+          signup
         </Link>
-      </form>
+      </p>
     </div>
   );
 }
