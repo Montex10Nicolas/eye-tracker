@@ -11,14 +11,14 @@ export function SerieButton(props: {
   const { watched, removeSerie, addAllSerie } = props;
 
   function addToast() {
-    toast("Add Serie sooner", {
-      description: "Serie is being added, please wait",
+    toast("Add Serie", {
+      description: "Serie is being added, please wait a second",
       duration: 1500,
     });
   }
 
   function removeToast() {
-    toast("Remove Serie sooner", {
+    toast("Remove Serie", {
       description: "Serie is being removed, please wait",
       duration: 1500,
     });

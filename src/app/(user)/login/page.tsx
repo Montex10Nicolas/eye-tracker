@@ -8,17 +8,14 @@ export default async function Login() {
   async function handleSubmit(formData: z.infer<FormSchemaType>) {
     "use server";
 
-    console.log("formData:", formData);
-
     const { username, password } = formData;
 
     const { status, statusText } = await login(username, password);
-    console.log(status, statusText);
     return [status, statusText] as const;
   }
 
   return (
-    <div className="m-6 ml-auto mr-auto w-96 rounded-md bg-white p-4 text-black">
+    <div className="sm:-96 m-6 ml-auto mr-auto w-[90%] rounded-md bg-white p-4 text-black">
       <h1 className="mb-2 flex justify-center text-xl font-bold uppercase">
         Login
       </h1>

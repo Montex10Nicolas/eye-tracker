@@ -133,7 +133,6 @@ export async function login(username: string, password: string) {
   });
 
   if (!user) {
-    console.log("user not found");
     return new NextResponse("username or password wrong", {
       status: 401,
       statusText: "Username or password wrong",

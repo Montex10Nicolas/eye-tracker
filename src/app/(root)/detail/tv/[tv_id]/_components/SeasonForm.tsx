@@ -73,7 +73,6 @@ export function SeasonForm(props: {
   }, [episodeWatched, season.episode_count]);
 
   useEffect(() => {
-    console.log("Edned", ended);
     if (ended === null || ended === undefined) return;
     setStatus("COMPLETED");
   }, [ended]);

@@ -16,7 +16,7 @@ export default async function Page() {
   }
 
   return (
-    <div className="m-6 ml-auto mr-auto w-96 rounded-md bg-white p-4 text-black">
+    <div className="m-6 ml-auto mr-auto w-[90%]  rounded-md bg-white p-4 text-black sm:w-96">
       <h1 className="mb-2 flex justify-center text-xl font-bold uppercase">
         Sign up
       </h1>
