@@ -1,7 +1,6 @@
 import { hash, verify } from "@node-rs/argon2";
 import { desc } from "drizzle-orm";
 import { generateIdFromEntropySize } from "lucia";
-import { KoHo } from "next/font/google";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
@@ -15,6 +14,7 @@ import {
   userTable,
 } from "~/server/db/schema";
 import {
+  DRIZZLE_ERROR_CODE,
   type DBSeasonType,
   type DBSeasonWatchedType,
   type DBSerieType,
@@ -71,7 +71,7 @@ export async function signup(username: string, password: string) {
     !/^[a-z0-9_-]+$/.test(username)
   ) {
     return new NextResponse("Invalid username", {
-      status: 400,
+      status: 401,
     });
   }
 
@@ -81,17 +81,35 @@ export async function signup(username: string, password: string) {
     password.length > 255
   ) {
     return new NextResponse("invalid password", {
-      status: 400,
+      status: 401,
     });
   }
   const passwordHash = await hash(password, { ...PASSWORD_HASH_PAR });
   const userId = generateIdFromEntropySize(10);
 
-  await db.insert(userTable).values({
-    username: username,
-    password_hash: passwordHash,
-    id: userId,
-  });
+  try {
+    await db.insert(userTable).values({
+      username: username,
+      password_hash: passwordHash,
+      id: userId,
+    });
+
+    // Probably this is all improvable especially on the TS side of things
+  } catch (e: unknown) {
+    const { code } = e;
+
+    const found = DRIZZLE_ERROR_CODE.find((c) => {
+      const key = Object.keys(c);
+      return key[0] === code;
+    });
+
+    const message = Object.values(found)[0];
+
+    return new NextResponse(message ?? "Unknown error", {
+      status: 401,
+      statusText: message ?? "Unknown error",
+    });
+  }
 
   await db.insert(userInfoTable).values({
     userId: userId,

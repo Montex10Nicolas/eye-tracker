@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { type z } from "zod";
 import { Separator } from "~/components/ui/separator";
-import LoginForm, { type FormSchemaType } from "../_components/LoginForm";
+import LoginForm, { type FormSchemaType } from "../_components/Form";
 import { login } from "../user_action";
 
 export default async function Login() {

@@ -38,7 +38,12 @@ export type DBSerieWatchedType = typeof seriesWatchedTable.$inferSelect;
 
 export type DBSeasonWatchedType = typeof seasonWatchedTable.$inferSelect;
 
-export const CODES_STATUS: number[] = [23505];
+export const DRIZZLE_ERROR_CODE: Record<string, string>[] = [
+  {
+    "23505": "A record already exist with this username",
+  },
+  { "69": "Yes this is a good juk, cause i'm funny like that" },
+];
 
 export function generateErrorMessage(code: number) {
   switch (code) {
