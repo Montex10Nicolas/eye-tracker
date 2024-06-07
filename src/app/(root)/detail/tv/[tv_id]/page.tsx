@@ -28,7 +28,7 @@ import {
   removeAllSerie,
   type SeriesAndSeasonsWatched,
 } from "../../actions";
-import { SerieButton } from "./_components/ButtonsToast";
+import { AddBtn, RemoveBtn, SerieButton } from "./_components/ButtonsToast";
 import { EditSeason } from "./_components/EditSeason";
 
 async function Info(props: {
@@ -234,17 +234,6 @@ async function Seasons(props: {
       });
     }
 
-    const AddBtn = (
-      <form className="h-full w-full" action={DBAddSeason}>
-        <button
-          type="submit"
-          className="h-full w-full items-center justify-center bg-blue-500 font-semibold uppercase text-white"
-        >
-          Add
-        </button>
-      </form>
-    );
-
     const EditBtn = (
       <div className="h-full w-full">
         <EditSeason
@@ -262,41 +251,22 @@ async function Seasons(props: {
       </div>
     );
 
-    if (found === undefined) {
-      return (
-        <div className="flex h-16">
-          {AddBtn}
-          {EditBtn}
-        </div>
-      );
-    }
-    const { status } = found;
+    const status = found?.status;
     const myStatus = status as StatusWatchedType;
 
     let customBtn: JSX.Element | null = null;
-
-    const RemoveBtn = (
-      <form action={DBRemoveSeason} className="h-full w-full">
-        <button
-          type="submit"
-          className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase text-white"
-        >
-          Remove
-        </button>
-      </form>
-    );
 
     if (myStatus === "COMPLETED") {
       customBtn = (
         <>
           {EditBtn}
-          {RemoveBtn}
+          <RemoveBtn DBRemoveSeason={DBRemoveSeason} />
         </>
       );
     } else if (myStatus === "WATCHING") {
       customBtn = (
         <>
-          {AddBtn}
+          <RemoveBtn DBRemoveSeason={DBRemoveSeason} />
           {EditBtn}
           {RemoveBtn}
         </>
@@ -304,7 +274,7 @@ async function Seasons(props: {
     } else {
       customBtn = (
         <>
-          {AddBtn}
+          <AddBtn DBAddSeason={DBAddSeason} />
           {EditBtn}
         </>
       );

@@ -53,91 +53,40 @@ export function SerieButton(props: {
   );
 }
 
-export function SeasonButton(props: {
-  userId: string;
-  serie: Serie;
-  season: Season;
-  DBAddSeason: () => Promise<void>;
-  DBRemoveSeason: () => Promise<void>;
-  EditBtn: JSX.Element
-}) {
-  const { userId, serie, season, DBAddSeason, DBRemoveSeason } = props;
-
-  const AddBtn = (
+export function AddBtn(props: { DBAddSeason: () => Promise<void> }) {
+  const { DBAddSeason } = props;
+  return (
     <form className="h-full w-full" action={DBAddSeason}>
       <button
         type="submit"
         className="h-full w-full items-center justify-center bg-blue-500 font-semibold uppercase text-white"
+        onClick={() => {
+          toast("Add", {
+            description: "Adding season...",
+          });
+        }}
       >
         Add
       </button>
     </form>
   );
+}
 
-  const EditBtn = (
-    <div className="h-full w-full">
-      <EditSeason
-        serie={serie}
-        season={season}
-        userId={userId}
-        addEpisode={addEpisodeToSeasonWatched}
-        season_w={found}
-        myButton={
-          <button className="h-full w-full cursor-pointer items-center justify-center bg-green-500 font-semibold uppercase text-white">
-            edit
-          </button>
-        }
-      />
-    </div>
-  );
-
-  if (found === undefined) {
-    return (
-      <div className="flex h-12">
-        {AddBtn}
-        {EditBtn}
-      </div>
-    );
-  }
-  const { status } = found;
-  const myStatus = status as StatusWatchedType;
-
-  let customBtn: JSX.Element | null = null;
-
-  const RemoveBtn = (
+export function RemoveBtn(props: { DBRemoveSeason: () => Promise<void> }) {
+  const { DBRemoveSeason } = props;
+  return (
     <form action={DBRemoveSeason} className="h-full w-full">
       <button
         type="submit"
         className="h-full w-full items-center justify-center bg-red-500 font-semibold uppercase text-white"
+        onClick={() => {
+          toast("Remove", {
+            description: "Removing season...",
+          });
+        }}
       >
         Remove
       </button>
     </form>
   );
-
-  if (myStatus === "COMPLETED") {
-    customBtn = (
-      <>
-        {EditBtn}
-        {RemoveBtn}
-      </>
-    );
-  } else if (myStatus === "WATCHING") {
-    customBtn = (
-      <>
-        {AddBtn}
-        {EditBtn}
-        {RemoveBtn}
-      </>
-    );
-  } else {
-    customBtn = (
-      <>
-        {AddBtn}
-        {EditBtn}
-      </>
-    );
-  }
-
-  return <div className="flex h-12">{customBtn}</div>;
 }
