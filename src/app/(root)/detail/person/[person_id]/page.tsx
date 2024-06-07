@@ -1,5 +1,10 @@
+import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  addSerieFromTMDB,
+  createMovieFromTMDB,
+} from "~/_utils/actions_helpers";
 import {
   NOT_FOUND_POSTER,
   TMDB_IMAGE_URL,
@@ -13,14 +18,23 @@ import {
   myWatchedSeries,
   type SeriesAndSeasonWatched,
 } from "~/app/(user)/user_action";
+import { db } from "~/server/db";
 import { queryTMDBPersonDetail } from "~/server/queries";
 import {
   type MovieCredits,
+  type MovieDetail,
   type PersonDetailType,
   type PersonsCast,
+  type Serie,
   type TvCredits,
 } from "~/types/tmdb_detail";
 import { DisplayGenres } from "../../_components/Display";
+import {
+  addToMovieWatched,
+  markSeriesAsCompleted,
+  removeAllSerie,
+  removeFromMovieWatched,
+} from "../../actions";
 
 function mergeCredits(movie: MovieCredits, tv: TvCredits): PersonsCast[] {
   const all = [...movie.cast, ...movie.crew, ...tv.cast, ...tv.crew];
@@ -125,54 +139,146 @@ function DisplayInfo(person: PersonDetailType) {
   );
 }
 
-function DisplayCredit(
+// Render each credita
+async function DisplayCredit(
   cred: PersonsCast,
   movie: boolean,
   url_image: string,
+  person_id: number,
   watched = false,
 ) {
+  const user = await getUser();
+  const logged = user !== null;
+  const userId = user?.id;
+  const id = cred.id.toString();
+
+  async function addAll() {
+    "use server";
+
+    if (movie) {
+      const movieData = await db.query.moviesTable.findFirst({
+        where: (movie, { eq }) => eq(movie.id, id),
+      });
+
+      let data: MovieDetail | undefined = movieData?.movie_data;
+      if (data === undefined) {
+        data = await createMovieFromTMDB(id);
+      }
+
+      await addToMovieWatched(userId!, data);
+      return revalidatePath(`/detail/person/${person_id}`);
+    }
+
+    const serieData = await db.query.seriesTable.findFirst({
+      where: (serie, { eq }) => eq(serie.id, id),
+    });
+
+    let data: Serie | undefined = serieData?.serie_data;
+    if (data === undefined) {
+      data = await addSerieFromTMDB(id);
+    }
+
+    await markSeriesAsCompleted(userId!, id, data);
+    return revalidatePath(`/detail/person/${person_id}`);
+  }
+
+  async function removeAll() {
+    "use server";
+
+    if (movie) {
+      const movieData = await db.query.moviesTable.findFirst({
+        where: (movie, { eq }) => eq(movie.id, id),
+      });
+
+      let data: MovieDetail | undefined = movieData?.movie_data;
+      if (data === undefined) {
+        data = await createMovieFromTMDB(id);
+      }
+
+      await removeFromMovieWatched(userId!, data);
+      return revalidatePath(`/detail/person/${person_id}`);
+    }
+
+    const serieData = await db.query.seriesTable.findFirst({
+      where: (serie, { eq }) => eq(serie.id, id),
+    });
+
+    let data: Serie | undefined = serieData?.serie_data;
+    if (data === undefined) {
+      data = await addSerieFromTMDB(id);
+    }
+
+    await removeAllSerie(userId!, id, data);
+    return revalidatePath(`/detail/person/${person_id}`);
+  }
+
   return (
-    <Link
-      key={cred.id}
-      href={movie ? `/detail/movie/${cred.id}` : `/detail/tv/${cred.id}`}
-    >
-      <div
-        className={`flex h-full max-w-36 cursor-pointer flex-col border p-2 sm:max-w-48 ${watched ? "border-4 border-amber-500" : "border-red"}`}
+    <section key={cred.id}>
+      <Link
+        key={cred.id}
+        href={movie ? `/detail/movie/${cred.id}` : `/detail/tv/${cred.id}`}
       >
-        <div className="relative">
-          <Image
-            src={url_image}
-            width={192}
-            height={250}
-            alt={`${cred.original_title}`}
-            className="min-h-[250px] object-cover"
-          />
-          <div className="absolute right-1 top-1 rounded-sm bg-white px-2 py-1 font-semibold uppercase text-black">
-            {movie ? "Movie" : "TV"}
+        <div
+          className={`flex h-[400px] max-w-36 cursor-pointer flex-col justify-stretch border p-2 sm:max-w-48 ${watched ? "border-4 border-amber-500" : "border-red"}`}
+        >
+          <div className="relative">
+            <Image
+              src={url_image}
+              width={192}
+              height={250}
+              alt={`${cred.original_title}`}
+              className="min-h-[250px] object-cover"
+            />
+            <div className="absolute right-1 top-1 rounded-sm bg-white px-2 py-1 font-semibold uppercase text-black">
+              {movie ? "Movie" : "TV"}
+            </div>
+          </div>
+          <div className="font-bold">
+            {cred.title ?? cred.title} {cred.name ?? cred.name} {"\n"}
+          </div>
+          <div className="max-w bottom-0 flex flex-col">
+            <span>{cred.character}</span>
+            <div className="flex justify-between">
+              <span>
+                {cred.release_date !== undefined
+                  ? displayHumanDate(cred.release_date)
+                  : cred.first_air_date !== undefined
+                    ? displayHumanDate(cred.first_air_date)
+                    : null}
+              </span>
+              <span>{cred.vote_average.toFixed(1)}</span>
+            </div>
           </div>
         </div>
-        <div className="font-bold">
-          {cred.title ?? cred.title} {cred.name ?? cred.name} {"\n"}
+      </Link>
+      {logged ? (
+        <div className="h-12 bg-white text-black">
+          {watched ? (
+            <form className="h-full" action={removeAll}>
+              <button
+                type="submit"
+                className="h-full w-full bg-red-500 font-semibold uppercase"
+              >
+                remove
+              </button>
+            </form>
+          ) : (
+            <form className="h-full" action={addAll}>
+              <button
+                className="h-full w-full bg-blue-500 font-semibold uppercase"
+                type="submit"
+              >
+                Add
+              </button>
+            </form>
+          )}
         </div>
-        <div className="max-w bottom-0 flex flex-col">
-          <span>{cred.character}</span>
-          <div className="flex justify-between">
-            <span>
-              {cred.release_date !== undefined
-                ? displayHumanDate(cred.release_date)
-                : cred.first_air_date !== undefined
-                  ? displayHumanDate(cred.first_air_date)
-                  : null}
-            </span>
-            <span>{cred.vote_average.toFixed(1)}</span>
-          </div>
-        </div>
-      </div>
-    </Link>
+      ) : null}
+    </section>
   );
 }
 
-async function DisplayCreditsPerson(credits: PersonsCast[]) {
+async function DisplayCreditsPerson(credits: PersonsCast[], person_id: number) {
   const user = await getUser();
 
   // Get all the Movie/Series that the user has watched
@@ -219,7 +325,7 @@ async function DisplayCreditsPerson(credits: PersonsCast[]) {
                 (movie) => movie.movieId === cred.id.toString(),
               ) !== undefined;
 
-            return DisplayCredit(cred, movie, url_image, found);
+            return DisplayCredit(cred, movie, url_image, person_id, found);
           })}
         </div>
       </div>
@@ -233,7 +339,7 @@ async function DisplayCreditsPerson(credits: PersonsCast[]) {
             ? TMDB_IMAGE_URL(cred.poster_path)
             : NOT_FOUND_POSTER;
 
-          return DisplayCredit(cred, movie, url_image);
+          return DisplayCredit(cred, movie, url_image, person_id);
         })}
       </div>
     );
@@ -241,14 +347,17 @@ async function DisplayCreditsPerson(credits: PersonsCast[]) {
 }
 
 export default async function Page(props: { params: { person_id: number } }) {
-  const person = await queryTMDBPersonDetail(props.params.person_id);
+  const {
+    params: { person_id },
+  } = props;
+  const person = await queryTMDBPersonDetail(person_id);
   const credits = mergeCredits(person.movie_credits, person.tv_credits);
 
   return (
     <main className="mb-8 mt-8 w-screen">
       {DisplayInfo(person)}
       <hr className="my-2 w-full" />
-      {DisplayCreditsPerson(credits)}
+      {DisplayCreditsPerson(credits, person_id)}
     </main>
   );
 }

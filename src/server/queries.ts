@@ -70,6 +70,8 @@ export async function queryTMDBMovieDetail(id: number) {
     },
   });
 
+  console.log(response);
+
   if (response.status !== 200) {
     throw new Error("Smething went wrong");
   }

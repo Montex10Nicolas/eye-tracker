@@ -15,8 +15,32 @@ import {
   type DBUserInfoType,
   type StatusWatchedType,
 } from "~/server/db/types";
+import { queryTMDBMovieDetail, queryTMDBTVDetail } from "~/server/queries";
 import { type MovieDetail, type Season, type Serie } from "~/types/tmdb_detail";
 import { changeDateInvoValue } from "./utils";
+
+export async function createMovieFromTMDB(movieId: string) {
+  const id = parseInt(movieId);
+  if (Number.isNaN(id)) {
+    throw new Error("not a number");
+  }
+
+  const movieData = await queryTMDBMovieDetail(id);
+  await createMovie(movieId, movieData);
+
+  return movieData;
+}
+
+export async function addSerieFromTMDB(serieId: string) {
+  const id = parseInt(serieId);
+  if (Number.isNaN(id)) {
+    throw new Error("Not a number");
+  }
+
+  const serieData = await queryTMDBTVDetail(serieId);
+  await getOrCreateTVSeries(serieId, serieData);
+  return serieData;
+}
 
 export async function getOrCreateInfo(userId: string) {
   let info: DBUserInfoType | undefined = await db.query.userInfoTable.findFirst(
