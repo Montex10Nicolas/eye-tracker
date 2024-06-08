@@ -142,6 +142,7 @@ export async function login(username: string, password: string) {
   if (!validPassword) {
     return new NextResponse("Invalid email or password", {
       status: 401,
+      statusText: "Wrong username or password",
     });
   }
 
