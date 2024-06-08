@@ -23,24 +23,24 @@ export function DisplayTV(props: {
 }) {
   const { result: found, background_url } = props;
   return (
-    <Link href={`/detail/tv/${found.id}`}>
-      <div className="max-h-[400px] max-w-[200px] cursor-pointer overflow-hidden border border-black text-black hover:border-yellow-600">
+    <Link href={`/detail/tv/${found.id}`} className="h-full w-full">
+      <div className="">
         <div className="relative h-full overflow-hidden">
           <Image
             src={TMDB_IMAGE_URL(background_url)}
-            width={500}
-            height={300}
+            width={200}
+            height={100}
             alt={`Poster ${found.name}`}
-            className="image min-h-[300px] min-w-[200px] overflow-hidden object-cover transition-all duration-200 ease-in-out hover:relative hover:scale-110"
+            className="h-[200px] w-[150px] duration-300 ease-in-out hover:scale-125"
           />
           <div className="absolute right-1 top-1 rounded-sm bg-white px-2 py-1 font-semibold uppercase text-black">
             TV
           </div>
         </div>
-        <div className="p-2 text-black">
-          <div>{found.name}</div>
+        <div className="">
+          <div className="font-semibold">{found.name}</div>
           <div className="flex justify-between">
-            <span>{displayHumanDate(found.first_air_date)}</span>
+            <code>{displayHumanDate(found.first_air_date ?? null)}</code>
             <span>{found.origin_country}</span>
           </div>
         </div>
@@ -57,19 +57,19 @@ export function DisplayPerson(props: {
 
   return (
     <Link href={`/detail/person/${person.id}`}>
-      <div className="max-h-[400px] max-w-[200px] cursor-pointer overflow-hidden border border-black text-black hover:border-yellow-600">
+      <div className="">
         <div className="overflow-hidden">
           <Image
             src={TMDB_IMAGE_URL(background_url)}
             width={200}
             height={300}
             alt={`Poster ${person.name}`}
-            className="min-h-[300px] min-w-[200px] object-cover transition-all duration-200 ease-in-out hover:relative hover:scale-110"
+            className="h-[200px] w-[150px] duration-300 ease-in-out hover:scale-125"
           />
         </div>
-        <div className="p-2">
-          <div className="text-xl font-semibold">{person.name}</div>
-          <div className="flex justify-between">
+        <div className="">
+          <div className="">{person.name}</div>
+          <div className="">
             <span>{numberToGender(person.gender)}</span>
             <span>{person.known_for_department}</span>
           </div>
@@ -86,24 +86,22 @@ export function DisplayMovies(props: {
   const { result: found, background_url } = props;
   return (
     <Link href={`/detail/movie/${found.id}`}>
-      <div className="max-h-[400px] max-w-[200px] cursor-pointer overflow-hidden border border-black text-black hover:border-yellow-600">
-        <div className="relative h-full overflow-hidden">
+      <div className="">
+        <div className="relative overflow-hidden">
           <Image
             src={TMDB_IMAGE_URL(background_url)}
             width={500}
             height={300}
             alt={`Poster ${found.title}`}
-            className="image min-h-[300px] min-w-[200px] object-cover transition-all duration-200 ease-in-out hover:relative hover:scale-110"
+            className="h-[200px] w-[150px] duration-300 ease-in-out hover:scale-125"
           />
           <div className="absolute right-1 top-1 rounded-sm bg-white px-2 py-1 font-semibold uppercase text-black">
             Movie
           </div>
         </div>
-        <div className="p-2">
-          <div>{found.title}</div>
-          <div className="flex justify-between">
-            <span>Released in: {displayHumanDate(found.release_date)}</span>
-          </div>
+        <div className="space-y-2">
+          <div className="font-bold">{found.title}</div>
+          <p className="">{displayHumanDate(found.release_date)}</p>
         </div>
       </div>
     </Link>
