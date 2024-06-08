@@ -37,7 +37,7 @@ async function LatestSerie(props: { user: User }) {
                     alt={name}
                     width={100}
                     height={100}
-                    className="h-[200px] w-[180px] p-1"
+                    className="h-[170px] w-[180px] p-1 sm:h-[200px]"
                   />
                 </div>
                 <div className="flex w-full flex-col justify-between py-1 text-xl">
@@ -98,7 +98,7 @@ async function LatestMovie(props: { user: User }) {
                     alt={title}
                     width={100}
                     height={100}
-                    className="h-[200px] w-[180px] p-1"
+                    className="h-[170px] w-[180px] p-1 sm:h-[200px]"
                   />
                 </div>
                 <div className="flex w-full flex-col justify-between py-1 text-lg">
