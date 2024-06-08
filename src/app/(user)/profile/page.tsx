@@ -62,7 +62,7 @@ async function List(props: { userId: string }) {
           >
             <div
               key={serie.id}
-              className="flex flex-row hover:border-2 hover:border-white hover:p-2"
+              className="flex flex-row hover:border-2 hover:border-white hover:p-2 sm:hover:border-0 sm:hover:p-0"
             >
               <div className="h-[80px] w-[75px] overflow-hidden">
                 <Image
@@ -70,7 +70,7 @@ async function List(props: { userId: string }) {
                   alt={name}
                   width={100}
                   height={100}
-                  className="h-full w-full p-1"
+                  className="h-full w-full p-1 sm:hover:scale-125"
                 />
               </div>
               <div className="mx-2 flex w-full flex-col">
