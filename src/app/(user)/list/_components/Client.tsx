@@ -115,7 +115,7 @@ export function Tables(props: {
 
   switch (filter) {
     case "COMPLETED":
-      FinalTable = <>{WatchingTable}</>;
+      FinalTable = <>{CompletedTable}</>;
       break;
     case "DROPPED":
       FinalTable = <>{DroppedTable}</>;
