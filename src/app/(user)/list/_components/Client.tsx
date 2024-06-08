@@ -38,10 +38,10 @@ function MyTable(props: {
     } = props;
 
     const startedString = started
-      ? new Date(started).toLocaleDateString()
+      ? displayHumanDate(new Date(started).toLocaleDateString())
       : "Not set";
     const endedString = ended
-      ? new Date(ended).toLocaleDateString()
+      ? displayHumanDate(new Date(ended).toLocaleDateString())
       : "Not set";
 
     return (
