@@ -70,7 +70,7 @@ async function List(props: { userId: string }) {
                   alt={name}
                   width={100}
                   height={100}
-                  className="h-full w-full p-1 hover:scale-125"
+                  className="h-full w-full p-1"
                 />
               </div>
               <div className="mx-2 flex w-full flex-col">
