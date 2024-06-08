@@ -40,6 +40,12 @@ export default function Profile(props: { logout: () => Promise<never> }) {
           >
             <Link href={"/profile"}>Profile</Link>
           </DropdownMenuItem>
+          <DropdownMenuItem
+            className="w-full cursor-pointer"
+            onClick={() => router.push("/list")}
+          >
+            <Link href={"/list"}>Your List</Link>
+          </DropdownMenuItem>
           <Separator orientation="horizontal" className="bg-black" />
           <DropdownMenuItem
             className="w-full cursor-pointer bg-red-500 hover:bg-red-500"
