@@ -107,3 +107,88 @@ export function SummaryGraph(props: { info: DBUserInfoType }) {
     </div>
   );
 }
+
+export function RadarGraph(props: { info: DBUserInfoType }) {
+  const { info } = props;
+  const {
+    tvSerieCompleted,
+    tvSerieWatching,
+    tvSeasonCompleted,
+    tvSeasonDropped,
+    tvSeasonPaused,
+    tvSeasonPlanned,
+    tvSeasonWatching,
+    tvSerieDropped,
+    tvSeriePaused,
+    tvSeriePlanned,
+  } = info;
+
+  const serieTotal =
+    tvSerieDropped +
+    tvSeriePaused +
+    tvSeriePlanned +
+    tvSerieCompleted +
+    tvSerieWatching;
+  const seasonTotal =
+    tvSeasonDropped +
+    tvSeasonPaused +
+    tvSeasonPlanned +
+    tvSeasonCompleted +
+    tvSeasonWatching;
+
+  function percentual(n: number, total: number) {
+    // total:100=n:x
+    return Math.ceil((n * 100) / total);
+  }
+  const seriePlanned = percentual(tvSeriePlanned, serieTotal);
+  const serieWatching = percentual(tvSerieWatching, serieTotal);
+  const serieCompleted = percentual(tvSerieCompleted, serieTotal);
+  const serieDropped = percentual(tvSerieDropped, serieTotal);
+  const seriePaused = percentual(tvSeriePaused, serieTotal);
+  const seasonPlanned = percentual(tvSeasonPlanned, seasonTotal);
+  const seasonWatching = percentual(tvSeasonWatching, seasonTotal);
+  const seasonCompleted = percentual(tvSeasonCompleted, seasonTotal);
+  const seasonDropped = percentual(tvSeasonDropped, seasonTotal);
+  const seasonPaused = percentual(tvSeasonPaused, seasonTotal);
+
+  const data = {
+    labels: ["Planning", "Watching", "Completed", "Paused", "Dropped"],
+    datasets: [
+      {
+        label: "Serie(%)",
+        data: [
+          seriePlanned,
+          serieWatching,
+          serieCompleted,
+          seriePaused,
+          serieDropped,
+        ],
+        fill: true,
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgb(255, 99, 132)",
+        pointBackgroundColor: "rgb(255, 99, 132)",
+        pointBorderColor: "#fff",
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: "rgb(255, 99, 132)",
+      },
+      {
+        label: "Season(%)",
+        data: [
+          seasonPlanned,
+          seasonWatching,
+          seasonCompleted,
+          seasonPaused,
+          seasonDropped,
+        ],
+        fill: true,
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgb(255, 99, 132)",
+        pointBackgroundColor: "rgb(255, 99, 132)",
+        pointBorderColor: "#fff",
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: "rgb(255, 99, 132)",
+      },
+    ],
+  };
+  return <Bar className="max-h-[300px] max-w-[400px]" data={data} />;
+}
