@@ -38,7 +38,7 @@ export default async function Page() {
         planned.push(serie);
         break;
       case "WATCHING":
-        planned.push(serie);
+        watching.push(serie);
         break;
     }
   }
