@@ -113,7 +113,7 @@ async function Info(props: {
             />
             {logged ? (
               <SerieButton
-                watched={watched}
+                status={status as StatusWatchedType}
                 addAllSerie={AddAllSerie}
                 removeSerie={removeSerie}
               />
