@@ -25,7 +25,7 @@ export function SerieButton(props: {
   }
 
   return (
-    <div className="grid h-12 w-full place-items-center  bg-slate-800">
+    <div className="grid h-8 w-full place-items-center bg-slate-800 sm:h-12">
       {status === "COMPLETED" ? (
         <form className="h-full w-full" action={removeSerie}>
           <button

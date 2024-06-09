@@ -315,7 +315,6 @@ export async function markSeriesAsCompleted(
       ended: new Date(),
     });
 
-    console.log(seasonId, season.name, serieName, preEp, season.episode_count);
     const {
       serie_data: { episode_run_time },
     } = serie;

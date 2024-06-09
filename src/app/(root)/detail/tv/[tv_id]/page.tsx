@@ -266,9 +266,9 @@ async function Seasons(props: {
     } else if (myStatus === "WATCHING") {
       customBtn = (
         <>
-          <RemoveBtn DBRemoveSeason={DBRemoveSeason} />
+          <AddBtn DBAddSeason={DBAddSeason} />
           {EditBtn}
-          {RemoveBtn}
+          <RemoveBtn DBRemoveSeason={DBRemoveSeason} />
         </>
       );
     } else {

@@ -1,4 +1,5 @@
 import {
+  addEpisodeToSeasonWatched,
   markSeriesAsCompleted,
   removeAllSerie,
 } from "~/app/(root)/detail/actions";
@@ -58,6 +59,7 @@ export default async function Page() {
         userId={userId}
         markSerie={markSeriesAsCompleted}
         removeSerie={removeAllSerie}
+        addEpisodeToSeasonWatched={addEpisodeToSeasonWatched}
       />
     </main>
   );
