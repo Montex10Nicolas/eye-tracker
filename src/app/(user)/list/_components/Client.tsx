@@ -1,10 +1,17 @@
 "use client";
 
+import { AccordionTrigger } from "@radix-ui/react-accordion";
+import { revalidatePath } from "next/cache";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
+import { SerieButton } from "~/app/(root)/detail/tv/[tv_id]/_components/ButtonsToast";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+} from "~/components/ui/accordion";
 import {
   Table,
   TableBody,
@@ -15,16 +22,98 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { type StatusWatchedType } from "~/server/db/types";
-import { type SeriesAndSeasonWatched } from "../../user_action";
+import { type Serie } from "~/types/tmdb_detail";
+import {
+  type SeriesAndSeasonWatched,
+  type seasonWatchWithSeason,
+} from "../../user_action";
 
 function MyTable(props: {
   data: SeriesAndSeasonWatched[];
   status: StatusWatchedType;
+  markSerie: (
+    userId: string,
+    serieId: string,
+    serieData: Serie,
+  ) => Promise<void>;
+  removeSerie: (
+    userId: string,
+    serieId: string,
+    serieData: Serie,
+  ) => Promise<void>;
+  userId: string;
 }) {
-  const { data, status: TableStatus } = props;
+  const { data, status: TableStatus, markSerie, removeSerie, userId } = props;
   const router = useRouter();
 
-  function Row(props: { serie: SeriesAndSeasonWatched }) {
+  function DisplayTable(props: { seasons: seasonWatchWithSeason[] }) {
+    const { seasons } = props;
+
+    function Row(props: { season: seasonWatchWithSeason }) {
+      const {
+        season: {
+          season: {
+            seasonName,
+            season_data: { poster_path },
+          },
+          started,
+          ended,
+          status,
+        },
+      } = props;
+
+      const startedString = started
+        ? displayHumanDate(new Date(started).toLocaleDateString())
+        : "Not set";
+      const endedString = ended
+        ? displayHumanDate(new Date(ended).toLocaleDateString())
+        : "Not set";
+
+      return (
+        <TableRow className="">
+          <TableCell>
+            <div>
+              <Image
+                src={TMDB_IMAGE_URL(poster_path)}
+                alt={seasonName}
+                width={100}
+                height={100}
+              />
+            </div>
+            <div className="flex flex-col">
+              <a className="font-semibold text-blue-600 underline">
+                {seasonName}
+              </a>
+            </div>
+          </TableCell>
+
+          <TableCell>{status}</TableCell>
+          <TableCell>{displayHumanDate(startedString)}</TableCell>
+          <TableCell>{displayHumanDate(endedString)}</TableCell>
+        </TableRow>
+      );
+    }
+
+    return (
+      <Table className="border border-white p-2 text-xs sm:text-sm">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Season</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Stated</TableHead>
+            <TableHead>Ended</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {seasons.map((season) => (
+            <Row key={season.id} season={season} />
+          ))}
+        </TableBody>
+      </Table>
+    );
+  }
+
+  function DisplayAccording(props: { serie: SeriesAndSeasonWatched }) {
     const {
       serie: {
         serie: {
@@ -34,8 +123,12 @@ function MyTable(props: {
         started,
         ended,
         status,
+        seasonsWatched,
       },
     } = props;
+    const { serie: watched } = props;
+    const serieData = watched.serie.serie_data;
+    const serieId = id.toString();
 
     const startedString = started
       ? displayHumanDate(new Date(started).toLocaleDateString())
@@ -44,54 +137,64 @@ function MyTable(props: {
       ? displayHumanDate(new Date(ended).toLocaleDateString())
       : "Not set";
 
+    async function addAll() {
+      await markSerie(userId, serieId, serieData);
+      router.refresh();
+    }
+    async function removeAll() {
+      await removeSerie(userId, serieId, serieData);
+      router.refresh();
+    }
+
     return (
-      <TableRow
-        onClick={() => router.push(`/detail/tv/${id}`)}
-        className="h-full w-full cursor-pointer bg-white text-black"
-      >
-        <TableCell>
-          <div className="h-[80px] w-[70px] overflow-hidden">
-            <Image
-              src={TMDB_IMAGE_URL(poster_path)}
-              alt={name}
-              width={100}
-              height={100}
-              className="h-full w-full duration-300 ease-in-out hover:scale-125"
-            />
-          </div>
-          <p>{name}</p>
-        </TableCell>
-        <TableCell>{status}</TableCell>
-        <TableCell>{startedString}</TableCell>
-        <TableCell>{endedString}</TableCell>
-      </TableRow>
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value={name}>
+          <AccordionTrigger className="w-full">
+            <div className="flex w-full flex-row items-center justify-between gap-4 px-1 py-2 text-sm">
+              <div className="">
+                <Image
+                  src={TMDB_IMAGE_URL(poster_path)}
+                  height={150}
+                  width={150}
+                  alt={name}
+                  className="h-[80px] w-[65px] sm:h-[150px] sm:w-[100px]"
+                />
+                <div>
+                  <p className="text-lg font-bold">{name}</p>
+                  <SerieButton
+                    addAllSerie={addAll}
+                    removeSerie={removeAll}
+                    status={status as StatusWatchedType}
+                  />
+                </div>
+              </div>
+              <p>{status}</p>
+              <p>{displayHumanDate(startedString)}</p>
+              <p>{displayHumanDate(endedString)}</p>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <DisplayTable seasons={seasonsWatched} />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <section>
+        <h1>You don&apos;t have any data in {TableStatus}</h1>
+      </section>
     );
   }
 
   return (
-    <Table className="sm:text-md -z-10 text-xs">
-      <TableCaption>{TableStatus} this table describe this</TableCaption>
-      <TableHeader className="relative">
-        <TableRow className="sticky top-0">
-          <TableHead>Name</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Started</TableHead>
-          <TableHead>Ended</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data.map((serie) => (
-          <Row serie={serie} key={serie.id} />
-        ))}
-      </TableBody>
-      {data.length === 0 ? (
-        <TableCaption>
-          <h1 className="text-lg font-bold text-white sm:text-xl">
-            You don&apos;t have any serie in this {TableStatus} at this moment
-          </h1>
-        </TableCaption>
-      ) : null}
-    </Table>
+    <section>
+      {data.map((serie) => (
+        <DisplayAccording key={serie.id} serie={serie} />
+      ))}
+    </section>
   );
 }
 
@@ -101,15 +204,75 @@ export function Tables(props: {
   planned: SeriesAndSeasonWatched[];
   dropped: SeriesAndSeasonWatched[];
   paused: SeriesAndSeasonWatched[];
+  userId: string;
+  markSerie: (
+    userId: string,
+    serieId: string,
+    serieData: Serie,
+  ) => Promise<void>;
+  removeSerie: (
+    userId: string,
+    serieId: string,
+    serieData: Serie,
+  ) => Promise<void>;
 }) {
-  const { watching, completed, planned, dropped, paused } = props;
+  const {
+    watching,
+    completed,
+    planned,
+    dropped,
+    paused,
+    markSerie,
+    removeSerie,
+    userId,
+  } = props;
   const [filter, setFilter] = useState<StatusWatchedType | null>(null);
 
-  const WatchingTable = <MyTable status={"WATCHING"} data={watching} />;
-  const CompletedTable = <MyTable status={"COMPLETED"} data={completed} />;
-  const PlannedTable = <MyTable status={"PLANNING"} data={planned} />;
-  const DroppedTable = <MyTable status={"DROPPED"} data={dropped} />;
-  const PausedTable = <MyTable status={"PAUSED"} data={paused} />;
+  const WatchingTable = (
+    <MyTable
+      userId={userId}
+      markSerie={markSerie}
+      removeSerie={removeSerie}
+      status={"WATCHING"}
+      data={watching}
+    />
+  );
+  const CompletedTable = (
+    <MyTable
+      userId={userId}
+      markSerie={markSerie}
+      removeSerie={removeSerie}
+      status={"COMPLETED"}
+      data={completed}
+    />
+  );
+  const PlannedTable = (
+    <MyTable
+      userId={userId}
+      markSerie={markSerie}
+      removeSerie={removeSerie}
+      status={"PLANNING"}
+      data={planned}
+    />
+  );
+  const DroppedTable = (
+    <MyTable
+      userId={userId}
+      markSerie={markSerie}
+      removeSerie={removeSerie}
+      status={"DROPPED"}
+      data={dropped}
+    />
+  );
+  const PausedTable = (
+    <MyTable
+      userId={userId}
+      markSerie={markSerie}
+      removeSerie={removeSerie}
+      status={"PAUSED"}
+      data={paused}
+    />
+  );
 
   let FinalTable: JSX.Element = <></>;
 

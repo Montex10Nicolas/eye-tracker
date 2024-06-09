@@ -1,3 +1,7 @@
+import {
+  markSeriesAsCompleted,
+  removeAllSerie,
+} from "~/app/(root)/detail/actions";
 import { type StatusWatchedType } from "~/server/db/types";
 import { NoUser } from "../profile/_components/Client";
 import {
@@ -51,6 +55,9 @@ export default async function Page() {
         planned={planned}
         dropped={dropped}
         paused={paused}
+        userId={userId}
+        markSerie={markSeriesAsCompleted}
+        removeSerie={removeAllSerie}
       />
     </main>
   );

@@ -1,14 +1,14 @@
 "use client";
 
 import { toast } from "sonner";
-import { type SeriesAndSeasonsWatched } from "../../../actions";
+import { type StatusWatchedType } from "~/server/db/types";
 
 export function SerieButton(props: {
-  watched: SeriesAndSeasonsWatched | undefined;
   removeSerie: () => Promise<void>;
   addAllSerie: () => Promise<void>;
+  status: StatusWatchedType;
 }) {
-  const { watched, removeSerie, addAllSerie } = props;
+  const { status, removeSerie, addAllSerie } = props;
 
   function addToast() {
     toast("Add Serie", {
@@ -26,7 +26,7 @@ export function SerieButton(props: {
 
   return (
     <div className="grid h-12 w-full place-items-center  bg-slate-800">
-      {watched?.serie.status === "COMPLETED" ? (
+      {status === "COMPLETED" ? (
         <form className="h-full w-full" action={removeSerie}>
           <button
             type="submit"
