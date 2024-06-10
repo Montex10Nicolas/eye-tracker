@@ -464,7 +464,7 @@ export function Tables(props: {
   return (
     <main className="mb-4">
       {/* Filter button */}
-      <section className="sticky top-0 z-10 flex w-full flex-row flex-wrap justify-around gap-y-2 bg-white pt-2 sm:justify-center sm:gap-8">
+      <section className="sticky top-[80px] z-10 flex h-full w-full flex-row flex-wrap items-center justify-around gap-y-2 border border-black bg-white pt-2 sm:flex-nowrap sm:justify-center sm:gap-8">
         <button
           className={`w-24 rounded-sm uppercase text-white ${filter === null ? "bg-red-300" : "bg-sky-600"}`}
           onClick={() => setFilter(null)}
@@ -501,7 +501,6 @@ export function Tables(props: {
         >
           Dropped
         </button>
-        <div className="h-1 w-full bg-slate-900" />
       </section>
 
       <section className="flex flex-col gap-8">{FinalTable}</section>

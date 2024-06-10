@@ -243,7 +243,7 @@ export default async function Page() {
   const logged = user !== null;
 
   return (
-    <main className="min-h-screen w-screen">
+    <main className="-z-10 min-h-screen w-screen">
       <div className="">
         {logged ? (
           <div className="mx-auto mt-10 flex max-h-[800px] w-[90%]  flex-col overflow-auto bg-white sm:flex-row">

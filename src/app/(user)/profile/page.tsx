@@ -7,13 +7,8 @@ import {
   displayHumanDate,
 } from "~/_utils/utils";
 import { db } from "~/server/db";
-import {
-  getUser,
-  myInfo,
-  myLatestSeries,
-  myWatchedMovie,
-} from "../user_action";
-import { LoginRedirect, NoUser } from "./_components/Client";
+import { getUser, myInfo, myLatestSeries } from "../user_action";
+import { NoUser } from "./_components/Client";
 import { RadarGraph } from "./_components/SummaryGraph";
 
 async function Summary(props: { user: User }) {

@@ -24,7 +24,7 @@ async function HandleLogged() {
 
 export default async function NavBar() {
   return (
-    <section className="max-w-screen sticky flex flex-row bg-white p-2 py-4 sm:p-4">
+    <section className="max-w-screen sticky top-0 flex h-[80px] flex-row bg-white p-2 py-4 sm:p-4">
       <div className=""></div>
       <div className="flex w-full  flex-row items-center justify-between text-black">
         <Link className="cursor-pointer" href={"/"}>

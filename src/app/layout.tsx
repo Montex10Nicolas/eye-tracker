@@ -27,7 +27,7 @@ export default async function RootLayout({
         className={`font-sans ${inter.variable} flex min-h-screen flex-col bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white`}
       >
         <NavBar />
-        {children}
+        <main className="-z-10">{children}</main>
         <Toaster position="top-right" />
         <div id="modal-root"></div>
         <footer className="mt-auto flex h-20 w-full items-center justify-between bg-slate-800 p-6">

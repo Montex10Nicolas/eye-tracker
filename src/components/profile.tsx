@@ -24,7 +24,7 @@ export default function Profile(props: { logout: () => Promise<never> }) {
   }
 
   return (
-    <section className="z-100 z-100 flex gap-4">
+    <section className="z-50 flex gap-4">
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Avatar>
@@ -33,22 +33,22 @@ export default function Profile(props: { logout: () => Promise<never> }) {
           </Avatar>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent className="flex w-32 cursor-pointer flex-col items-center rounded-md bg-sky-300 text-black">
+        <DropdownMenuContent className="z-50 flex w-32 cursor-pointer flex-col items-center rounded-md bg-sky-300 text-black">
           <DropdownMenuItem
-            className="w-full cursor-pointer"
+            className="z-50 w-full cursor-pointer"
             onClick={goToProfile}
           >
             <Link href={"/profile"}>Profile</Link>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="w-full cursor-pointer"
+            className="z-50 w-full cursor-pointer"
             onClick={() => router.push("/list")}
           >
             <Link href={"/list"}>Your List</Link>
           </DropdownMenuItem>
           <Separator orientation="horizontal" className="bg-black" />
           <DropdownMenuItem
-            className="w-full cursor-pointer bg-red-500 hover:bg-red-500"
+            className="z-50 w-full cursor-pointer bg-red-500 hover:bg-red-500"
             onClick={handleSubmit}
           >
             Log out
