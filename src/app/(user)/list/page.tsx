@@ -49,7 +49,7 @@ export default async function Page() {
   }
 
   return (
-    <main className="-z-10">
+    <main className="">
       <Tables
         completed={completed}
         watching={watching}
