@@ -1,7 +1,6 @@
 "use client";
 
 import { AccordionTrigger } from "@radix-ui/react-accordion";
-import { revalidatePath } from "next/cache";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,7 +20,6 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,

@@ -36,7 +36,7 @@ async function Info(props: {
   user: User | null;
   watched: SeriesAndSeasonsWatched | undefined;
 }) {
-  const { user, serie, watched } = props;
+  const { user, serie } = props;
   const {
     name,
     status,
