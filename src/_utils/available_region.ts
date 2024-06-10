@@ -228,6 +228,8 @@ export const ALL_REGIONS = [
   { iso_3166_1: "ZW", english_name: "Zimbabwe", native_name: "Zimbabwe" },
 ] as const;
 
+export const ISO = ALL_REGIONS.map((region) => region.iso_3166_1);
+
 export function getAllIso() {
   return ALL_REGIONS.map((region) => region.iso_3166_1);
 }

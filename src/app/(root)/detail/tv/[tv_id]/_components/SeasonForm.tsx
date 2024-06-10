@@ -106,11 +106,16 @@ export function SeasonForm(props: {
   }
 
   const startedMax = ended ?? new Date();
-  const endedMin = started;
+  const endedMin = started ?? new Date();
   const endedMax = new Date();
 
   return (
     <section className="z-40 my-5 h-[80%] w-[90%] cursor-default bg-white p-4 text-black sm:h-[70%] sm:w-[70%]">
+      {/* <code className="absolute flex flex-col gap-4 bg-white p-10">
+        <span>SM{startedMax.toLocaleDateString()}</span>
+        <span>Em{endedMin?.toLocaleDateString()}</span>
+        <span>EM{endedMax.toLocaleDateString()}</span>
+      </code> */}
       <div className="flex h-full w-full flex-col items-center gap-4">
         <h1 className="mx-auto text-lg font-bold sm:text-3xl">
           {name} <span>{season_number}</span>
