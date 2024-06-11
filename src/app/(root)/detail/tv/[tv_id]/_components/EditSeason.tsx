@@ -22,6 +22,12 @@ export function EditSeason(props: {
     document.body.style.overflowY = visible ? "hidden" : "visible";
   }, [visible]);
 
+  useEffect(() => {
+    return () => {
+      document.body.style.overflowY = "visible";
+    };
+  }, []);
+
   if (!visible) {
     return (
       <>
