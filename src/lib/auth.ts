@@ -1,13 +1,9 @@
 // src/auth.ts
-import { Lucia } from "lucia";
+import { Lucia, TimeSpan } from "lucia";
 import { adapter } from "./adapter";
 
 export const lucia = new Lucia(adapter, {
-  // getSessionAttributes: function (attributes) {
-  //   return {
-  //     username: attributes.username,
-  //   };
-  // },
+  sessionExpiresIn: new TimeSpan(2, "w"),
   getUserAttributes: function (attributes) {
     return {
       username: attributes.username,
@@ -26,14 +22,10 @@ export const lucia = new Lucia(adapter, {
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
-    // DatabaseSessionAttributes: DatabaseSessionAttributes;
     DatabaseUserAttributes: DatabaseUserAttributes;
   }
 }
 
-// interface DatabaseSessionAttributes {
-//   username: string;
-// }
 interface DatabaseUserAttributes {
   username: string;
 }
