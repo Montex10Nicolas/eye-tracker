@@ -140,6 +140,7 @@ export const seriesTable = createTable("tv-series-table", {
   id: varchar("id", { length: 256 }).notNull().primaryKey(),
   name: varchar("name", { length: 256 }).notNull(),
   serie_data: json("serie_data").$type<Serie>().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }),
 });
 
 export const seriesRelations = relations(seriesTable, ({ many }) => ({
