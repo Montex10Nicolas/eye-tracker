@@ -142,11 +142,12 @@ export async function getOrCreateMovie(movieId: string, movie: MovieDetail) {
   return movie_db;
 }
 
-async function updateSeries(serieId: string, serie: Serie) {
+export async function updateSeries(serieId: string, serie: Serie) {
   const serie_db = await db
     .update(seriesTable)
     .set({
       serie_data: serie,
+      updatedAt: new Date(),
     })
     .where(eq(seriesTable.id, serieId))
     .returning();
