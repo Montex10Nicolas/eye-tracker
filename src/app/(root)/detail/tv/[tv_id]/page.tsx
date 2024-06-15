@@ -196,7 +196,7 @@ async function Seasons(props: { user: User | null; seasons: Season[] }) {
     } = props;
 
     return (
-      <div className="flex flex-col">
+      <div className="flex snap-center flex-col items-center">
         <div className="relative h-[130px] w-[90px] sm:h-[200px] sm:w-[150px]">
           <Image
             src={TMDB_IMAGE_URL(season_poster)}
@@ -215,7 +215,7 @@ async function Seasons(props: { user: User | null; seasons: Season[] }) {
         </div>
 
         {/* Actions */}
-        <div className="grid h-10 w-full grid-cols-3 text-xs font-bold sm:text-sm">
+        <div className="grid h-8 w-full grid-cols-3 text-xs font-bold sm:h-10 sm:text-sm">
           <form action="" className="h-full w-full">
             <button className="h-full w-full bg-primary text-black">Add</button>
           </form>
@@ -239,7 +239,7 @@ async function Seasons(props: { user: User | null; seasons: Season[] }) {
           <span className="my-auto text-lg font-bold">Seasons</span>
         </div>
       </div>
-      <div className="mx-2 mt-2 flex h-full w-full flex-row gap-12 overflow-x-scroll bg-foreground pr-6 sm:mx-auto sm:mt-6 sm:w-3/4 sm:pr-0">
+      <div className="mx-2 mt-2 flex h-full w-full snap-x snap-proximity flex-row gap-4 overflow-x-scroll scroll-smooth bg-foreground pr-6 sm:mx-auto sm:mt-6 sm:w-3/4 sm:pr-0 md:gap-12">
         {seasons.map((season) => (
           <DispalySeason key={season.id} season={season} />
         ))}
