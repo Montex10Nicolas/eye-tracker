@@ -28,11 +28,13 @@ export function EditSeason(props: {
     };
   }, []);
 
+  // document.body.style.overflowY = "visible";
+
   if (!visible) {
     return (
       <>
         <div
-          className="h-full w-full appearance-none"
+          // className="h-full w-full appearance-none"
           onClick={() => setVisible(true)}
         >
           {/* <EditIcon /> */}
@@ -49,7 +51,7 @@ export function EditSeason(props: {
   return (
     <div className="">
       {createPortal(
-        <div className="fixed left-0 top-0 flex h-screen w-screen items-center justify-center overflow-hidden bg-slate-900 bg-opacity-95">
+        <div className="fixed left-0 top-0 flex h-[100vh] min-h-screen w-screen overflow-auto bg-slate-900 bg-opacity-95">
           <div
             onClick={() => {
               setVisible(false);

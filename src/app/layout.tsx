@@ -29,7 +29,6 @@ export default async function RootLayout({
         <NavBar />
         {children}
         <Toaster position="top-right" />
-        <div id="modal-root"></div>
         <footer className="mt-auto flex h-20 w-full items-center justify-between bg-slate-800 p-6">
           <div>
             Created by <span>Nicolas Montecchiani</span>
