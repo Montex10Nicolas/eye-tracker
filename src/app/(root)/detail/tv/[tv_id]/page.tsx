@@ -2,8 +2,9 @@ import { type User } from "lucia";
 import Image from "next/image";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
-import { type Season, type Serie } from "~/types/tmdb_detail";
+import { Credits, type Season, type Serie } from "~/types/tmdb_detail";
 import { TVGetOrUpdateSerieData } from "./_actions/tv_actions";
+import { ClientCredits } from "./_components/Client";
 
 async function Detail(props: { user: User | null; serie: Serie }) {
   const { user, serie } = props;
@@ -248,25 +249,10 @@ async function Seasons(props: { user: User | null; seasons: Season[] }) {
   );
 }
 
-async function Credits(props: { user: User | null }) {
-  const { user } = props;
+async function Credits(props: { credits: Credits }) {
+  const { credits } = props;
 
-  return (
-    <section className="left-0 flex h-[250px] w-full flex-col border-y-2 border-secondary bg-foreground sm:h-[350px]">
-      <div className="min-w-full basis-12 bg-secondary text-center">
-        <div className="mx-auto flex h-full w-3/4 items-center justify-between px-4">
-          <span className="cursor-pointer text-lg font-bold text-primary hover:text-primary">
-            Cast
-          </span>
-          <span className="my-auto text-xl font-bold">Credits</span>
-          <span className="cursor-pointer text-lg font-bold text-slate-600 hover:text-primary">
-            Crew
-          </span>
-        </div>
-      </div>
-      <div className="mx-auto h-full w-full bg-foreground outline outline-red-400 sm:w-3/4"></div>
-    </section>
-  );
+  return <ClientCredits credits={credits} />;
 }
 
 async function Reccomendation() {
@@ -289,13 +275,13 @@ export default async function Page(props: { params: { tv_id: string } }) {
 
   const user = await getUser();
   const serie = await TVGetOrUpdateSerieData(tv_id);
-  const { seasons } = serie;
+  const { seasons, credits } = serie;
 
   return (
     <main className="my-6 w-screen space-y-6 overflow-hidden bg-background">
       <Detail user={user} serie={serie} />
       <Seasons user={user} seasons={seasons} />
-      <Credits user={user} />
+      <Credits credits={credits} />
       <Reccomendation />
     </main>
   );
