@@ -68,15 +68,11 @@ export function myModule(n: number, divident: number): [number, number] {
   const whole = Math.floor(n / divident);
   const left = n % divident;
 
-  console.log(n, whole, left, divident);
-
   return [whole, left];
 }
 
 // Convert minutes into months/days/hours/minutes
 export function convertMinute(start: number) {
-  console.log("Starting point: ", start);
-
   const [toHours, minutes] = myModule(start, 60);
   const [toDays, hours] = myModule(toHours, 24);
   const [months, days] = myModule(toDays, 31);

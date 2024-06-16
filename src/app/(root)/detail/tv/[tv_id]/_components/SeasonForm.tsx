@@ -4,14 +4,13 @@ import { useEffect, useState } from "react";
 
 import Image from "next/image";
 import { toast } from "sonner";
+import { TMDB_IMAGE_URL, dateIntoDateInput } from "~/_utils/utils";
 import {
-    type DBSeasonWatchedType,
-    type StatusWatchedType,
+  type DBSeasonWatchedType,
+  type StatusWatchedType,
 } from "~/server/db/types";
 import { type Season, type Serie } from "~/types/tmdb_detail";
 import { type addEpisodeToSeasonWatched } from "../../../actions";
-import { TMDB_IMAGE_URL, dateToYY } from -MM - D;
-} from "~/_utils/utils";
 
 const StatusTypes: StatusWatchedType[] = [
   "PLANNING",
@@ -31,11 +30,7 @@ export function SeasonForm(props: {
 }) {
   const { serie, season, userId, seasonWatch, addEpisode, close } = props;
   const { name, poster_path } = serie;
-  const { season_number } = season;
-
-  // started: Date | null = null,
-  // ended: Date | null = null,
-  // epWatched = 0;
+  const { season_number, name: serie_name, episode_count } = season;
 
   const [status, setStatus] = useState<StatusWatchedType>(() => {
     return (seasonWatch?.status as StatusWatchedType) ?? "PLANNING";
@@ -51,32 +46,6 @@ export function SeasonForm(props: {
   });
 
   const completed = status === "COMPLETED";
-
-  useEffect(() => {
-    if (status === "COMPLETED") {
-      setEpisode(season.episode_count);
-      setEnded(new Date());
-    } else if (status === "PLANNING") {
-      setEpisode(0);
-    }
-  }, [status, setEpisode, season.episode_count]);
-
-  useEffect(() => {
-    if (episodeWatched === season.episode_count) {
-      setStatus("COMPLETED");
-      return;
-    } else if (episodeWatched === 0) {
-      setStatus("PLANNING");
-      return;
-    }
-
-    setStatus("WATCHING");
-  }, [episodeWatched, season.episode_count]);
-
-  useEffect(() => {
-    if (ended === null || ended === undefined) return;
-    setStatus("COMPLETED");
-  }, [ended]);
 
   async function submit() {
     toast("Updating", {
@@ -106,166 +75,80 @@ export function SeasonForm(props: {
     close();
   }
 
-  const startedMax = ended ?? new Date();
-  const endedMin = started ?? new Date();
-  const endedMax = new Date();
-
   return (
-    <section className="z-50 my-5 h-[80%] w-[90%] cursor-default bg-white p-4 text-black sm:h-[70%] sm:w-[70%]">
-      <div className="flex h-full w-full flex-col items-center gap-4">
-        <h1 className="mx-auto text-lg font-bold sm:text-3xl">
-          {name} <span>{season_number}</span>
-        </h1>
-        {/* Poster */}
-        <div className="h-[200px] w-24 overflow-hidden sm:h-[300px] sm:w-36">
-          <Image
-            src={TMDB_IMAGE_URL(poster_path)}
-            alt={name}
-            width={300}
-            height={300}
-            className="h-full w-full"
-          />
+    <section className="z-20 w-11/12 bg-foreground text-black">
+      <div>
+        <div className="text-center">
+          <p className="">{name}</p>
+          <p className="">{serie_name}</p>
         </div>
 
-        {/* STATUS */}
-        <div className="flex justify-center">
-          <select
-            className="w-36 rounded-sm bg-blue-500 px-1 py-4 text-center text-xl font-semibold text-white sm:py-2"
-            onChange={(e) => setStatus(e.target.value as StatusWatchedType)}
-            value={status as string}
-          >
-            {StatusTypes.map((value) => {
-              let disabled = false;
-              disabled =
-                (value === "DROPPED" && completed) ||
-                (value === "WATCHING" && completed);
-              return (
-                <option disabled={disabled} value={value as string} key={value}>
-                  {value}
-                </option>
-              );
-            })}
-          </select>
+        <hr className="my-1 h-1 w-full bg-primary" />
+
+        <div className="flex items-center gap-2">
+          {/* IMG + INFO */}
+          <div className="relative h-[150px] w-[110px]">
+            <Image
+              src={TMDB_IMAGE_URL(poster_path)}
+              alt={`${name}-${season_number}`}
+              width={100}
+              height={150}
+              className="h-full w-full"
+            />
+            <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-b from-transparent to-black">
+              <div className="absolute bottom-1 flex w-full justify-between px-2 text-white">
+                <span>S{season_number}</span>
+                <span>{episode_count}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Vote */}
+          <div className="mr-2">
+            <div>
+              <input
+                className="bg-primary py-1 text-center"
+                type="number"
+                value={8}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* EPISODE */}
-        <div className="flex flex-row items-center justify-around gap-8">
-          <button
-            disabled={episodeWatched === 0}
-            onClick={() => setEpisode((c) => c - 1)}
-            className="h-8 w-8 rounded-sm bg-slate-300 text-3xl disabled:opacity-40"
-          >
-            -
-          </button>
-          <select
-            className="w-36 rounded-sm bg-blue-500 px-1 py-4 text-center text-xl font-semibold text-white sm:py-2"
-            value={episodeWatched}
-            onChange={(e) => setEpisode(parseInt(e.target.value))}
-          >
-            {new Array(season.episode_count + 1)
-              .fill(null)
-              .map((value, index) => {
-                return (
-                  <option key={index} value={index}>
-                    {index}
+        <hr className="my-1 h-1 w-full bg-primary" />
+
+        <div>
+          {/* Episode count */}
+          <div>
+            <h3 className="text-center">Episodes</h3>
+            <div className="flex">
+              <button className="w-1/12">-</button>
+              <input
+                className="w-10/12 bg-primary py-2 text-center"
+                type="number"
+                value={0}
+              />
+              <button className="w-1/12">+</button>
+            </div>
+          </div>
+
+          {/* Progress/Status */}
+          <div>
+            <h3 className="text-center">Status</h3>
+            <div className="w-full px-4">
+              <select className="w-full bg-primary py-2 text-center lowercase">
+                {StatusTypes.map((status) => (
+                  <option
+                    key={status}
+                    className="lowercase"
+                    value={status as string}
+                  >
+                    {status}
                   </option>
-                );
-              })}
-          </select>
-          <button
-            disabled={completed}
-            onClick={() => setEpisode((c) => c + 1)}
-            className="h-8 w-8 rounded-sm bg-slate-300 p-0 text-3xl disabled:opacity-40"
-          >
-            <span>+</span>
-          </button>
-        </div>
-
-        {/* Started */}
-        <div className="flex w-full justify-between gap-4">
-          {/* Started */}
-          <div className="w-[90%]">
-            <label htmlFor="started">Started</label>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <input
-                max={dateToYY-MM-D(startedMax)}
-                type="date"
-                className="h-12 w-full rounded-sm bg-blue-500 px-4 text-center font-bold uppercase text-white"
-                name="started"
-                value={dateToYY-MM-D(started)}
-                onChange={(e) => {
-                  setStarted(() => {
-                    const value = e.target.value;
-                    return value.length === 0 ? null : new Date(value);
-                  });
-                }}
-              />
-              <button
-                onClick={() => setStarted(new Date())}
-                className="h-12 rounded-sm bg-green-500 px-4 text-sm uppercase text-white"
-              >
-                Today
-              </button>
+                ))}
+              </select>
             </div>
           </div>
-
-          {/* Ended */}
-          <div className="w-[90%]">
-            <label htmlFor="ended" className="mx-auto">
-              Ended
-            </label>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <input
-                type="date"
-                name="ended"
-                min={dateToYY-MM-D(endedMin)}
-                max={dateToYY-MM-D(endedMax)}
-                className="h-12 w-full rounded-sm bg-blue-500 px-4 text-end font-bold uppercase text-white"
-                value={dateToYY-MM-D(ended)}
-                onChange={(e) => {
-                  setEnded(() => {
-                    const value = e.target.value;
-                    return value.length === 0 ? null : new Date(value);
-                  });
-                }}
-              />
-              <button
-                onClick={() => setEnded(new Date())}
-                className="h-12 rounded-sm bg-green-500 px-4 text-sm uppercase text-white"
-              >
-                Today
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Buttons */}
-        <div className="mx-auto mt-auto flex w-[90%] gap-5 sm:w-[80%]">
-          <button
-            onClick={close}
-            className="w-full bg-green-900 font-bold uppercase text-white"
-          >
-            Close
-          </button>
-          <button
-            onClick={remove}
-            className="w-full bg-red-500 font-bold uppercase text-white"
-          >
-            Remove Season
-          </button>
-          <button
-            onClick={submit}
-            className="w-full bg-blue-500 font-bold uppercase text-white sm:h-12"
-          >
-            Save
-          </button>
-        </div>
-
-        <div className="sr-only">
-          <p>{status}</p>
-          <p>Started: {started?.toLocaleDateString()}</p>
-          <p>Ended: {ended?.toLocaleDateString()}</p>
-          <p>EP: {episodeWatched}</p>
         </div>
       </div>
     </section>

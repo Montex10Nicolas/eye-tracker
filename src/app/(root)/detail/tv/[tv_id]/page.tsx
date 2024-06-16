@@ -8,13 +8,27 @@ import {
   displayHumanDate,
 } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
+import { type DBSeasonWatchedType } from "~/server/db/types";
 import { queryTMDBTVRecomendation } from "~/server/queries";
 import { type Credits, type Season, type Serie } from "~/types/tmdb_detail";
+import {
+  addEpisodeToSeasonWatched,
+  getUserWatchedTVAndSeason,
+  type SeriesAndSeasonsWatched,
+} from "../../actions";
 import { TVGetOrUpdateSerieData } from "./_actions/tv_actions";
 import { ClientCredits } from "./_components/Client";
+import { EditSeason } from "./_components/EditSeason";
 
 async function Detail(props: { user: User | null; serie: Serie }) {
   const { user, serie } = props;
+
+  const userId = user?.id;
+  const serieId = serie.id.toString();
+
+  const season_watched = await getUserWatchedTVAndSeason(userId, serieId);
+  const isLogged = user !== null,
+    hasWatched = season_watched !== null;
 
   const {
     name,
@@ -83,9 +97,11 @@ async function Detail(props: { user: User | null; serie: Serie }) {
               />
             </div>
             <div className="ml-2 text-xs sm:hidden">{overview}</div>
-            <button className="mt-4 hidden w-full rounded-sm bg-primary py-3 text-sm sm:px-8 sm:text-base lg:block">
-              <span>Add to list</span>
-            </button>
+            {isLogged ? (
+              <button className="mt-4 hidden w-full rounded-sm bg-primary py-3 text-sm sm:px-8 sm:text-base lg:block">
+                <span>Add to list</span>
+              </button>
+            ) : null}
           </div>
           <div className="mx-6 my-3 text-xs sm:mb-0 sm:mr-8 sm:text-base">
             <div className="hidden sm:block">{overview}</div>
@@ -93,11 +109,13 @@ async function Detail(props: { user: User | null; serie: Serie }) {
 
             {/* Detail on Mobile */}
             <div className="lg:hidden">
-              <div className="mb-3">
-                <button className="mt-4 w-2/5 rounded-sm bg-primary px-4 py-1 text-base ">
-                  <span>Add to list</span>
-                </button>
-              </div>
+              {isLogged ? (
+                <div className="mb-3">
+                  <button className="mt-4 w-2/5 rounded-sm bg-primary px-4 py-1 text-base ">
+                    <span>Add to list</span>
+                  </button>
+                </div>
+              ) : null}
               <Field title="Name: ">{name}</Field>
               <Field title="Status: ">{status}</Field>
               <Field title="Episode: ">{number_of_episodes}</Field>
@@ -207,8 +225,19 @@ async function Detail(props: { user: User | null; serie: Serie }) {
   );
 }
 
-async function Seasons(props: { user: User | null; seasons: Season[] }) {
-  const { user, seasons } = props;
+async function Seasons(props: {
+  user: User | null;
+  seasons: Season[];
+  serie: Serie;
+}) {
+  const { user, seasons, serie } = props;
+
+  const userId = user?.id;
+  const serieId = serie.id.toString();
+
+  const season_watched: SeriesAndSeasonsWatched | undefined =
+    await getUserWatchedTVAndSeason(userId, serieId);
+  const isLogged = user !== null;
 
   if (seasons[0] && seasons[0].season_number === 0) {
     const first = seasons.shift();
@@ -219,14 +248,47 @@ async function Seasons(props: { user: User | null; seasons: Season[] }) {
 
   // Single Season "card"
   function DisplaySeason(props: { season: Season }) {
+    const { season } = props;
     const {
-      season: {
-        episode_count,
-        poster_path: season_poster,
-        name: season_name,
-        season_number,
-      },
-    } = props;
+      id,
+      episode_count,
+      poster_path: season_poster,
+      name: season_name,
+      season_number,
+    } = season;
+    async function DBAddSeason() {
+      "use server";
+
+      await addEpisodeToSeasonWatched(userId!, serie, season, {
+        episodeCount: episode_count,
+        status: "COMPLETED",
+        ended: new Date(),
+      });
+    }
+
+    async function DBRemoveSeason() {
+      "use server";
+
+      await addEpisodeToSeasonWatched(userId!, serie, season, {
+        episodeCount: -1,
+        status: null,
+        ended: null,
+        started: null,
+      });
+    }
+
+    const seasonId = id.toString();
+    const season_w: DBSeasonWatchedType | undefined =
+      season_watched?.seasons.find((s) => s.seasonId === seasonId);
+
+    const hasWatched = season_w !== undefined;
+
+    let grid_cols = 2;
+    if (hasWatched) {
+      if (season_w.status !== "COMPLETED" && season_w.status !== "PLANNING") {
+        grid_cols = 3;
+      }
+    }
 
     return (
       <div className="flex snap-center flex-col items-center">
@@ -242,25 +304,50 @@ async function Seasons(props: { user: User | null; seasons: Season[] }) {
           <div className="absolute bottom-2 left-0 w-full">
             <p className="mx-2 flex justify-between sm:text-lg">
               <span>S{season_number}</span>
-              <span>{episode_count}</span>
+              <span>
+                {hasWatched ? <span>{season_w.episodeWatched}/</span> : null}
+                {episode_count}
+              </span>
             </p>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="grid h-8 w-full grid-cols-3 text-xs font-bold sm:h-10 sm:text-sm">
-          <form action="" className="h-full w-full">
-            <button className="h-full w-full bg-primary text-black">Add</button>
-          </form>
-          <form action="" className="h-full w-full">
-            <button className="h-full w-full bg-secondary text-white">
-              Edit
-            </button>
-          </form>
-          <form action="" className="h-full w-full">
-            <button className="h-full w-full bg-red-700 text-white">Del</button>
-          </form>
-        </div>
+        {isLogged ? (
+          <div
+            className={`grid h-8 w-full grid-cols-${grid_cols} grid-flow-col text-xs font-bold sm:h-10 sm:text-sm`}
+          >
+            {season_w?.status !== "COMPLETED" ? (
+              <form action={DBAddSeason} className="col-span-1 h-full w-full">
+                <button className="h-full w-full bg-primary text-black">
+                  Add
+                </button>
+              </form>
+            ) : null}
+            {season_w && season_w.status !== "PLANNING" ? (
+              <form
+                action={DBRemoveSeason}
+                className="col-span-1 h-full w-full"
+              >
+                <button className="h-full w-full bg-red-700 text-white">
+                  Del
+                </button>
+              </form>
+            ) : null}
+            <EditSeason
+              addEpisode={addEpisodeToSeasonWatched}
+              season={season}
+              season_w={season_w}
+              serie={serie}
+              userId={userId!}
+              myButton={
+                <button className="h-full w-full bg-secondary text-white">
+                  Edit
+                </button>
+              }
+            />
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -340,7 +427,7 @@ export default async function Page(props: { params: { tv_id: string } }) {
   return (
     <main className="my-6 w-screen space-y-6 overflow-x-hidden bg-background">
       <Detail user={user} serie={serie} />
-      <Seasons user={user} seasons={seasons} />
+      <Seasons user={user} seasons={seasons} serie={serie} />
       <Credits credits={credits} />
       <Reccomendation tvId={tv_id} />
     </main>

@@ -15,7 +15,7 @@ export function EditSeason(props: {
   season_w: DBSeasonWatchedType | undefined;
   myButton: JSX.Element;
 }) {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const { serie, season, addEpisode, userId, season_w, myButton } = props;
 
   useEffect(() => {
