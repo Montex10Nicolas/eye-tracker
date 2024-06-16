@@ -40,7 +40,8 @@ export function addZero(n: number | string | undefined) {
   return n > 10 ? n.toString() : "0" + n;
 }
 
-export function changeDateInvoValue(date: Date | null | undefined) {
+// This funcion exist to transform date from db into date accepted by input:date or to db
+export function dateIntoDateInput(date: Date | null | undefined) {
   if (date === null || date === undefined) return;
   const day = date.getDate(),
     month = date.getMonth() + 1,
@@ -66,14 +67,19 @@ export function numberToGender(num: number) {
 export function myModule(n: number, divident: number): [number, number] {
   const whole = Math.floor(n / divident);
   const left = n % divident;
+
+  console.log(n, whole, left, divident);
+
   return [whole, left];
 }
 
-// Convert minutes into days/hours/years
+// Convert minutes into months/days/hours/minutes
 export function convertMinute(start: number) {
+  console.log("Starting point: ", start);
+
   const [toHours, minutes] = myModule(start, 60);
   const [toDays, hours] = myModule(toHours, 24);
   const [months, days] = myModule(toDays, 31);
 
-  return [months, days, hours, minutes] as const;
+  return { months, days, hours, minutes } as const;
 }

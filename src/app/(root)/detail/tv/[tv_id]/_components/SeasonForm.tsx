@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 
 import Image from "next/image";
 import { toast } from "sonner";
-import { TMDB_IMAGE_URL, changeDateInvoValue } from "~/_utils/utils";
 import {
-  type DBSeasonWatchedType,
-  type StatusWatchedType,
+    type DBSeasonWatchedType,
+    type StatusWatchedType,
 } from "~/server/db/types";
 import { type Season, type Serie } from "~/types/tmdb_detail";
 import { type addEpisodeToSeasonWatched } from "../../../actions";
+import { TMDB_IMAGE_URL, dateToYY } from -MM - D;
+} from "~/_utils/utils";
 
 const StatusTypes: StatusWatchedType[] = [
   "PLANNING",
@@ -187,11 +188,11 @@ export function SeasonForm(props: {
             <label htmlFor="started">Started</label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <input
-                max={changeDateInvoValue(startedMax)}
+                max={dateToYY-MM-D(startedMax)}
                 type="date"
                 className="h-12 w-full rounded-sm bg-blue-500 px-4 text-center font-bold uppercase text-white"
                 name="started"
-                value={changeDateInvoValue(started)}
+                value={dateToYY-MM-D(started)}
                 onChange={(e) => {
                   setStarted(() => {
                     const value = e.target.value;
@@ -217,10 +218,10 @@ export function SeasonForm(props: {
               <input
                 type="date"
                 name="ended"
-                min={changeDateInvoValue(endedMin)}
-                max={changeDateInvoValue(endedMax)}
+                min={dateToYY-MM-D(endedMin)}
+                max={dateToYY-MM-D(endedMax)}
                 className="h-12 w-full rounded-sm bg-blue-500 px-4 text-end font-bold uppercase text-white"
-                value={changeDateInvoValue(ended)}
+                value={dateToYY-MM-D(ended)}
                 onChange={(e) => {
                   setEnded(() => {
                     const value = e.target.value;

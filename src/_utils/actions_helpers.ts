@@ -17,7 +17,7 @@ import {
 } from "~/server/db/types";
 import { queryTMDBMovieDetail, queryTMDBTVDetail } from "~/server/queries";
 import { type MovieDetail, type Season, type Serie } from "~/types/tmdb_detail";
-import { changeDateInvoValue } from "./utils";
+import { dateIntoDateInput } from "./utils";
 
 export async function createMovieFromTMDB(movieId: string) {
   const id = parseInt(movieId);
@@ -492,13 +492,13 @@ export async function updateOrCreateOrDeleteSeasonWatch(
   if (started === undefined) {
     startedUTC = before.started;
   } else {
-    startedUTC = changeDateInvoValue(started);
+    startedUTC = dateIntoDateInput(started);
   }
   let endedUTC;
   if (ended === undefined) {
     endedUTC = before.ended;
   } else {
-    endedUTC = changeDateInvoValue(ended);
+    endedUTC = dateIntoDateInput(ended);
   }
 
   const newData = await db

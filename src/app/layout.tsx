@@ -24,7 +24,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`font-sans ${inter.variable} flex min-h-screen flex-col bg-background text-white`}
+        className={`font-sans ${inter.variable} flex min-h-screen flex-col overflow-x-hidden bg-background text-white`}
       >
         <NavBar />
         {children}

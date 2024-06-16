@@ -95,7 +95,7 @@ async function Stats(props: { user: User }) {
     );
   }
   const { tvDurationTotal, movieDurationTotal } = info;
-  const [months, days, hours, minutes] = convertMinute(
+  const { months, days, hours, minutes } = convertMinute(
     tvDurationTotal + movieDurationTotal,
   );
 

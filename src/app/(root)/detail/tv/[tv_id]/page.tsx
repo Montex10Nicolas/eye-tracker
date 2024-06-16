@@ -1,7 +1,12 @@
 import { type User } from "lucia";
 import Image from "next/image";
 import Link from "next/link";
-import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
+import {
+  TMDB_IMAGE_URL,
+  addZero,
+  convertMinute,
+  displayHumanDate,
+} from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { queryTMDBTVRecomendation } from "~/server/queries";
 import { type Credits, type Season, type Serie } from "~/types/tmdb_detail";
@@ -28,8 +33,15 @@ async function Detail(props: { user: User | null; serie: Serie }) {
     languages,
     networks,
   } = serie;
+  const totalRuntime = (episode_run_time[0] ?? -1) * number_of_episodes;
+  const {
+    minutes: totalMinutes,
+    hours: totalHours,
+    days: totalDays,
+    months: totalMonths,
+  } = convertMinute(totalRuntime);
 
-  function Thing(props: { title: string; children: React.ReactNode }) {
+  function Field(props: { title: string; children: React.ReactNode }) {
     const { title, children } = props;
 
     return (
@@ -38,6 +50,13 @@ async function Detail(props: { user: User | null; serie: Serie }) {
         <span className="space-x-1 capitalize">{children}</span>
       </div>
     );
+  }
+
+  function DisplayDateInput(props: { input: number; appendix: string }) {
+    const { input, appendix } = props;
+    return input !== -1 && input > 0 ? (
+      <span>{`${addZero(input)}${appendix}`}</span>
+    ) : null;
   }
 
   function Main() {
@@ -79,65 +98,71 @@ async function Detail(props: { user: User | null; serie: Serie }) {
                   <span>Add to list</span>
                 </button>
               </div>
-              <Thing title="Name: ">{name}</Thing>
-              <Thing title="Status: ">{status}</Thing>
-              <Thing title="Episode: ">{number_of_episodes}</Thing>
-              <Thing title="Seasons: ">{number_of_seasons}</Thing>
-              <Thing title="Runtime: ">
+              <Field title="Name: ">{name}</Field>
+              <Field title="Status: ">{status}</Field>
+              <Field title="Episode: ">{number_of_episodes}</Field>
+              <Field title="Seasons: ">{number_of_seasons}</Field>
+              <Field title="Runtime: ">
                 {episode_run_time.length > 0 ? (
                   episode_run_time.map((el) => <span key={el}>{el}</span>)
                 ) : (
                   <span className="text-red-600">uknown</span>
                 )}
-              </Thing>
-              <Thing title="Air time: ">
+              </Field>
+              <Field title="Total runtime: ">
+                <DisplayDateInput input={totalMonths} appendix="M" />
+                <DisplayDateInput input={totalDays} appendix="d" />
+                <DisplayDateInput input={totalHours} appendix="h" />
+                <DisplayDateInput input={totalMinutes} appendix="m" />
+              </Field>
+              <Field title="Air time: ">
                 {displayHumanDate(first_air_date)}-
                 {displayHumanDate(last_air_date)}
-              </Thing>
+              </Field>
             </div>
 
             {/* Detail for Desktop and Mobile */}
             <div className="">
-              <Thing title="Native name: ">{original_name}</Thing>
-              <Thing title="Country of origin: ">
+              <Field title="Native name: ">{original_name}</Field>
+              <Field title="Country of origin: ">
                 {origin_country.length > 0 ? (
                   origin_country.map((el) => <span key={el}>{el}</span>)
                 ) : (
                   <span>Unknown</span>
                 )}
-              </Thing>
-              <Thing title="Genres: ">
+              </Field>
+              <Field title="Genres: ">
                 {genres.map((el, idx) => (
                   <span key={el.id}>
                     {el.name}
                     {idx != genres.length - 1 ? ", " : ""}
                   </span>
                 ))}
-              </Thing>
-              <Thing title="Keywords: ">
+              </Field>
+              <Field title="Keywords: ">
                 {keywords.results.map((el, idx) => (
                   <span key={el.id}>
                     {el.name}
                     {idx != keywords.results.length - 1 ? "," : ""}
                   </span>
                 ))}
-              </Thing>
-              <Thing title={`Language${languages.length > 1 ? "s" : ""}: `}>
+              </Field>
+              <Field title={`Language${languages.length > 1 ? "s" : ""}: `}>
                 {languages.map((el, idx) => (
                   <span className="uppercase" key={el}>
                     {el}
                     {idx !== languages.length - 1 ? "," : ""}
                   </span>
                 ))}
-              </Thing>
-              <Thing title="Networks: ">
+              </Field>
+              <Field title="Networks: ">
                 {networks.map((el, idx) => (
                   <span key={el.id}>
                     {el.name}
                     {idx != networks.length - 1 ? "," : ""}
                   </span>
                 ))}
-              </Thing>
+              </Field>
             </div>
           </div>
         </div>
@@ -151,15 +176,20 @@ async function Detail(props: { user: User | null; serie: Serie }) {
 
     return (
       <div className="px-4 py-2 text-xl text-black">
-        <Thing title="Name: ">{name}</Thing>
-        <Thing title="Status: ">{status}</Thing>
-        <Thing title="Episode: ">{number_of_episodes}</Thing>
-        <Thing title="Seasons: ">{number_of_seasons}</Thing>
-        <Thing title="Runtime: ">{runtime}</Thing>
-        <Thing title="Total runtime: ">{runtime * number_of_episodes}</Thing>
-        <Thing title="Air time: ">
+        <Field title="Name: ">{name}</Field>
+        <Field title="Status: ">{status}</Field>
+        <Field title="Episode: ">{number_of_episodes}</Field>
+        <Field title="Seasons: ">{number_of_seasons}</Field>
+        <Field title="Runtime: ">{runtime}</Field>
+        <Field title="Total runtime: ">
+          <DisplayDateInput input={totalMonths} appendix="M" />
+          <DisplayDateInput input={totalDays} appendix="d" />
+          <DisplayDateInput input={totalHours} appendix="h" />
+          <DisplayDateInput input={totalMinutes} appendix="m" />
+        </Field>
+        <Field title="Air time: ">
           {displayHumanDate(first_air_date)}-{displayHumanDate(last_air_date)}
-        </Thing>
+        </Field>
       </div>
     );
   }
@@ -308,7 +338,7 @@ export default async function Page(props: { params: { tv_id: string } }) {
   const { seasons, credits } = serie;
 
   return (
-    <main className="my-6 w-screen space-y-6 overflow-hidden bg-background">
+    <main className="my-6 w-screen space-y-6 overflow-x-hidden bg-background">
       <Detail user={user} serie={serie} />
       <Seasons user={user} seasons={seasons} />
       <Credits credits={credits} />
