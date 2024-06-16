@@ -1,8 +1,10 @@
 import { type User } from "lucia";
 import Image from "next/image";
+import Link from "next/link";
 import { TMDB_IMAGE_URL, displayHumanDate } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
-import { Credits, type Season, type Serie } from "~/types/tmdb_detail";
+import { queryTMDBTVRecomendation } from "~/server/queries";
+import { type Credits, type Season, type Serie } from "~/types/tmdb_detail";
 import { TVGetOrUpdateSerieData } from "./_actions/tv_actions";
 import { ClientCredits } from "./_components/Client";
 
@@ -186,7 +188,7 @@ async function Seasons(props: { user: User | null; seasons: Season[] }) {
   }
 
   // Single Season "card"
-  function DispalySeason(props: { season: Season }) {
+  function DisplaySeason(props: { season: Season }) {
     const {
       season: {
         episode_count,
@@ -242,7 +244,7 @@ async function Seasons(props: { user: User | null; seasons: Season[] }) {
       </div>
       <div className="mx-2 mt-2 flex h-full w-full snap-x snap-proximity flex-row gap-4 overflow-x-scroll scroll-smooth bg-foreground pr-6 sm:mx-auto sm:mt-6 sm:w-3/4 sm:pr-0 md:gap-12">
         {seasons.map((season) => (
-          <DispalySeason key={season.id} season={season} />
+          <DisplaySeason key={season.id} season={season} />
         ))}
       </div>
     </section>
@@ -255,7 +257,11 @@ async function Credits(props: { credits: Credits }) {
   return <ClientCredits credits={credits} />;
 }
 
-async function Reccomendation() {
+async function Reccomendation(props: { tvId: string }) {
+  const { tvId } = props;
+
+  const { results } = await queryTMDBTVRecomendation(tvId, 1);
+
   return (
     <section className="left-0 flex h-[250px] w-full flex-col border-y-2 border-secondary bg-foreground sm:h-[350px]">
       <div className="min-w-full basis-12 bg-secondary text-center">
@@ -263,7 +269,31 @@ async function Reccomendation() {
           <span className="my-auto text-lg font-bold">Reccomendation</span>
         </div>
       </div>
-      <div className="mx-auto h-full w-full bg-foreground outline outline-red-400 sm:w-3/4"></div>
+      <div className="mx-2 mt-2 flex h-full w-full snap-x snap-proximity flex-row gap-4 overflow-x-scroll scroll-smooth bg-foreground pr-6 text-black sm:mx-auto sm:mt-6 sm:w-3/4 sm:pr-0 md:gap-12">
+        {results.map((item) => {
+          const { poster_path, id, name, media_type } = item;
+          return (
+            <div key={id}>
+              <Link href={`${id}`}>
+                <div className="relative h-[130px] w-[90px] sm:h-[200px] sm:w-[150px]">
+                  <Image
+                    src={TMDB_IMAGE_URL(poster_path)}
+                    height={200}
+                    width={200}
+                    alt={name}
+                    className="h-full w-full"
+                  />
+                  <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-b from-transparent to-black"></div>
+                  <div className="absolute bottom-2 left-0 w-full font-semibold text-white">
+                    <p>{name}</p>
+                  </div>
+                </div>
+                <div>{media_type}</div>
+              </Link>
+            </div>
+          );
+        })}
+      </div>
     </section>
   );
 }
@@ -282,7 +312,7 @@ export default async function Page(props: { params: { tv_id: string } }) {
       <Detail user={user} serie={serie} />
       <Seasons user={user} seasons={seasons} />
       <Credits credits={credits} />
-      <Reccomendation />
+      <Reccomendation tvId={tv_id} />
     </main>
   );
 }
