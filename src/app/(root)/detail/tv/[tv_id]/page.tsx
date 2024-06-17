@@ -93,10 +93,8 @@ async function Detail(props: { user: User | null; serie: Serie }) {
         value={value}
       >
         <SerieForm
-          hello={async () => {
-            "use server";
-            console.log("Hellooo");
-          }}
+          markCompleted={markSeriesAsCompleted}
+          removeAllSerie={removeAllSerie}
           serie={serie}
           userId={userId!}
           season_watched={season_watched}

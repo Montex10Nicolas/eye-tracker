@@ -1,6 +1,8 @@
 "use client";
 
+import { markCurrentScopeAsDynamic } from "next/dist/server/app-render/dynamic-rendering";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
 import { type StatusWatchedType } from "~/server/db/types";
@@ -24,12 +26,15 @@ export function SerieForm(props: {
   serie: Serie;
   season_watched: SeriesAndSeasonsWatched | undefined;
   userId: string;
-  hello: () => Promise<void>;
+  markCompleted: typeof markSeriesAsCompleted;
+  removeAllSerie: typeof removeAllSerie;
 }) {
-  const { serie, season_watched, userId, hello } = props;
+  const { serie, season_watched, userId, markCompleted, removeAllSerie } =
+    props;
   const { name, poster_path, number_of_episodes, number_of_seasons, seasons } =
     serie;
 
+  const router = useRouter();
   const context = useContext(CloseContext);
   const serieId = serie.id.toString();
 
@@ -65,8 +70,14 @@ export function SerieForm(props: {
   }, [status, number_of_seasons]);
 
   async function submit() {
-    console.log("submitooo");
-    await hello();
+    if (status === "COMPLETED") {
+      await markCompleted(userId, serieId, serie);
+    } else if (status === "PLANNING") {
+      await removeAllSerie(userId, serieId, serie);
+    }
+
+    context?.close();
+    router.refresh();
   }
 
   return (
@@ -79,7 +90,7 @@ export function SerieForm(props: {
               className="my-auto h-3/4 w-3/4 bg-secondary text-white"
               onClick={context?.close}
             >
-              X
+              x
             </button>
           </div>
         </div>
