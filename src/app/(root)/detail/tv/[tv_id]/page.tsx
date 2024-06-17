@@ -131,7 +131,7 @@ async function Detail(props: { user: User | null; serie: Serie }) {
             <div className="ml-2 text-xs sm:hidden">{overview}</div>
             {isLogged ? (
               <div className="hidden sm:block">
-                <AddToListButton value={true} />
+                <AddToListButton />
                 <button className="mt-4 h-full w-full rounded-sm bg-primary py-3 text-base">
                   stars
                 </button>
