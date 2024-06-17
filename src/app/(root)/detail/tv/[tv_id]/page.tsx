@@ -82,8 +82,7 @@ async function Detail(props: { user: User | null; serie: Serie }) {
     ) : null;
   }
 
-  function AddToListButton(p: { value: boolean } = { value: false }) {
-    const { value } = p;
+  function AddToListButton() {
     return (
       <EditSeason
         myButton={
@@ -91,7 +90,6 @@ async function Detail(props: { user: User | null; serie: Serie }) {
             <span>Add to list</span>
           </button>
         }
-        value={value}
       >
         <SerieForm
           markCompleted={markSeriesAsCompleted}
@@ -146,7 +144,7 @@ async function Detail(props: { user: User | null; serie: Serie }) {
             <div className="sm:hidden">
               {isLogged ? (
                 <div className="mb-3 flex justify-between">
-                  <AddToListButton value={false} />
+                  <AddToListButton />
                   <button className="mt-4 h-full w-2/5 rounded-sm bg-primary py-1 text-base">
                     stars
                   </button>
