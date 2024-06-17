@@ -15,6 +15,9 @@ import Provider from "../../_components/Providers";
 import {
   addEpisodeToSeasonWatched,
   getUserWatchedTVAndSeason,
+  markSeriesAsCompleted,
+  removeAllSerie,
+  updateSerieData,
   type SeriesAndSeasonsWatched,
 } from "../../actions";
 import { TVGetOrUpdateSerieData } from "./_actions/tv_actions";
@@ -89,7 +92,14 @@ async function Detail(props: { user: User | null; serie: Serie }) {
         }
         value={value}
       >
-        <SerieForm serie={serie} season_watched={season_watched} />
+        <SerieForm
+          userId={userId!}
+          serie={serie}
+          season_watched={season_watched}
+          updateSerie={updateSerieData}
+          markAsCompleted={markSeriesAsCompleted}
+          removeSerie={removeAllSerie}
+        />
       </EditSeason>
     );
   }
