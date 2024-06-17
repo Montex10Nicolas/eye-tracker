@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
 import { type StatusWatchedType } from "~/server/db/types";
 import { type Serie } from "~/types/tmdb_detail";
@@ -105,6 +106,16 @@ export function SerieForm(props: {
   }, [seasonWatched]);
 
   async function submit() {
+    const message =
+      status === "COMPLETED"
+        ? "Serie is being marked as completed..."
+        : status === "PLANNING"
+          ? "Serie is being removed..."
+          : "Serie is being updated";
+    toast("Serie", {
+      description: message,
+      duration: 1000,
+    });
     if (status === "COMPLETED") {
       await markCompleted(userId, serieId, serie);
     } else if (status === "PLANNING") {

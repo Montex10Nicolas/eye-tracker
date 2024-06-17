@@ -91,7 +91,6 @@ async function Detail(props: { user: User | null; serie: Serie }) {
             <span>Add to list</span>
           </button>
         }
-        value={value}
       >
         <SerieForm
           markCompleted={markSeriesAsCompleted}

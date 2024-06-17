@@ -12,6 +12,7 @@ import {
   SerieButton,
 } from "~/app/(root)/detail/tv/[tv_id]/_components/ButtonsToast";
 import { EditSeason } from "~/app/(root)/detail/tv/[tv_id]/_components/EditSeason";
+import { SeasonForm } from "~/app/(root)/detail/tv/[tv_id]/_components/SeasonForm";
 import {
   Accordion,
   AccordionContent,
@@ -125,17 +126,20 @@ function MyTable(props: {
         const EditBtn = (
           <div className="h-full w-full">
             <EditSeason
-              serie={serieData}
-              season={season}
-              userId={userId}
-              addEpisode={addEpisodeToSeasonWatched}
-              season_w={found}
               myButton={
                 <button className="h-full w-full cursor-pointer items-center justify-center bg-green-500 text-xs font-semibold uppercase text-white">
                   edit
                 </button>
               }
-            />
+            >
+              <SeasonForm
+                userId={userId}
+                serie={serieData}
+                season={season}
+                addEpisode={addEpisodeToSeasonWatched}
+                seasonWatch={season_w}
+              />
+            </EditSeason>
           </div>
         );
 
