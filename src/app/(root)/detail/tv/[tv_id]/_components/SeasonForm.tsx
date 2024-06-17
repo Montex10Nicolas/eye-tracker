@@ -111,7 +111,7 @@ export function SeasonForm(props: {
     <section className="z-20 mx-auto my-32 h-fit w-11/12 bg-foreground text-black xl:w-4/5 2xl:w-3/5">
       <div className="">
         <div className="flex justify-between text-center">
-          <div>
+          <div className="w-full">
             <p className="">{name}</p>
             <p className="">{serie_name}</p>
           </div>
@@ -170,22 +170,27 @@ export function SeasonForm(props: {
                 <h3 className="text-center">Episodes</h3>
                 <div className="flex">
                   <button
-                    className="w-1/12"
+                    className="w-2/12"
                     onClick={() => setEpisode((c) => c - 1)}
                   >
-                    -
+                    <span className="text-3xl">-</span>
                   </button>
-                  <input
-                    className="w-10/12 bg-primary py-2 text-center"
-                    type="number"
-                    value={episodeWatched}
-                    onChange={(e) => setEpisode(parseInt(e.target.value))}
-                  />
+                  <div className="flex w-8/12 bg-primary text-center">
+                    <input
+                      className="h-full w-10/12 bg-inherit py-2 text-center"
+                      type="number"
+                      value={episodeWatched}
+                      onChange={(e) => setEpisode(parseInt(e.target.value))}
+                    />
+                    <div className="grid w-2/12 place-content-center border-l-2 border-secondary">
+                      <span>Tot: {episode_count}</span>
+                    </div>
+                  </div>
                   <button
-                    className="w-1/12"
+                    className="w-2/12 text-lg"
                     onClick={() => setEpisode((c) => c + 1)}
                   >
-                    +
+                    <span className="text-3xl">+</span>
                   </button>
                 </div>
               </div>
