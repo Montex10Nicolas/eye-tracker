@@ -43,16 +43,15 @@ function DisplayProvider(props: { provider: ProviderResult | undefined }) {
   const { flatrate, buy, rent } = provider;
   const final = fixProvider(flatrate, buy, rent);
 
-  let colLen = final.length;
-  if (colLen > 4) colLen = 4;
+  const grid_cols = `grid-cols-${final.length < 13 ? final.length : 12}`;
 
   return (
-    <div className="flex h-16 flex-row flex-wrap space-x-4">
+    <div className={`grid  h-16 ${grid_cols}`}>
       {final.map((prov) => {
         return (
-          <div key={prov.provider_id} className="w-16">
+          <div key={prov.provider_id} className="flex items-center">
             <img
-              className="rounded-sm border border-slate-800 object-fill"
+              className="h-[30px] w-[30px] rounded-sm border border-slate-800 object-fill sm:h-[50px] sm:w-[50px]"
               src={TMDB_IMAGE_URL(prov.logo_path)}
               alt={prov.provider_name}
             />
@@ -84,7 +83,7 @@ export default function Provider(props: {
       <select
         onChange={handleChange}
         value={country}
-        className="cursor-pointer rounded-sm bg-white px-4 py-2 text-black"
+        className="cursor-pointer rounded-sm bg-primary px-4 py-2 text-black"
       >
         {keys.map((key) => {
           return (

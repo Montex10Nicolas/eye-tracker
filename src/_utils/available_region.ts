@@ -229,6 +229,7 @@ export const ALL_REGIONS = [
 ] as const;
 
 export const ISO = ALL_REGIONS.map((region) => region.iso_3166_1);
+export type CountryISO = keyof typeof ISO;
 
 export function getAllIso() {
   return ALL_REGIONS.map((region) => region.iso_3166_1);

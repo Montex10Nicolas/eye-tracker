@@ -15,7 +15,7 @@ export function EditSeason(props: {
   season_w: DBSeasonWatchedType | undefined;
   myButton: JSX.Element;
 }) {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const { serie, season, addEpisode, userId, season_w, myButton } = props;
 
   useEffect(() => {
@@ -27,8 +27,6 @@ export function EditSeason(props: {
       document.body.style.overflowY = "visible";
     };
   }, []);
-
-  // document.body.style.overflowY = "visible";
 
   if (!visible) {
     return (

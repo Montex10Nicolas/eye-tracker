@@ -9,8 +9,9 @@ import {
 } from "~/_utils/utils";
 import { getUser } from "~/app/(user)/user_action";
 import { type DBSeasonWatchedType } from "~/server/db/types";
-import { queryTMDBTVRecomendation } from "~/server/queries";
+import { queryTMDBProvider, queryTMDBTVRecomendation } from "~/server/queries";
 import { type Credits, type Season, type Serie } from "~/types/tmdb_detail";
+import Provider from "../../_components/Providers";
 import {
   addEpisodeToSeasonWatched,
   getUserWatchedTVAndSeason,
@@ -29,6 +30,8 @@ async function Detail(props: { user: User | null; serie: Serie }) {
   const season_watched = await getUserWatchedTVAndSeason(userId, serieId);
   const isLogged = user !== null,
     hasWatched = season_watched !== null;
+
+  const services = await queryTMDBProvider("tv", serie.id);
 
   const {
     name,
@@ -98,9 +101,15 @@ async function Detail(props: { user: User | null; serie: Serie }) {
             </div>
             <div className="ml-2 text-xs sm:hidden">{overview}</div>
             {isLogged ? (
-              <button className="mt-4 hidden w-full rounded-sm bg-primary py-3 text-sm sm:px-8 sm:text-base lg:block">
-                <span>Add to list</span>
-              </button>
+              <div className="hidden sm:block">
+                <button className="mt-4 w-full rounded-sm bg-primary py-3 text-sm sm:px-8 sm:text-base">
+                  <span>Add to list</span>
+                </button>
+
+                <button className="mt-4 h-full w-full rounded-sm bg-primary py-3 text-base">
+                  stars
+                </button>
+              </div>
             ) : null}
           </div>
           <div className="mx-6 my-3 text-xs sm:mb-0 sm:mr-8 sm:text-base">
@@ -108,11 +117,14 @@ async function Detail(props: { user: User | null; serie: Serie }) {
             <hr className="mx-auto h-1 w-11/12 bg-primary sm:w-full " />
 
             {/* Detail on Mobile */}
-            <div className="lg:hidden">
+            <div className="sm:hidden">
               {isLogged ? (
-                <div className="mb-3">
+                <div className="mb-3 flex justify-between">
                   <button className="mt-4 w-2/5 rounded-sm bg-primary px-4 py-1 text-base ">
                     <span>Add to list</span>
+                  </button>
+                  <button className="mt-4 h-full w-2/5 rounded-sm bg-primary py-1 text-base">
+                    stars
                   </button>
                 </div>
               ) : null}
@@ -181,6 +193,10 @@ async function Detail(props: { user: User | null; serie: Serie }) {
                   </span>
                 ))}
               </Field>
+            </div>
+
+            <div>
+              <Provider providers={services.results} />
             </div>
           </div>
         </div>
@@ -401,7 +417,7 @@ async function Reccomendation(props: { tvId: string }) {
                     className="h-full w-full"
                   />
                   <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-b from-transparent to-black"></div>
-                  <div className="absolute bottom-2 left-0 w-full font-semibold text-white">
+                  <div className="absolute bottom-2 left-0 w-full text-xs font-semibold text-white sm:text-base">
                     <p>{name}</p>
                   </div>
                 </div>

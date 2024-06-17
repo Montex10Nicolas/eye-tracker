@@ -1,3 +1,5 @@
+import { type CountryISO } from "~/_utils/available_region";
+
 export interface User {
   id: string;
   username?: string;

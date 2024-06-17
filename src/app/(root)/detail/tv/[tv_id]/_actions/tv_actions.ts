@@ -3,6 +3,8 @@ import { addSerieFromTMDB, updateSeries } from "~/_utils/actions_helpers";
 import { db } from "~/server/db";
 import { queryTMDBTVDetail } from "~/server/queries";
 
+// If the data in the database is less than 1 week old and exist uses that in the db
+// Otherwise fetch and update from TMDB
 export async function TVGetOrUpdateSerieData(serieId: string) {
   const serie = await db.query.seriesTable.findFirst({
     where: (serie, { eq }) => eq(serie.id, serieId),
