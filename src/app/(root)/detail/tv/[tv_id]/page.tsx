@@ -18,6 +18,7 @@ import {
   getUserWatchedTVAndSeason,
   markSeriesAsCompleted,
   removeAllSerie,
+  updateSerieData,
   type SeriesAndSeasonsWatched,
 } from "../../actions";
 import { TVGetOrUpdateSerieData } from "./_actions/tv_actions";
@@ -95,6 +96,7 @@ async function Detail(props: { user: User | null; serie: Serie }) {
         <SerieForm
           markCompleted={markSeriesAsCompleted}
           removeAllSerie={removeAllSerie}
+          updateSerie={updateSerieData}
           serie={serie}
           userId={userId!}
           season_watched={season_watched}

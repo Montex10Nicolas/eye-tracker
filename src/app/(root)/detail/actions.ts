@@ -387,3 +387,62 @@ export async function removeAllSerie(
 
   await updateInfoWatchComp(userId);
 }
+
+export async function updateSerieData(
+  userId: string,
+  serieId: string,
+  serie: Serie,
+  serieWatched: boolean[],
+  status: StatusWatchedType,
+) {
+  "use server";
+
+  const serieDB = await getOrCreateTVSeries(serieId, serie);
+  const serieWatchedDB = await getOrCreateTVSeriesWatched(serieId, userId);
+
+  const { serie_data } = serieDB;
+  const { seasons, episode_run_time } = serie_data;
+
+  let s_count = 0;
+  for (let i = 0; i < serieWatched.length; i++) {
+    if (!serieWatched[i]) {
+      continue;
+    }
+
+    const { id, episode_count } = seasons[i]!;
+    const seasonId = id.toString();
+
+    const seasonWatchDB = await getOrCreateTVSeasonWatched(
+      userId,
+      serieId,
+      seasonId,
+    );
+    const { id: seasonWatchId, started, ended, episodeWatched } = seasonWatchDB;
+
+    await updateSeasonWatch(seasonWatchId, {
+      episodeCount: episode_count,
+      ended: ended ? new Date(ended) : null,
+      started: started ? new Date(started) : null,
+      status: "COMPLETED",
+    });
+
+    const newEp = episode_count - episodeWatched;
+    let runtime = 40;
+    if (episode_run_time[0] !== undefined) {
+      runtime = episode_run_time[0];
+    }
+    const time = newEp * runtime;
+    const watching = serieWatchedDB.status === "WATCHING" ? -1 : 0;
+
+    await updateInfo(userId, 0, 0, time, newEp, 1, watching);
+    s_count++;
+  }
+
+  await db
+    .update(seriesWatchedTable)
+    .set({
+      status: status,
+      seasonCount: s_count,
+    })
+    .where(eq(seriesWatchedTable.id, serieWatchedDB.id));
+}

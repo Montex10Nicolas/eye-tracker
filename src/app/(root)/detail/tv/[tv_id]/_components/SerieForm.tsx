@@ -11,6 +11,7 @@ import {
   type SeriesAndSeasonsWatched,
   type markSeriesAsCompleted,
   type removeAllSerie,
+  type updateSerieData,
 } from "../../../actions";
 import { CloseContext } from "./EditSeason";
 
@@ -28,9 +29,16 @@ export function SerieForm(props: {
   userId: string;
   markCompleted: typeof markSeriesAsCompleted;
   removeAllSerie: typeof removeAllSerie;
+  updateSerie: typeof updateSerieData;
 }) {
-  const { serie, season_watched, userId, markCompleted, removeAllSerie } =
-    props;
+  const {
+    serie,
+    season_watched,
+    userId,
+    markCompleted,
+    removeAllSerie,
+    updateSerie,
+  } = props;
   const { name, poster_path, number_of_episodes, number_of_seasons, seasons } =
     serie;
 
@@ -59,7 +67,9 @@ export function SerieForm(props: {
     }
     return result;
   });
-  const [status, setStatus] = useState<StatusWatchedType>(null);
+  const [status, setStatus] = useState<StatusWatchedType>(
+    (season_watched?.serie.status as StatusWatchedType) ?? null,
+  );
 
   useEffect(() => {
     if (status === "PLANNING") {
@@ -74,6 +84,8 @@ export function SerieForm(props: {
       await markCompleted(userId, serieId, serie);
     } else if (status === "PLANNING") {
       await removeAllSerie(userId, serieId, serie);
+    } else {
+      await updateSerie(userId, serieId, serie, seasonWatched, status);
     }
 
     context?.close();
