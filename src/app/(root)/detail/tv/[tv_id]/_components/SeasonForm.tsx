@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 
 import Image from "next/image";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ import {
 } from "~/server/db/types";
 import { type Season, type Serie } from "~/types/tmdb_detail";
 import { type addEpisodeToSeasonWatched } from "../../../actions";
+import { CloseContext } from "./EditSeason";
 
 const StatusTypes: StatusWatchedType[] = [
   "PLANNING",
@@ -27,11 +28,12 @@ export function SeasonForm(props: {
   userId: string;
   seasonWatch: DBSeasonWatchedType | undefined;
   addEpisode: typeof addEpisodeToSeasonWatched;
-  close: () => void;
 }) {
-  const { serie, season, userId, seasonWatch, addEpisode, close } = props;
+  const { serie, season, userId, seasonWatch, addEpisode } = props;
   const { name, poster_path } = serie;
   const { season_number, name: serie_name, episode_count } = season;
+
+  const context = useContext(CloseContext);
 
   const [status, setStatus] = useState<StatusWatchedType>(() => {
     return (seasonWatch?.status as StatusWatchedType) ?? "PLANNING";
@@ -90,7 +92,7 @@ export function SeasonForm(props: {
       started: started,
       ended: ended,
     });
-    close();
+    context?.close();
   }
 
   async function remove() {
@@ -104,7 +106,7 @@ export function SeasonForm(props: {
       started: null,
       ended: null,
     });
-    close();
+    context?.close();
   }
 
   return (
@@ -114,9 +116,10 @@ export function SeasonForm(props: {
           <div className="w-full">
             <p className="">{name}</p>
             <p className="">{serie_name}</p>
+            <code>{JSON.stringify(context, null, 2)}</code>
           </div>
           <div
-            onClick={() => close()}
+            onClick={context?.close}
             className="mx-1 my-1 h-12 w-12 cursor-pointer bg-secondary text-center font-bold text-white"
           >
             x
@@ -252,7 +255,7 @@ export function SeasonForm(props: {
                 Save
               </button>
               <button
-                onClick={() => close()}
+                onClick={context?.close}
                 className="bg-secondary py-2 sm:hidden"
               >
                 Close

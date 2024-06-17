@@ -20,6 +20,7 @@ import {
 import { TVGetOrUpdateSerieData } from "./_actions/tv_actions";
 import { ClientCredits } from "./_components/Client";
 import { EditSeason } from "./_components/EditSeason";
+import { SeasonForm } from "./_components/SeasonForm";
 
 async function Detail(props: { user: User | null; serie: Serie }) {
   const { user, serie } = props;
@@ -306,6 +307,11 @@ async function Seasons(props: {
       }
     }
 
+    async function test() {
+      "use server";
+      console.log("hello");
+    }
+
     return (
       <div className="flex snap-center flex-col items-center">
         <div className="relative h-[130px] w-[90px] sm:h-[200px] sm:w-[150px]">
@@ -351,17 +357,20 @@ async function Seasons(props: {
               </form>
             ) : null}
             <EditSeason
-              addEpisode={addEpisodeToSeasonWatched}
-              season={season}
-              season_w={season_w}
-              serie={serie}
-              userId={userId!}
               myButton={
                 <button className="h-full w-full bg-secondary text-white">
                   Edit
                 </button>
               }
-            />
+            >
+              <SeasonForm
+                userId={userId!}
+                serie={serie}
+                season={season}
+                addEpisode={addEpisodeToSeasonWatched}
+                seasonWatch={season_w}
+              />
+            </EditSeason>
           </div>
         ) : null}
       </div>

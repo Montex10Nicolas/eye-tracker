@@ -1,22 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { type DBSeasonWatchedType } from "~/server/db/types";
-import { type Season, type Serie } from "~/types/tmdb_detail";
-import { type addEpisodeToSeasonWatched } from "../../../actions";
-import { SeasonForm } from "./SeasonForm";
+
+export const CloseContext = createContext<{ close: () => void } | null>(null);
 
 export function EditSeason(props: {
-  serie: Serie;
-  season: Season;
-  userId: string;
-  addEpisode: typeof addEpisodeToSeasonWatched;
-  season_w: DBSeasonWatchedType | undefined;
-  myButton: JSX.Element;
+  myButton: React.ReactNode;
+  children: React.ReactNode;
 }) {
   const [visible, setVisible] = useState(false);
-  const { serie, season, addEpisode, userId, season_w, myButton } = props;
+  const { myButton, children } = props;
 
   useEffect(() => {
     document.body.style.overflowY = visible ? "hidden" : "visible";
@@ -31,13 +25,7 @@ export function EditSeason(props: {
   if (!visible) {
     return (
       <>
-        <div
-          // className="h-full w-full appearance-none"
-          onClick={() => setVisible(true)}
-        >
-          {/* <EditIcon /> */}
-          {myButton}
-        </div>
+        <div onClick={() => setVisible(true)}>{myButton}</div>
       </>
     );
   }
@@ -56,14 +44,9 @@ export function EditSeason(props: {
             }}
             className="absolute left-0 top-0 min-h-full min-w-full cursor-crosshair bg-transparent"
           ></div>
-          <SeasonForm
-            userId={userId}
-            serie={serie}
-            season={season}
-            addEpisode={addEpisode}
-            seasonWatch={season_w}
-            close={closeDialog}
-          />
+          <CloseContext.Provider value={{ close: closeDialog }}>
+            {children}
+          </CloseContext.Provider>
         </div>,
         document.body,
       )}
