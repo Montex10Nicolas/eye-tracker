@@ -8,9 +8,12 @@ export const CloseContext = createContext<{ close: () => void } | null>(null);
 export function EditSeason(props: {
   myButton: React.ReactNode;
   children: React.ReactNode;
+
+  // Ease of programming
+  value?: boolean;
 }) {
-  const [visible, setVisible] = useState(false);
-  const { myButton, children } = props;
+  const { myButton, children, value } = props;
+  const [visible, setVisible] = useState(value ?? false);
 
   useEffect(() => {
     document.body.style.overflowY = visible ? "hidden" : "visible";

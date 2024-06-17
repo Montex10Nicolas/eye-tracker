@@ -21,6 +21,7 @@ import { TVGetOrUpdateSerieData } from "./_actions/tv_actions";
 import { ClientCredits } from "./_components/Client";
 import { EditSeason } from "./_components/EditSeason";
 import { SeasonForm } from "./_components/SeasonForm";
+import { SerieForm } from "./_components/SerieForm";
 
 async function Detail(props: { user: User | null; serie: Serie }) {
   const { user, serie } = props;
@@ -77,6 +78,22 @@ async function Detail(props: { user: User | null; serie: Serie }) {
     ) : null;
   }
 
+  function AddToListButton(p: { value: boolean } = { value: false }) {
+    const { value } = p;
+    return (
+      <EditSeason
+        myButton={
+          <button className="mt-4 w-full rounded-sm bg-primary py-3 text-sm sm:px-8 sm:text-base">
+            <span>Add to list</span>
+          </button>
+        }
+        value={value}
+      >
+        <SerieForm serie={serie} season_watched={season_watched} />
+      </EditSeason>
+    );
+  }
+
   function Main() {
     return (
       <div className="col-span-8 row-span-2 h-full bg-foreground  text-black">
@@ -103,10 +120,7 @@ async function Detail(props: { user: User | null; serie: Serie }) {
             <div className="ml-2 text-xs sm:hidden">{overview}</div>
             {isLogged ? (
               <div className="hidden sm:block">
-                <button className="mt-4 w-full rounded-sm bg-primary py-3 text-sm sm:px-8 sm:text-base">
-                  <span>Add to list</span>
-                </button>
-
+                <AddToListButton value={true} />
                 <button className="mt-4 h-full w-full rounded-sm bg-primary py-3 text-base">
                   stars
                 </button>
@@ -121,9 +135,7 @@ async function Detail(props: { user: User | null; serie: Serie }) {
             <div className="sm:hidden">
               {isLogged ? (
                 <div className="mb-3 flex justify-between">
-                  <button className="mt-4 w-2/5 rounded-sm bg-primary px-4 py-1 text-base ">
-                    <span>Add to list</span>
-                  </button>
+                  <AddToListButton value={false} />
                   <button className="mt-4 h-full w-2/5 rounded-sm bg-primary py-1 text-base">
                     stars
                   </button>
