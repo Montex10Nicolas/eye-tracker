@@ -1,5 +1,6 @@
 import { and, eq, sql, type SQL } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { Noto_Sans_Tamil_Supplement } from "next/font/google";
 import "server-only";
 import {
   getOrCreateTVSeason,
@@ -400,6 +401,8 @@ export async function updateSerieData(
 ) {
   "use server";
 
+  console.log(userId, serieWatched);
+
   const serieDB = await getOrCreateTVSeries(serieId, serie);
   const serieWatchedDB = await getOrCreateTVSeriesWatched(serieId, userId);
 
@@ -408,11 +411,8 @@ export async function updateSerieData(
 
   let s_count = 0;
   for (let i = 0; i < serieWatched.length; i++) {
-    if (!serieWatched[i]) {
-      continue;
-    }
-
-    const { id, episode_count } = seasons[i]!;
+    const s_data = seasons[i]!;
+    const { id, episode_count } = s_data;
     const seasonId = id.toString();
 
     const seasonWatchDB = await getOrCreateTVSeasonWatched(
@@ -420,6 +420,17 @@ export async function updateSerieData(
       serieId,
       seasonId,
     );
+
+    if (!serieWatched[i]) {
+      await addEpisodeToSeasonWatched(userId, serie, s_data, {
+        episodeCount: -1,
+        status: null,
+        ended: null,
+        started: null,
+      });
+      continue;
+    }
+
     const { id: seasonWatchId, started, ended, episodeWatched } = seasonWatchDB;
 
     await updateSeasonWatch(seasonWatchId, {
