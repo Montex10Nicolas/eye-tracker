@@ -399,13 +399,6 @@ export async function updateSerieData(
   status: StatusWatchedType,
 ) {
   "use server";
-<<<<<<< HEAD
-=======
-  if (1 > 0) {
-    console.log(serieWatched, status);
-    return;
-  }
->>>>>>> c8f9662 (broken)
 
   const serieDB = await getOrCreateTVSeries(serieId, serie);
   const serieWatchedDB = await getOrCreateTVSeriesWatched(serieId, userId);
