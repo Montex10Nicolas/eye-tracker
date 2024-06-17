@@ -1,6 +1,6 @@
-"use server";
 import { and, eq, sql, type SQL } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import "server-only";
 import {
   getOrCreateTVSeason,
   getOrCreateTVSeasonWatched,
@@ -248,6 +248,7 @@ export async function addEpisodeToSeasonWatched(
   season: Season,
   newInfo: UpdateSeasonWatchData,
 ) {
+  "use server";
   const serieId = serie.id.toString(),
     seasonId = season.id.toString();
 
@@ -286,6 +287,7 @@ export async function markSeriesAsCompleted(
   serieId: string,
   serieData: Serie,
 ) {
+  "use server";
   const watched = await getOrCreateTVSeriesWatched(serieId, userId);
 
   // Get or create all season of a series and then update each one of them
@@ -344,6 +346,7 @@ export async function removeAllSerie(
   serieId: string,
   serie: Serie,
 ) {
+  "use server";
   let serieData = await getTVSeried(serieId);
   if (serieData === null) {
     serieData = await getOrCreateTVSeries(serieId, serie);
@@ -396,6 +399,13 @@ export async function updateSerieData(
   status: StatusWatchedType,
 ) {
   "use server";
+<<<<<<< HEAD
+=======
+  if (1 > 0) {
+    console.log(serieWatched, status);
+    return;
+  }
+>>>>>>> c8f9662 (broken)
 
   const serieDB = await getOrCreateTVSeries(serieId, serie);
   const serieWatchedDB = await getOrCreateTVSeriesWatched(serieId, userId);

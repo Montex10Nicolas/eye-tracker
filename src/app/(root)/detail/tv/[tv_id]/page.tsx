@@ -94,12 +94,21 @@ async function Detail(props: { user: User | null; serie: Serie }) {
         value={value}
       >
         <SerieForm
+<<<<<<< HEAD
           markCompleted={markSeriesAsCompleted}
           removeAllSerie={removeAllSerie}
           updateSerie={updateSerieData}
           serie={serie}
           userId={userId!}
           season_watched={season_watched}
+=======
+          userId={userId!}
+          serie={serie}
+          season_watched={season_watched}
+          updateSerie={updateSerieData}
+          markAsCompleted={markSeriesAsCompleted}
+          removeSerie={removeAllSerie}
+>>>>>>> c8f9662 (broken)
         />
       </EditSeason>
     );

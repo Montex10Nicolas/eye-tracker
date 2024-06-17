@@ -1,3 +1,4 @@
+import "server-only";
 import { getOrCreateTVSeries } from "~/_utils/actions_helpers";
 import {
   type MovieDetail,
@@ -60,7 +61,6 @@ export async function queryTMDBMultiSearch(query: string) {
 }
 
 export async function queryTMDBMovieDetail(id: number) {
-  "use server";
   const url = new URL(`3/movie/${id}`, TMDB_URL);
   url.searchParams.set("append_to_response", "credits,images,videos");
 
@@ -114,7 +114,6 @@ export async function queryTMDBTVDetail(id: string) {
 }
 
 export async function queryTMDBTVRecomendation(tvId: string, page: number) {
-  "use server";
   const id = tvId.toString();
   const url = new URL(`/3/tv/${id}/recommendations`, TMDB_URL);
   url.searchParams.set("page", page.toString());

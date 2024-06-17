@@ -1,17 +1,28 @@
 "use client";
 
+<<<<<<< HEAD
 import { markCurrentScopeAsDynamic } from "next/dist/server/app-render/dynamic-rendering";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+=======
+import Image from "next/image";
+>>>>>>> c8f9662 (broken)
 import { useContext, useEffect, useState } from "react";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
 import { type StatusWatchedType } from "~/server/db/types";
 import { type Serie } from "~/types/tmdb_detail";
 import {
+<<<<<<< HEAD
   type SeriesAndSeasonsWatched,
   type markSeriesAsCompleted,
   type removeAllSerie,
   type updateSerieData,
+=======
+  updateSerieData,
+  type SeriesAndSeasonsWatched,
+  type markSeriesAsCompleted,
+  type removeAllSerie,
+>>>>>>> c8f9662 (broken)
 } from "../../../actions";
 import { CloseContext } from "./EditSeason";
 
@@ -27,22 +38,37 @@ export function SerieForm(props: {
   serie: Serie;
   season_watched: SeriesAndSeasonsWatched | undefined;
   userId: string;
+<<<<<<< HEAD
   markCompleted: typeof markSeriesAsCompleted;
   removeAllSerie: typeof removeAllSerie;
   updateSerie: typeof updateSerieData;
+=======
+  updateSerie?: typeof updateSerieData;
+  markAsCompleted?: typeof markSeriesAsCompleted;
+  removeSerie?: typeof removeAllSerie;
+>>>>>>> c8f9662 (broken)
 }) {
   const {
     serie,
     season_watched,
     userId,
+<<<<<<< HEAD
     markCompleted,
     removeAllSerie,
     updateSerie,
+=======
+    updateSerie,
+    markAsCompleted,
+    removeSerie,
+>>>>>>> c8f9662 (broken)
   } = props;
   const { name, poster_path, number_of_episodes, number_of_seasons, seasons } =
     serie;
 
+<<<<<<< HEAD
   const router = useRouter();
+=======
+>>>>>>> c8f9662 (broken)
   const context = useContext(CloseContext);
   const serieId = serie.id.toString();
 
@@ -67,9 +93,13 @@ export function SerieForm(props: {
     }
     return result;
   });
+<<<<<<< HEAD
   const [status, setStatus] = useState<StatusWatchedType>(
     (season_watched?.serie.status as StatusWatchedType) ?? null,
   );
+=======
+  const [status, setStatus] = useState<StatusWatchedType>(null);
+>>>>>>> c8f9662 (broken)
 
   useEffect(() => {
     if (status === "PLANNING") {
@@ -80,6 +110,7 @@ export function SerieForm(props: {
   }, [status, number_of_seasons]);
 
   async function submit() {
+<<<<<<< HEAD
     if (status === "COMPLETED") {
       await markCompleted(userId, serieId, serie);
     } else if (status === "PLANNING") {
@@ -90,6 +121,10 @@ export function SerieForm(props: {
 
     context?.close();
     router.refresh();
+=======
+    console.log("submit");
+    await updateSerieData(userId, serieId, serie, seasonWatched, status);
+>>>>>>> c8f9662 (broken)
   }
 
   return (
@@ -102,7 +137,11 @@ export function SerieForm(props: {
               className="my-auto h-3/4 w-3/4 bg-secondary text-white"
               onClick={context?.close}
             >
+<<<<<<< HEAD
               x
+=======
+              X
+>>>>>>> c8f9662 (broken)
             </button>
           </div>
         </div>
@@ -201,7 +240,11 @@ export function SerieForm(props: {
 
           {/* Actions */}
           <div className="my-4 w-full space-y-2 px-4 text-white sm:mt-auto sm:space-y-0">
+<<<<<<< HEAD
             <div className="mt-4 w-full">
+=======
+            <div className="w-full">
+>>>>>>> c8f9662 (broken)
               <button onClick={submit} className="w-full bg-secondary py-2">
                 Save
               </button>
