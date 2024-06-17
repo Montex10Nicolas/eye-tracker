@@ -1,6 +1,7 @@
 import { type User } from "lucia";
 import Image from "next/image";
 import Link from "next/link";
+import { removeAllListeners } from "process";
 import {
   TMDB_IMAGE_URL,
   addZero,
@@ -15,6 +16,8 @@ import Provider from "../../_components/Providers";
 import {
   addEpisodeToSeasonWatched,
   getUserWatchedTVAndSeason,
+  markSeriesAsCompleted,
+  removeAllSerie,
   type SeriesAndSeasonsWatched,
 } from "../../actions";
 import { TVGetOrUpdateSerieData } from "./_actions/tv_actions";
@@ -89,7 +92,15 @@ async function Detail(props: { user: User | null; serie: Serie }) {
         }
         value={value}
       >
-        <SerieForm serie={serie} season_watched={season_watched} />
+        <SerieForm
+          hello={async () => {
+            "use server";
+            console.log("Hellooo");
+          }}
+          serie={serie}
+          userId={userId!}
+          season_watched={season_watched}
+        />
       </EditSeason>
     );
   }
