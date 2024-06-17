@@ -201,7 +201,7 @@ export function SerieForm(props: {
 
           {/* Actions */}
           <div className="my-4 w-full space-y-2 px-4 text-white sm:mt-auto sm:space-y-0">
-            <div className="w-full">
+            <div className="mt-4 w-full">
               <button onClick={submit} className="w-full bg-secondary py-2">
                 Save
               </button>
