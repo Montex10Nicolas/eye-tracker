@@ -35,7 +35,7 @@ function DisplayProvider(props: { provider: ProviderResult | undefined }) {
 
   if (provider === undefined)
     return (
-      <div className="text-xl text-red-400">
+      <div className="flex h-16 items-center text-xl text-red-400">
         This content is not available in this country
       </div>
     );
@@ -46,7 +46,7 @@ function DisplayProvider(props: { provider: ProviderResult | undefined }) {
   const grid_cols = `grid-cols-${final.length < 13 ? final.length : 12}`;
 
   return (
-    <div className={`grid  h-16 ${grid_cols}`}>
+    <div className={`grid h-16 place-items-center justify-center ${grid_cols}`}>
       {final.map((prov) => {
         return (
           <div key={prov.provider_id} className="flex items-center">
