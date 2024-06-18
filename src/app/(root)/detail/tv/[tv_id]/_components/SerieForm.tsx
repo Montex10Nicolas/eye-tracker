@@ -141,9 +141,9 @@ export function SerieForm(props: {
       </section>
       <section className="h-fit w-full md:flex">
         {/* IMG + VOTE */}
-        <div className="h-fit w-full sm:w-1/6 md:flex">
-          <div className="mx-4">
-            <div className="mx-auto h-[150px] w-[100px] p-2 sm:h-[200px] sm:w-[150px]">
+        <div className="my-2 flex h-full w-full flex-col border-b-4 border-primary sm:w-2/6 sm:border-b-0 sm:border-r-4 md:flex">
+          <div className="mx-4 h-full w-full">
+            <div className="mx-auto h-[150px] w-[100px] p-2 sm:h-3/4 sm:w-3/5">
               <Image
                 src={TMDB_IMAGE_URL(poster_path)}
                 alt={name}
@@ -154,21 +154,18 @@ export function SerieForm(props: {
             </div>
             <button
               onClick={remove}
-              className="hidden w-full bg-red-600 py-2 md:block"
+              className="mx-auto hidden w-3/4 bg-red-600 py-2 md:block"
             >
               Remove
             </button>
           </div>
-
-          <hr className="mb-2 mt-1 h-2 w-full bg-primary md:hidden" />
-          <hr className="mb-2 mt-1 hidden h-full w-2 bg-primary md:block" />
         </div>
 
         {/* Right side on desktop */}
-        <div className="mx-auto w-full text-black sm:w-5/6 md:mx-0">
+        <div className="mx-auto w-full text-black sm:w-4/6 md:mx-1">
           {/* Data */}
           <div className="space-y-4 md:mr-2">
-            <div className="flex flex-col justify-between md:flex-row">
+            <div className="grid grid-cols-2">
               <p className="w-full text-center md:w-1/5 md:text-start">
                 Status:
               </p>
