@@ -73,9 +73,9 @@ export function SerieForm(props: {
 
   useEffect(() => {
     if (status === "PLANNING") {
-      setSeason(new Array<boolean>(number_of_seasons).fill(false));
+      setSeason((c) => [...c.fill(false)]);
     } else if (status === "COMPLETED") {
-      setSeason(new Array<boolean>(number_of_seasons).fill(true));
+      setSeason((c) => [...c.fill(true)]);
     }
   }, [status, number_of_seasons]);
 

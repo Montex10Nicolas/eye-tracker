@@ -22,6 +22,8 @@ const StatusTypes: StatusWatchedType[] = [
   "PAUSED",
 ] as const;
 
+const today = new Date();
+
 export function SeasonForm(props: {
   serie: Serie;
   season: Season;
@@ -49,17 +51,17 @@ export function SeasonForm(props: {
     return seasonWatch?.ended as Date | undefined;
   });
 
-  const today = useMemo(() => new Date(), []);
-
   useEffect(() => {
     if (episodeWatched < 0) {
       setEpisode(0);
+      setStarted(undefined);
+      setEnded(undefined);
     } else if (episodeWatched >= episode_count) {
       setEpisode(episode_count);
       setStatus("COMPLETED");
-      setEnded(today);
+      setEnded(ended ?? today);
     }
-  }, [episodeWatched, episode_count, today]);
+  }, [episodeWatched, ended, episode_count]);
 
   useEffect(() => {
     if (status === "COMPLETED") {
@@ -116,7 +118,6 @@ export function SeasonForm(props: {
           <div className="w-full">
             <p className="">{name}</p>
             <p className="">{serie_name}</p>
-            <code>{JSON.stringify(context, null, 2)}</code>
           </div>
           <div
             onClick={context?.close}
