@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
 import { type Cast, type Credits, type Crew } from "~/types/tmdb_detail";
@@ -11,7 +10,7 @@ function RenderCrew(props: { crew: Crew[] }) {
   return (
     <>
       {crews.map((crew) => {
-        const { profile_path, name, department } = crew;
+        const { profile_path, name, department, id } = crew;
 
         return (
           <div key={crew.id} className="text-black">
