@@ -204,49 +204,20 @@ export async function myWatchedSeries(userId: string) {
     with: {
       serie: {
         with: {
-          seasons: true,
+          seasons: {
+            with: {
+              watchedBy: {
+                where: (seasonW, { eq }) => eq(seasonW.userId, userId),
+              },
+            },
+          },
         },
       },
     },
     orderBy: desc(seriesWatchedTable.updatedAt),
   });
-  const series: SeriesAndSeasonWatched[] = [];
 
-  for (const serie of results) {
-    const season_watched: seasonWatchWithSeason[] = [];
-    for (const season of serie.serie.seasons) {
-      const seasonId = season.id.toString();
-      const seasonWatchRes: seasonWatchWithSeason | undefined =
-        await db.query.seasonWatchedTable.findFirst({
-          where: (ses, { eq, and }) =>
-            and(eq(ses.userId, userId), eq(ses.seasonId, seasonId)),
-          with: {
-            season: true,
-          },
-        });
-      if (seasonWatchRes === undefined) continue;
-
-      season_watched.push(seasonWatchRes);
-    }
-
-    const serieAndSeasons: SeriesAndSeasonWatched = {
-      id: serie.id,
-      seasonCount: serie.seasonCount,
-      serieId: serie.serieId,
-      status: serie.status,
-      userId: serie.userId,
-      serie: serie.serie,
-      started: serie.started,
-      ended: serie.ended,
-      seasonsWatched: season_watched,
-      createdAt: serie.createdAt,
-      updatedAt: serie.updatedAt,
-    };
-
-    series.push(serieAndSeasons);
-  }
-
-  return series;
+  return results;
 }
 
 export async function myWatchedSeason(userId: string | undefined) {
