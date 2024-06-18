@@ -88,8 +88,14 @@ export function SerieForm(props: {
       await updateSerie(userId, serieId, serie, seasonWatched, status);
     }
 
-    context?.close();
     router.refresh();
+    context?.close();
+  }
+
+  async function remove() {
+    await removeAllSerie(userId, serieId, serie);
+    router.refresh();
+    context?.close();
   }
 
   return (
@@ -121,7 +127,10 @@ export function SerieForm(props: {
                 className="h-full w-full"
               />
             </div>
-            <button className="hidden w-full bg-red-600 py-2 md:block">
+            <button
+              onClick={remove}
+              className="hidden w-full bg-red-600 py-2 md:block"
+            >
               Remove
             </button>
           </div>
