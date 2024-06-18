@@ -82,7 +82,7 @@ async function Detail(props: { user: User | null; serie: Serie }) {
     ) : null;
   }
 
-  function AddToListButton(p: { value: boolean } = { value: false }) {
+  function AddToListButton(p: { value?: boolean } = { value: false }) {
     const { value } = p;
     return (
       <EditSeason
@@ -146,7 +146,7 @@ async function Detail(props: { user: User | null; serie: Serie }) {
             <div className="sm:hidden">
               {isLogged ? (
                 <div className="mb-3 flex justify-between">
-                  <AddToListButton value={false} />
+                  <AddToListButton />
                   <button className="mt-4 h-full w-2/5 rounded-sm bg-primary py-1 text-base">
                     stars
                   </button>
@@ -330,14 +330,9 @@ async function Seasons(props: {
       }
     }
 
-    async function test() {
-      "use server";
-      console.log("hello");
-    }
-
     return (
       <div className="flex snap-center flex-col items-center">
-        <div className="relative h-[130px] w-[90px] sm:h-[200px] sm:w-[150px]">
+        <div className="relative aspect-video w-[90px] sm:w-[150px]">
           <Image
             src={TMDB_IMAGE_URL(season_poster)}
             height={200}

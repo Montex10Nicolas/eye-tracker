@@ -30,28 +30,14 @@ async function HandleLogged() {
 }
 
 export default async function NavBar() {
-  if (1 > 0) {
-    return (
-      <section className="max-w-screen-s m sticky top-0 z-50 flex h-16 justify-between bg-secondary text-primary">
-        <div className="flex h-full items-center">
-          <Link href="/" className="mx-2 cursor-pointer">
-            <span className="my-auto text-xl font-bold">Siuwi Tracker</span>
-          </Link>
-        </div>
-        <div className="flex items-center gap-2">
-          <DisplaySearchMultiple />
-          <HandleLogged />
-        </div>
-      </section>
-    );
-  }
   return (
-    <section className="max-w-screen sticky top-0 z-40 flex h-[80px] flex-row bg-white p-2 py-4 sm:p-4">
-      <div className=""></div>
-      <div className="flex w-full  flex-row items-center justify-between text-black">
-        <Link className="cursor-pointer" href={"/"}>
-          <h1 className="text-lg font-bold sm:text-2xl">Siuwi Tracker</h1>
+    <section className="max-w-screen-s m sticky top-0 z-50 flex h-16 justify-between bg-secondary text-primary">
+      <div className="flex h-full items-center">
+        <Link href="/" className="mx-2 cursor-pointer">
+          <span className="my-auto text-2xl font-bold">Siuwi Tracker</span>
         </Link>
+      </div>
+      <div className="flex items-center gap-2">
         <DisplaySearchMultiple />
         <HandleLogged />
       </div>

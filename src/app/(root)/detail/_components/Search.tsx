@@ -41,7 +41,7 @@ export function DisplaySearchMultiple() {
         type="text"
         name="search"
         placeholder={"Search a TV Series a Movie or a Person"}
-        className="hidden appearance-none px-1 !outline-none  sm:block"
+        className="hidden appearance-none px-1 text-black  !outline-none sm:block"
         value={search}
         onChange={handleChange}
         onKeyDown={keyDown}

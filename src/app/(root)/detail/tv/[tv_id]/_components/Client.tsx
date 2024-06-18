@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { TMDB_IMAGE_URL } from "~/_utils/utils";
 import { type Cast, type Credits, type Crew } from "~/types/tmdb_detail";
@@ -14,19 +15,21 @@ function RenderCrew(props: { crew: Crew[] }) {
 
         return (
           <div key={crew.id} className="text-black">
-            <div className="h-[130px] w-[80px] sm:h-[220px] sm:w-[150px]">
-              <Image
-                className="h-full w-full"
-                src={TMDB_IMAGE_URL(profile_path ?? null)}
-                height={100}
-                width={200}
-                alt={name}
-              />
-            </div>
-            <div className="w-full text-xs sm:text-base">
-              <h3>{name}</h3>
-              <h4>{department}</h4>
-            </div>
+            <a href={`/detail/person/${id}`}>
+              <div className="h-[130px] w-[80px] sm:h-[220px] sm:w-[150px]">
+                <Image
+                  className="h-full w-full"
+                  src={TMDB_IMAGE_URL(profile_path ?? null)}
+                  height={100}
+                  width={200}
+                  alt={name}
+                />
+              </div>
+              <div className="w-full text-xs sm:text-base">
+                <h3>{name}</h3>
+                <h4>{department}</h4>
+              </div>
+            </a>
           </div>
         );
       })}
@@ -38,23 +41,25 @@ function RenderCast(props: { cast: Cast[] }) {
   return (
     <>
       {casts.map((cast) => {
-        const { profile_path, name, character } = cast;
+        const { profile_path, name, character, id } = cast;
 
         return (
           <div key={cast.id} className="text-black">
-            <div className="h-[130px] w-[80px] sm:h-[220px] sm:w-[150px]">
-              <Image
-                className="h-full w-full"
-                src={TMDB_IMAGE_URL(profile_path ?? null)}
-                height={100}
-                width={200}
-                alt={name}
-              />
-            </div>
-            <div className="w-full text-xs sm:text-base">
-              <h3>{name}</h3>
-              <h4>{character}</h4>
-            </div>
+            <a href={`/detail/person/${id}`}>
+              <div className="h-[130px] w-[80px] sm:h-[220px] sm:w-[150px]">
+                <Image
+                  className="h-full w-full"
+                  src={TMDB_IMAGE_URL(profile_path ?? null)}
+                  height={100}
+                  width={200}
+                  alt={name}
+                />
+              </div>
+              <div className="w-full text-xs sm:text-base">
+                <h3>{name}</h3>
+                <h4>{character}</h4>
+              </div>
+            </a>
           </div>
         );
       })}
