@@ -1,6 +1,5 @@
 import { and, eq, sql, type SQL } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { Noto_Sans_Tamil_Supplement } from "next/font/google";
 import "server-only";
 import {
   getOrCreateTVSeason,

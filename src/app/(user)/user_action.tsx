@@ -195,6 +195,7 @@ export type SeriesAndSeasonWatched = typeof seriesWatchedTable.$inferSelect & {
   serie: DBSerieType;
 };
 
+// Return all the season a user Watched
 export async function myWatchedSeries(userId: string) {
   "use server";
 

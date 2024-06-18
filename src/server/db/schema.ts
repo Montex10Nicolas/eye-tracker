@@ -211,11 +211,12 @@ export const seasonTable = createTable("tv-season", {
   episodeCount: integer("episode_count").notNull(),
 });
 
-export const seasonRelations = relations(seasonTable, ({ one }) => ({
+export const seasonRelations = relations(seasonTable, ({ one, many }) => ({
   series: one(seriesTable, {
     references: [seriesTable.id],
     fields: [seasonTable.seriesId],
   }),
+  watchedBy: many(seasonWatchedTable),
 }));
 
 export const seasonWatchedTable = createTable("tv-season-watched", {

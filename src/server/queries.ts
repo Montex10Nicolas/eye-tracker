@@ -87,6 +87,7 @@ export async function queryTMDBPersonDetail(id: number) {
     headers: {
       Authorization: Authorization,
     },
+    // cache: "no-cache",
   });
 
   if (response.status !== 200) {

@@ -26,7 +26,7 @@ export default function Profile(props: { logout: () => Promise<never> }) {
   return (
     <section className="z-50 flex gap-4">
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger className="overflow-hidden rounded-full bg-foreground">
           <Avatar>
             <AvatarImage src={"/github_logo.png"} />
             <AvatarFallback>CN</AvatarFallback>
