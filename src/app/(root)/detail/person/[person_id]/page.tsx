@@ -287,7 +287,7 @@ async function DisplayCreditsPerson(credits: PersonsCast[], person_id: number) {
     const myMovies = await myWatchedMovie(userId);
 
     const serieWatched = mySeries.flatMap((serie) => {
-      const arr: SeriesAndSeasonWatched[] = [];
+      const arr: typeof mySeries = [];
       for (const cred of credits) {
         if (cred.id.toString() === serie.serieId) {
           arr.push(serie);
