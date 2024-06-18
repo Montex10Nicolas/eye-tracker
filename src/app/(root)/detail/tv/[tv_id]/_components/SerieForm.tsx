@@ -1,6 +1,5 @@
 "use client";
 
-import { markCurrentScopeAsDynamic } from "next/dist/server/app-render/dynamic-rendering";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
@@ -46,7 +45,6 @@ export function SerieForm(props: {
   const context = useContext(CloseContext);
   const serieId = serie.id.toString();
 
-  let episodeWatched = 0;
   const [seasonWatched, setSeason] = useState<boolean[]>(() => {
     const result = new Array<boolean>(number_of_seasons).fill(false);
     if (season_watched === undefined) {
@@ -58,15 +56,22 @@ export function SerieForm(props: {
       if (season === undefined) continue;
       const sW = season_w.find((x) => x.seasonId === season.id.toString());
 
-      const found = sW && sW.status === "COMPLETED";
+      const found = sW;
 
       if (found) {
         result[i] = true;
-        episodeWatched += season.episode_count;
       }
     }
     return result;
   });
+
+  const episodeWatched = seasons.reduce((prev, curr, index) => {
+    if (seasonWatched[index]) {
+      return prev + curr.episode_count;
+    }
+    return prev;
+  }, 0);
+
   const [status, setStatus] = useState<StatusWatchedType>(
     (season_watched?.serie.status as StatusWatchedType) ?? null,
   );
@@ -78,6 +83,26 @@ export function SerieForm(props: {
       setSeason((c) => [...c.fill(true)]);
     }
   }, [status, number_of_seasons]);
+
+  useEffect(() => {
+    setStatus((current) => {
+      if (seasonWatched.length === 0) {
+        return current;
+      }
+      const allTrue = () => {
+        return seasonWatched.find((c) => c === false);
+      };
+      const allFalse = () => {
+        return seasonWatched.filter((c) => c).length === 0;
+      };
+
+      return allTrue() === undefined
+        ? "COMPLETED"
+        : allFalse()
+          ? "PLANNING"
+          : "WATCHING";
+    });
+  }, [seasonWatched]);
 
   async function submit() {
     if (status === "COMPLETED") {
