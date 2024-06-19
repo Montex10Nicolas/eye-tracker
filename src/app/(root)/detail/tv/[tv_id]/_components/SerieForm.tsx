@@ -70,13 +70,10 @@ export function SerieForm(props: {
 
   const episodeWatched = seasons.reduce((prev, curr, index) => {
     if (seasonWatched[index]) {
-      if (season_watched === undefined) return prev;
+      const season = seasons[index];
+      if (season === undefined) return prev;
 
-      const { seasons: season_w } = season_watched;
-      const sW = season_w[index];
-      if (sW === undefined) return prev;
-
-      return prev + sW.episodeWatched;
+      return prev + season.episode_count;
     }
     return prev;
   }, 0);
