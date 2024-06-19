@@ -507,7 +507,7 @@ export async function updateOrCreateOrDeleteSeasonWatch(
       status: status,
       episodeWatched: episodeCount,
       started: startedUTC ?? null,
-      ended: endedUTC ?? null,
+      ended: status === "COMPLETED" ? endedUTC : null,
       updatedAt: new Date(),
     })
     .where(eq(seasonWatchedTable.id, before.id))

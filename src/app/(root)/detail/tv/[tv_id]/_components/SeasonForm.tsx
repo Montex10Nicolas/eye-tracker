@@ -123,9 +123,9 @@ export function SeasonForm(props: {
     <section className="z-20 mx-auto my-32 h-fit w-11/12 bg-foreground text-black xl:w-4/5 2xl:w-3/5">
       <div className="relative">
         <div className="left-0 top-0 z-40 bg-foreground">
-          <code>
+          {/* <code>
             <pre>{JSON.stringify(seasonWatch, null, 2)}</pre>
-          </code>
+          </code> */}
         </div>
         <div className="flex justify-between text-center">
           <div className="w-full">
