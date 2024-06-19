@@ -171,7 +171,7 @@ export default async function Page(props: {
                 key={serieWatched.id}
                 className="my-4 w-full p-4 text-black"
               >
-                <TableCell className="flex items-center gap-4">
+                <TableCell className="flex gap-4">
                   <>
                     <Link
                       href={`/detail/tv/${serieId}`}
@@ -179,13 +179,7 @@ export default async function Page(props: {
                     >
                       {name}
                     </Link>
-                    <EditSeason
-                      myButton={
-                        <button className="rounded-sm border border-primary px-2">
-                          Edit
-                        </button>
-                      }
-                    >
+                    <EditSeason myButton={<button>Edit</button>}>
                       <SerieForm
                         markCompleted={markSeriesAsCompleted}
                         removeAllSerie={removeAllSerie}
