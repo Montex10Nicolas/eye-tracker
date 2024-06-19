@@ -60,7 +60,9 @@ export function SerieForm(props: {
       const found = sW;
 
       if (found) {
-        result[i] = true;
+        if ((sW.status as StatusWatchedType) === "COMPLETED") {
+          result[i] = true;
+        }
       }
     }
     return result;
@@ -68,7 +70,13 @@ export function SerieForm(props: {
 
   const episodeWatched = seasons.reduce((prev, curr, index) => {
     if (seasonWatched[index]) {
-      return prev + curr.episode_count;
+      if (season_watched === undefined) return prev;
+
+      const { seasons: season_w } = season_watched;
+      const sW = season_w[index];
+      if (sW === undefined) return prev;
+
+      return prev + sW.episodeWatched;
     }
     return prev;
   }, 0);

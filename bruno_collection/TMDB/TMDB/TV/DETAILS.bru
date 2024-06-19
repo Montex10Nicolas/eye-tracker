@@ -7,14 +7,14 @@ meta {
 get {
   url: {{baseURL}}/tv/{{seriesID}}?language=us-US
   body: none
-  auth: none
+  auth: inherit
 }
 
-query {
+params:query {
   language: us-US
   ~append_to_response: reviews,keywords
 }
 
 vars:pre-request {
-  seriesID: 3215
+  seriesID: 63333
 }

@@ -52,33 +52,41 @@ export function SeasonForm(props: {
   });
 
   useEffect(() => {
-    if (episodeWatched < 0) {
+    if (episodeWatched <= 0) {
       setEpisode(0);
+      setStatus("PLANNING");
       setStarted(undefined);
       setEnded(undefined);
     } else if (episodeWatched >= episode_count) {
       setEpisode(episode_count);
       setStatus("COMPLETED");
       setEnded(ended ?? today);
+    } else {
+      setStatus((c) =>
+        c === "PLANNING" || c === "COMPLETED" ? "WATCHING" : c,
+      );
+      setEnded(undefined);
     }
   }, [episodeWatched, ended, episode_count]);
 
   useEffect(() => {
+    console.log("[status, episode_count]");
     if (status === "COMPLETED") {
+      console.log("Status is Completed");
       setEpisode(episode_count);
     } else if (status === "PLANNING") {
+      console.log("Status is planning");
       setEpisode(0);
     }
   }, [status, episode_count]);
 
   useEffect(() => {
-    if (ended === undefined) return;
+    if (ended === undefined || ended === null) return;
     setStatus("COMPLETED");
     setEpisode(episode_count);
   }, [ended, episode_count]);
 
   const completed = status === "COMPLETED";
-
   const endMax = today;
   const startMax = ended ?? today;
   const endMin = started;
@@ -113,7 +121,12 @@ export function SeasonForm(props: {
 
   return (
     <section className="z-20 mx-auto my-32 h-fit w-11/12 bg-foreground text-black xl:w-4/5 2xl:w-3/5">
-      <div className="">
+      <div className="relative">
+        <div className="left-0 top-0 z-40 bg-foreground">
+          <code>
+            <pre>{JSON.stringify(seasonWatch, null, 2)}</pre>
+          </code>
+        </div>
         <div className="flex justify-between text-center">
           <div className="w-full">
             <p className="">{name}</p>

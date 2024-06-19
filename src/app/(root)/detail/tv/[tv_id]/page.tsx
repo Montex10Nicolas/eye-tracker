@@ -379,6 +379,7 @@ async function Seasons(props: {
                   Edit
                 </button>
               }
+              // value={season.season_number === 1}
             >
               <SeasonForm
                 userId={userId!}
@@ -412,7 +413,6 @@ async function Seasons(props: {
 
 async function Credits(props: { credits: Credits }) {
   const { credits } = props;
-
   return <ClientCredits credits={credits} />;
 }
 
