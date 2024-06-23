@@ -331,7 +331,7 @@ async function Seasons(props: {
 
     return (
       <div className="flex snap-center flex-col items-center">
-        <div className="relative aspect-video w-[90px] sm:w-[150px]">
+        <div className="relative w-[90px] sm:w-[150px]">
           <Image
             src={TMDB_IMAGE_URL(season_poster)}
             height={200}
