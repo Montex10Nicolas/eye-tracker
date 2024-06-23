@@ -46,6 +46,7 @@ export const userTableRelation = relations(userTable, ({ one }) => ({
 export const userInfoTable = createTable("user_info", {
   id: varchar("id", { length: 256 })
     .primaryKey()
+    .default("3")
     .$defaultFn(() => generateId(32)),
   userId: varchar("user_id", { length: 256 })
     .unique()
