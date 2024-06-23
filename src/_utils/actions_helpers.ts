@@ -45,7 +45,7 @@ export async function addSerieFromTMDB(serieId: string) {
 export async function getOrCreateInfo(userId: string) {
   let info: DBUserInfoType | undefined = await db.query.userInfoTable.findFirst(
     {
-      where: (user, { eq }) => eq(userInfoTable.userId, userId),
+      where: (user, { eq }) => eq(user.userId, userId),
     },
   );
 
