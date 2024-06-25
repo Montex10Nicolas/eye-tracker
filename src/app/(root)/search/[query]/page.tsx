@@ -33,7 +33,7 @@ export default async function Page(props: { params: { query: string } }) {
   const sorted = sortByPopularity(results);
 
   return (
-    <main className="flex w-screen flex-row flex-wrap bg-fuchsia-900">
+    <main className="grid min-h-screen w-screen grid-cols-2 bg-fuchsia-900 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-9 2xl:grid-cols-12">
       {sorted.map((res) => {
         const background_image_url = res.poster_path
           ? res.poster_path
@@ -46,14 +46,14 @@ export default async function Page(props: { params: { query: string } }) {
         const display =
           media_type === "movie" ? (
             <DisplayMovies result={res} background_url={background_image_url} />
-          ) : "tv" ? (
+          ) : media_type === "tv" ? (
             <DisplayTV result={res} background_url={background_image_url} />
           ) : (
             <DisplayPerson result={res} background_url={background_poster} />
           );
 
         return (
-          <div className="mx-auto h-[300px] w-[150px] sm:mx-0" key={res.id}>
+          <div className="w-[150px] sm:mx-0" key={res.id}>
             {display}
           </div>
         );
