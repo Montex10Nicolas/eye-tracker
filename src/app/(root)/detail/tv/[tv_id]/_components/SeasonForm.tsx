@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import Image from "next/image";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ export function SeasonForm(props: {
   seasonWatch: DBSeasonWatchedType | undefined;
   addEpisode: typeof addEpisodeToSeasonWatched;
 }) {
+  const [vote, setVote] = useState<number | null>(null);
   const { serie, season, userId, seasonWatch, addEpisode } = props;
   const { name, poster_path } = serie;
   const { season_number, name: serie_name, episode_count } = season;
@@ -43,7 +44,6 @@ export function SeasonForm(props: {
   const [episodeWatched, setEpisode] = useState(() => {
     return seasonWatch?.episodeWatched ?? 0;
   });
-  const [vote, setVote] = useState<number | null>(null);
   const [started, setStarted] = useState<Date | undefined>(() => {
     return seasonWatch?.started as Date | undefined;
   });
@@ -51,40 +51,11 @@ export function SeasonForm(props: {
     return seasonWatch?.ended as Date | undefined;
   });
 
-  useEffect(() => {
-    if (episodeWatched <= 0) {
-      setEpisode(0);
-      setStatus("PLANNING");
-      setStarted(undefined);
-      setEnded(undefined);
-    } else if (episodeWatched >= episode_count) {
-      setEpisode(episode_count);
-      setStatus("COMPLETED");
-      setEnded(ended ?? today);
-    } else {
-      setStatus((c) =>
-        c === "PLANNING" || c === "COMPLETED" ? "WATCHING" : c,
-      );
-      setEnded(undefined);
-    }
-  }, [episodeWatched, ended, episode_count]);
-
-  useEffect(() => {
-    console.log("[status, episode_count]");
-    if (status === "COMPLETED") {
-      console.log("Status is Completed");
-      setEpisode(episode_count);
-    } else if (status === "PLANNING") {
-      console.log("Status is planning");
-      setEpisode(0);
-    }
-  }, [status, episode_count]);
-
-  useEffect(() => {
-    if (ended === undefined || ended === null) return;
-    setStatus("COMPLETED");
-    setEpisode(episode_count);
-  }, [ended, episode_count]);
+  const episodeInputDisable =
+    status === "COMPLETED" ||
+    status === "PLANNING" ||
+    episodeWatched === 0 ||
+    episodeWatched === episode_count;
 
   const completed = status === "COMPLETED";
   const endMax = today;
@@ -187,25 +158,60 @@ export function SeasonForm(props: {
                 <h3 className="text-center">Episodes</h3>
                 <div className="flex">
                   <button
-                    className="w-2/12"
-                    onClick={() => setEpisode((c) => c - 1)}
+                    className="w-2/12 disabled:opacity-10"
+                    onClick={() => {
+                      setEpisode((prev) => {
+                        const value = prev - 1;
+                        if (prev === episode_count) {
+                          setStatus("WATCHING");
+                        }
+                        return value;
+                      });
+                    }}
+                    disabled={episodeWatched === 0}
                   >
                     <span className="text-3xl">-</span>
                   </button>
-                  <div className="flex w-8/12 bg-primary text-center">
+                  <div
+                    className={`flex w-8/12 ${episodeInputDisable ? "bg-slate-500" : "bg-primary"} text-center`}
+                  >
                     <input
                       className="h-full w-10/12 bg-inherit py-2 text-center"
                       type="number"
                       value={episodeWatched}
-                      onChange={(e) => setEpisode(parseInt(e.target.value))}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (value < 0) {
+                          return;
+                        } else if (value >= episode_count) {
+                          setStatus("COMPLETED");
+                          return setEpisode(episode_count);
+                        }
+
+                        setEpisode(value);
+                      }}
+                      disabled={episodeInputDisable}
                     />
                     <div className="grid w-2/12 place-content-center border-l-2 border-secondary">
                       <span>Tot: {episode_count}</span>
                     </div>
                   </div>
                   <button
-                    className="w-2/12 text-lg"
-                    onClick={() => setEpisode((c) => c + 1)}
+                    className="w-2/12 text-lg disabled:opacity-10"
+                    onClick={() => {
+                      setEpisode((prev) => {
+                        const value = prev + 1;
+                        setStatus((curr) => {
+                          return value === episode_count
+                            ? "COMPLETED"
+                            : curr === "PLANNING"
+                              ? "WATCHING"
+                              : curr;
+                        });
+                        return prev + 1;
+                      });
+                    }}
+                    disabled={episodeWatched === episode_count}
                   >
                     <span className="text-3xl">+</span>
                   </button>
@@ -218,9 +224,9 @@ export function SeasonForm(props: {
                 <div className="w-full px-4">
                   <select
                     value={status as string}
-                    onChange={(e) =>
-                      setStatus(e.target.value as StatusWatchedType)
-                    }
+                    onChange={(e) => {
+                      setStatus(e.target.value as StatusWatchedType);
+                    }}
                     className="w-full bg-primary py-2 text-center lowercase"
                   >
                     {StatusTypes.map((status) => (
@@ -245,7 +251,9 @@ export function SeasonForm(props: {
                 <Calendar
                   toDate={startMax}
                   selected={started}
-                  onSelect={setStarted}
+                  onSelect={(date) => {
+                    setStarted(date);
+                  }}
                   mode="single"
                 />
               </div>
@@ -259,7 +267,16 @@ export function SeasonForm(props: {
                   fromDate={endMin}
                   toDate={endMax}
                   selected={ended}
-                  onSelect={setEnded}
+                  onSelect={(date) => {
+                    setEnded(date);
+                    if (date === undefined) {
+                      setStatus("WATCHING");
+                      setEpisode(episode_count - 1);
+                      return;
+                    }
+                    setStatus("COMPLETED");
+                    setEpisode(episode_count);
+                  }}
                   mode="single"
                 />
               </div>
