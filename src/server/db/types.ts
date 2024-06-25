@@ -39,7 +39,7 @@ export type DBSerieWatchedType = typeof seriesWatchedTable.$inferSelect;
 export type DBSeasonWatchedType = typeof seasonWatchedTable.$inferSelect;
 
 export const DRIZZLE_ERROR_CODE: Record<string, string> = {
-  "23505": "A record already exist with this username",
+  "23505": "Username already in use",
   "69": "Yes this is a good juk, cause i'm funny like that",
 };
 
