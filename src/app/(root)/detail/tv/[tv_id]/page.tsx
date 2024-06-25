@@ -142,7 +142,7 @@ async function Detail(props: { user: User | null; serie: Serie }) {
             <hr className="mx-auto h-1 w-11/12 bg-primary sm:w-full " />
 
             {/* Detail on Mobile */}
-            <div className="lg:hidden">
+            <div className="sm:hidden">
               {isLogged ? (
                 <div className="mb-3 flex justify-between">
                   <AddToListButton />
