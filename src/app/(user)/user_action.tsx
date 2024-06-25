@@ -88,6 +88,11 @@ export async function signup(username: string, password: string) {
   const passwordHash = await hash(password, { ...PASSWORD_HASH_PAR });
   const userId = generateIdFromEntropySize(10);
 
+  if (1 > 0) {
+    console.log(username, password);
+    return;
+  }
+
   try {
     await db.insert(userTable).values({
       username: username,
