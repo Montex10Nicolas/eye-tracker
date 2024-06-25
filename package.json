@@ -56,11 +56,7 @@
   },
   "devDependencies": {
     "@types/eslint": "^8.56.10",
-<<<<<<< HEAD
     "@types/node": "^20.14.8",
-=======
-    "@types/node": "^20.14.6",
->>>>>>> 755b9b2 (pnpm update)
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
