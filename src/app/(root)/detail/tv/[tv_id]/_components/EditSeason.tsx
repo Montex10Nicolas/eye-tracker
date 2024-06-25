@@ -28,7 +28,7 @@ export function EditSeason(props: {
   if (!visible) {
     return (
       <>
-        <div className="w-2/5" onClick={() => setVisible(true)}>
+        <div className="w-2/5 sm:w-full" onClick={() => setVisible(true)}>
           {myButton}
         </div>
       </>
